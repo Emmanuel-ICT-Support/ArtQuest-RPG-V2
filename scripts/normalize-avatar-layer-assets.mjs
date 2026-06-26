@@ -1,0 +1,428 @@
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.resolve(__dirname, '..');
+const sourceRoot = path.join(projectRoot, 'public/images/avatar-layers/source');
+const outputRoot = path.join(projectRoot, 'public/images/avatar-layers/generated/normalized');
+const blankBasePath = path.join(outputRoot, 'base/blank.png');
+
+const TARGET_WIDTH = 1024;
+const TARGET_HEIGHT = 1536;
+const ALPHA_THRESHOLD = 10;
+
+const SKIN_LAYER_COLORS = {
+  amber: { fill: '#d97706', shadow: '#9a5a16', highlight: '#f59e0b' },
+  deep_brown: { fill: '#5f3324', shadow: '#3f241a', highlight: '#8b4a2f' },
+  fair: { fill: '#f6c99d', shadow: '#c98752', highlight: '#ffd8b2' },
+  golden: { fill: '#f2ad63', shadow: '#bf6b34', highlight: '#ffd38a' },
+  medium_brown: { fill: '#9a5a36', shadow: '#6f3824', highlight: '#c77b4a' },
+  porcelain: { fill: '#f7d7c4', shadow: '#d7a88f', highlight: '#ffe6d7' },
+  tan: { fill: '#c98752', shadow: '#855136', highlight: '#e9b07a' },
+  warm_beige: { fill: '#d9a06f', shadow: '#a8663f', highlight: '#f4c28e' },
+};
+
+const pngModuleCandidates = [
+  'pngjs',
+  '/Users/andrew.middleton/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs/lib/png.js',
+];
+
+const loadPngModule = async () => {
+  const errors = [];
+
+  for (const candidate of pngModuleCandidates) {
+    try {
+      const module = await import(candidate);
+      const PNG = module.PNG || module.default?.PNG || module.default || module['module.exports']?.PNG;
+      if (PNG) return PNG;
+    } catch (error) {
+      errors.push(`${candidate}: ${error.message}`);
+    }
+  }
+
+  throw new Error(`Could not load pngjs. Tried:\n${errors.join('\n')}`);
+};
+
+const PNG = await loadPngModule();
+
+const readDirSafe = async (dir) => {
+  try {
+    return await readdir(dir, { withFileTypes: true });
+  } catch (error) {
+    if (error.code === 'ENOENT') return [];
+    throw error;
+  }
+};
+
+const collectPngs = async (dir) => {
+  const entries = await readDirSafe(dir);
+  const files = [];
+
+  for (const entry of entries) {
+    const absolutePath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...await collectPngs(absolutePath));
+    } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.png')) {
+      files.push(absolutePath);
+    }
+  }
+
+  return files.sort((first, second) => first.localeCompare(second));
+};
+
+const getAlphaBounds = (png) => {
+  let minX = png.width;
+  let minY = png.height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let y = 0; y < png.height; y += 1) {
+    for (let x = 0; x < png.width; x += 1) {
+      const alpha = png.data[(png.width * y + x) * 4 + 3];
+      if (alpha > ALPHA_THRESHOLD) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+
+  if (maxX < minX || maxY < minY) {
+    return null;
+  }
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX + 1,
+    height: maxY - minY + 1,
+    centerX: (minX + maxX) / 2,
+    centerY: (minY + maxY) / 2,
+    bottom: maxY + 1,
+  };
+};
+
+const inferCategory = (relativePath) => {
+  const normalizedPath = relativePath.split(path.sep).join('/');
+  if (normalizedPath.startsWith('Asset.Faces/')) return 'face';
+  if (normalizedPath.startsWith('Asset.Hair/')) return 'hair';
+  if (normalizedPath.startsWith('Asset.outfit/')) return 'outfit';
+  if (normalizedPath.startsWith('asset.object/')) return 'object';
+  return 'default';
+};
+
+const containTransform = (png) => {
+  const scale = Math.min(TARGET_WIDTH / png.width, TARGET_HEIGHT / png.height);
+  return {
+    scale,
+    offsetX: Math.round((TARGET_WIDTH - png.width * scale) / 2),
+    offsetY: Math.round((TARGET_HEIGHT - png.height * scale) / 2),
+  };
+};
+
+const getHairRig = (relativePath) => {
+  const filename = path.basename(relativePath).toLowerCase();
+  const [styleName] = filename.split('.');
+
+  if (styleName === 'ponytail') {
+    return { maxWidth: 390, top: 88, centerX: 548 };
+  }
+  if (styleName === 'spikeslong') {
+    return { maxWidth: 350, top: 64, centerX: 548 };
+  }
+  if (styleName === 'curls') {
+    return { maxWidth: 360, top: 82, centerX: 548 };
+  }
+
+  return { maxWidth: 380, top: 82, centerX: 548 };
+};
+
+const getTransform = (category, png, bounds, relativePath) => {
+  if (!bounds) return containTransform(png);
+
+  if (category === 'hair') {
+    const contain = containTransform(png);
+    const hairRig = getHairRig(relativePath);
+    const scale = Math.min(contain.scale, hairRig.maxWidth / bounds.width);
+    return {
+      scale,
+      offsetX: Math.round(hairRig.centerX - bounds.centerX * scale),
+      offsetY: Math.round(hairRig.top - bounds.y * scale),
+    };
+  }
+
+  if (category === 'face') {
+    const targetFaceHeight = 330;
+    const targetFaceCenterX = 548;
+    const targetFaceCenterY = 300;
+    const scale = targetFaceHeight / bounds.height;
+    return {
+      scale,
+      offsetX: Math.round(targetFaceCenterX - bounds.centerX * scale),
+      offsetY: Math.round(targetFaceCenterY - bounds.centerY * scale),
+    };
+  }
+
+  if (category === 'outfit') {
+    const targetOutfitHeight = 1000;
+    const targetOutfitCenterX = 548;
+    const targetOutfitBottom = 1320;
+    const scale = targetOutfitHeight / bounds.height;
+    return {
+      scale,
+      offsetX: Math.round(targetOutfitCenterX - bounds.centerX * scale),
+      offsetY: Math.round(targetOutfitBottom - bounds.bottom * scale),
+    };
+  }
+
+  if (category === 'object') {
+    const aspectRatio = bounds.height / bounds.width;
+    const target = (() => {
+      if (aspectRatio > 4) {
+        return { maxWidth: 170, maxHeight: 700, centerX: 860, centerY: 760 };
+      }
+      if (aspectRatio > 2.5) {
+        return { maxWidth: 210, maxHeight: 560, centerX: 865, centerY: 700 };
+      }
+      if (aspectRatio < 1.1) {
+        return { maxWidth: 280, maxHeight: 250, centerX: 855, centerY: 650 };
+      }
+      return { maxWidth: 280, maxHeight: 430, centerX: 865, centerY: 665 };
+    })();
+    const scale = Math.min(target.maxWidth / bounds.width, target.maxHeight / bounds.height);
+    return {
+      scale,
+      offsetX: Math.round(target.centerX - bounds.centerX * scale),
+      offsetY: Math.round(target.centerY - bounds.centerY * scale),
+    };
+  }
+
+  if (png.width === TARGET_WIDTH && png.height === TARGET_HEIGHT) {
+    return { scale: 1, offsetX: 0, offsetY: 0 };
+  }
+
+  return containTransform(png);
+};
+
+const hexToRgba = (hex, alpha = 255) => {
+  const value = hex.replace('#', '');
+  return {
+    r: Number.parseInt(value.slice(0, 2), 16),
+    g: Number.parseInt(value.slice(2, 4), 16),
+    b: Number.parseInt(value.slice(4, 6), 16),
+    a: alpha,
+  };
+};
+
+const drawRect = (png, x, y, width, height, color) => {
+  const rgba = typeof color === 'string' ? hexToRgba(color) : color;
+  const startX = Math.max(0, Math.round(x));
+  const startY = Math.max(0, Math.round(y));
+  const endX = Math.min(png.width, Math.round(x + width));
+  const endY = Math.min(png.height, Math.round(y + height));
+
+  for (let py = startY; py < endY; py += 1) {
+    for (let px = startX; px < endX; px += 1) {
+      const index = (png.width * py + px) * 4;
+      png.data[index] = rgba.r;
+      png.data[index + 1] = rgba.g;
+      png.data[index + 2] = rgba.b;
+      png.data[index + 3] = rgba.a;
+    }
+  }
+};
+
+const drawOutlinedRect = (png, x, y, width, height, color) => {
+  drawRect(png, x, y, width, height, '#111827');
+  drawRect(png, x + 16, y + 16, width - 32, height - 32, color.fill);
+  drawRect(png, x + width - 42, y + 24, 20, height - 48, color.shadow);
+  drawRect(png, x + 28, y + 18, Math.max(18, width / 3), 16, color.highlight);
+};
+
+const drawNeck = (png, skinColor) => {
+  drawRect(png, 512, 430, 42, 70, skinColor.fill);
+  drawRect(png, 518, 438, 18, 14, skinColor.highlight);
+  drawRect(png, 542, 462, 8, 26, skinColor.shadow);
+  drawRect(png, 518, 492, 30, 8, skinColor.shadow);
+};
+
+const drawLowerHand = (png, skinColor) => {
+  drawRect(png, 164, 800, 76, 70, '#111827');
+  drawRect(png, 176, 810, 52, 48, skinColor.fill);
+  drawRect(png, 188, 790, 32, 24, '#111827');
+  drawRect(png, 196, 798, 18, 14, skinColor.fill);
+  drawRect(png, 184, 816, 24, 16, skinColor.highlight);
+  drawRect(png, 214, 836, 10, 18, skinColor.shadow);
+};
+
+const drawRaisedHand = (png, skinColor) => {
+  drawRect(png, 820, 588, 84, 72, '#111827');
+  drawRect(png, 832, 598, 58, 50, skinColor.fill);
+  drawRect(png, 846, 578, 28, 26, '#111827');
+  drawRect(png, 854, 586, 14, 16, skinColor.fill);
+  drawRect(png, 844, 604, 26, 16, skinColor.highlight);
+  drawRect(png, 876, 626, 10, 18, skinColor.shadow);
+};
+
+const createSkinLayer = (skinColor, layerType = 'combined') => {
+  const png = new PNG({ width: TARGET_WIDTH, height: TARGET_HEIGHT });
+
+  if (layerType === 'neck' || layerType === 'under' || layerType === 'combined') {
+    drawNeck(png, skinColor);
+  }
+  if (layerType === 'lowerHand' || layerType === 'hands' || layerType === 'combined') {
+    drawLowerHand(png, skinColor);
+  }
+  if (layerType === 'raisedHand' || layerType === 'hands' || layerType === 'combined') {
+    drawRaisedHand(png, skinColor);
+  }
+
+  return png;
+};
+
+const drawScaledNearest = (source, transform) => {
+  const output = new PNG({ width: TARGET_WIDTH, height: TARGET_HEIGHT });
+  const destStartX = Math.max(0, Math.floor(transform.offsetX));
+  const destStartY = Math.max(0, Math.floor(transform.offsetY));
+  const destEndX = Math.min(TARGET_WIDTH, Math.ceil(transform.offsetX + source.width * transform.scale));
+  const destEndY = Math.min(TARGET_HEIGHT, Math.ceil(transform.offsetY + source.height * transform.scale));
+
+  for (let y = destStartY; y < destEndY; y += 1) {
+    const sourceY = Math.floor((y - transform.offsetY) / transform.scale);
+    if (sourceY < 0 || sourceY >= source.height) continue;
+
+    for (let x = destStartX; x < destEndX; x += 1) {
+      const sourceX = Math.floor((x - transform.offsetX) / transform.scale);
+      if (sourceX < 0 || sourceX >= source.width) continue;
+
+      const sourceIndex = (source.width * sourceY + sourceX) * 4;
+      const destIndex = (TARGET_WIDTH * y + x) * 4;
+      output.data[destIndex] = source.data[sourceIndex];
+      output.data[destIndex + 1] = source.data[sourceIndex + 1];
+      output.data[destIndex + 2] = source.data[sourceIndex + 2];
+      output.data[destIndex + 3] = source.data[sourceIndex + 3];
+    }
+  }
+
+  return output;
+};
+
+const createFrontHairLayer = (hairLayer) => {
+  const frontLayer = new PNG({ width: TARGET_WIDTH, height: TARGET_HEIGHT });
+  const faceCenterX = 548;
+  const faceCenterY = 306;
+  const faceRadiusX = 174;
+  const faceRadiusY = 166;
+  const fringeBottom = 245;
+
+  for (let y = 0; y < TARGET_HEIGHT; y += 1) {
+    for (let x = 0; x < TARGET_WIDTH; x += 1) {
+      const sourceIndex = (TARGET_WIDTH * y + x) * 4;
+      const alpha = hairLayer.data[sourceIndex + 3];
+      if (alpha <= ALPHA_THRESHOLD) continue;
+
+      const normalizedX = (x - faceCenterX) / faceRadiusX;
+      const normalizedY = (y - faceCenterY) / faceRadiusY;
+      const insideFaceWindow = (normalizedX * normalizedX) + (normalizedY * normalizedY) < 1;
+      const keepAsFront = !insideFaceWindow || y < fringeBottom;
+
+      if (!keepAsFront) continue;
+
+      frontLayer.data[sourceIndex] = hairLayer.data[sourceIndex];
+      frontLayer.data[sourceIndex + 1] = hairLayer.data[sourceIndex + 1];
+      frontLayer.data[sourceIndex + 2] = hairLayer.data[sourceIndex + 2];
+      frontLayer.data[sourceIndex + 3] = alpha;
+    }
+  }
+
+  return frontLayer;
+};
+
+const normalizeAsset = async (sourcePath) => {
+  const relativePath = path.relative(sourceRoot, sourcePath);
+  const outputPath = path.join(outputRoot, relativePath);
+  const source = PNG.sync.read(await readFile(sourcePath));
+  const bounds = getAlphaBounds(source);
+  const category = inferCategory(relativePath);
+  const transform = getTransform(category, source, bounds, relativePath);
+  const output = drawScaledNearest(source, transform);
+
+  await mkdir(path.dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, PNG.sync.write(output));
+
+  if (category === 'hair') {
+    const frontOutputPath = path.join(
+      outputRoot,
+      relativePath.replace(/^Asset\.Hair/, 'Asset.Hair.front'),
+    );
+    await mkdir(path.dirname(frontOutputPath), { recursive: true });
+    await writeFile(frontOutputPath, PNG.sync.write(createFrontHairLayer(output)));
+  }
+
+  return {
+    category,
+    source: `${source.width}x${source.height}`,
+    output: `${TARGET_WIDTH}x${TARGET_HEIGHT}`,
+    relativePath: relativePath.split(path.sep).join('/'),
+    scale: Number(transform.scale.toFixed(4)),
+    offsetX: transform.offsetX,
+    offsetY: transform.offsetY,
+  };
+};
+
+const writeBlankBase = async () => {
+  const blank = new PNG({ width: TARGET_WIDTH, height: TARGET_HEIGHT });
+  await mkdir(path.dirname(blankBasePath), { recursive: true });
+  await writeFile(blankBasePath, PNG.sync.write(blank));
+};
+
+const writeSkinLayers = async () => {
+  const outputDir = path.join(outputRoot, 'Asset.skin');
+  await mkdir(outputDir, { recursive: true });
+  await mkdir(path.join(outputDir, 'under'), { recursive: true });
+  await mkdir(path.join(outputDir, 'neck'), { recursive: true });
+  await mkdir(path.join(outputDir, 'hands'), { recursive: true });
+  await mkdir(path.join(outputDir, 'lower_hand'), { recursive: true });
+  await mkdir(path.join(outputDir, 'raised_hand'), { recursive: true });
+
+  for (const [skinId, colors] of Object.entries(SKIN_LAYER_COLORS)) {
+    await writeFile(path.join(outputDir, `${skinId}.png`), PNG.sync.write(createSkinLayer(colors)));
+    await writeFile(path.join(outputDir, 'under', `${skinId}.png`), PNG.sync.write(createSkinLayer(colors, 'under')));
+    await writeFile(path.join(outputDir, 'neck', `${skinId}.png`), PNG.sync.write(createSkinLayer(colors, 'neck')));
+    await writeFile(path.join(outputDir, 'hands', `${skinId}.png`), PNG.sync.write(createSkinLayer(colors, 'hands')));
+    await writeFile(path.join(outputDir, 'lower_hand', `${skinId}.png`), PNG.sync.write(createSkinLayer(colors, 'lowerHand')));
+    await writeFile(path.join(outputDir, 'raised_hand', `${skinId}.png`), PNG.sync.write(createSkinLayer(colors, 'raisedHand')));
+  }
+};
+
+const main = async () => {
+  if (!existsSync(sourceRoot)) {
+    throw new Error(`Avatar layer source folder does not exist: ${sourceRoot}`);
+  }
+
+  const sourceFiles = await collectPngs(sourceRoot);
+  const results = [];
+
+  for (const sourcePath of sourceFiles) {
+    results.push(await normalizeAsset(sourcePath));
+  }
+
+  await writeBlankBase();
+  await writeSkinLayers();
+
+  const byCategory = results.reduce((counts, result) => ({
+    ...counts,
+    [result.category]: (counts[result.category] || 0) + 1,
+  }), {});
+
+  console.log(`Normalized ${results.length} avatar PNGs into ${path.relative(projectRoot, outputRoot)}.`);
+  console.log(JSON.stringify(byCategory, null, 2));
+};
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

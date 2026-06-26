@@ -1,0 +1,6 @@
+{
+  "name": "ArtQuest: The Gallery of Secrets",
+  "description": "A dynamic text adventure game where players explore an enchanted art gallery, solving puzzles based on art principles to escape. Uses Gemini for narrative and Imagen for visuals.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
