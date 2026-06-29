@@ -2,9 +2,8 @@
 import React, { useState, useRef } from 'react';
 import { SplashScreenProps } from '../types';
 import LoadingSpinner from './LoadingSpinner';
-import { publicAssetUrl } from '../utils/publicAssets';
 
-const START_SCREEN_BACKGROUND = publicAssetUrl('images/screens/startscreen-v2.png');
+const START_SCREEN_BACKGROUND = './public/images/screens/startscreen-v2.png';
 const SCREEN_FRAME_STYLE: React.CSSProperties = {
   width: 'min(100vw, calc(100vh * 1672 / 941))',
   height: 'min(100vh, calc(100vw * 941 / 1672))',

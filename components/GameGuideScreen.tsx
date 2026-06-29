@@ -7,7 +7,6 @@ import {
   ArtQuestSectionTitle,
   artQuestCx,
 } from './ArtQuestUI';
-import { publicAssetUrl } from '../utils/publicAssets';
 
 type GuideTabId =
   | 'quick-start'
@@ -52,7 +51,7 @@ const GUIDE_TABS: GuideTab[] = [
       'Use Load Game to continue from an exported ArtQuest save file.',
       'The lock icon opens teacher preview mode for room review.',
     ],
-    screenshotSrc: publicAssetUrl('images/screens/guide/quick-start.png'),
+    screenshotSrc: './public/images/screens/guide/quick-start.png',
     screenshotAlt: 'ArtQuest start screen showing New Game, Load Game, guide, and teacher unlock controls.',
     callouts: [
       { number: 1, label: 'Game Guide', description: 'The question mark opens this guide before a game begins.', left: '87.9%', top: '8.6%' },
@@ -72,7 +71,7 @@ const GUIDE_TABS: GuideTab[] = [
       'Use the name field to personalise the journey.',
       'Begin ArtQuest opens the gallery map with the selected profile.',
     ],
-    screenshotSrc: publicAssetUrl('images/screens/guide/artist-setup.png'),
+    screenshotSrc: './public/images/screens/guide/artist-setup.png',
     screenshotAlt: 'ArtQuest artist profile setup showing year level, avatar cards, name field, and begin button.',
     callouts: [
       { number: 1, label: 'Year or Pathway', description: 'Sets the curriculum level for prompts, feedback, and assessment.', left: '50%', top: '28%' },
@@ -92,7 +91,7 @@ const GUIDE_TABS: GuideTab[] = [
       'Press Return to enter doors and exits; press E or Return for characters and side quests.',
       'The command bar links to Guide, Journal, Inventory, Side Quests, Assessment, Save, and Menu.',
     ],
-    screenshotSrc: publicAssetUrl('images/screens/guide/map-basics.png'),
+    screenshotSrc: './public/images/screens/guide/map-basics.png',
     screenshotAlt: 'ArtQuest gallery map showing command bar, door guard, Return prompt, and status bar.',
     callouts: [
       { number: 1, label: 'Command Bar', description: 'Quick access to guide pages, save, inventory, journal, and assessment.', left: '50%', top: '6.5%' },
@@ -112,7 +111,7 @@ const GUIDE_TABS: GuideTab[] = [
       'Use the Curator dialogue for prompts, feedback, and phase changes.',
       'Use More Help in the Visual Language Guide for extra examples and sentence support.',
     ],
-    screenshotSrc: publicAssetUrl('images/screens/guide/inside-wing.png'),
+    screenshotSrc: './public/images/screens/guide/inside-wing.png',
     screenshotAlt: 'Inside an ArtQuest wing showing challenge, dialogue, artwork, vocabulary, More Help, and stats.',
     callouts: [
       { number: 1, label: 'Your Challenge', description: 'The current phase task appears in the left sidebar.', left: '13%', top: '38%' },
@@ -133,7 +132,7 @@ const GUIDE_TABS: GuideTab[] = [
       'Interpret: suggest mood, meaning, story, or symbolism using evidence.',
       'Reflect: judge how successfully the artwork communicates.',
     ],
-    screenshotSrc: publicAssetUrl('images/screens/guide/answer-phases.png'),
+    screenshotSrc: './public/images/screens/guide/answer-phases.png',
     screenshotAlt: 'ArtQuest wing screen highlighting the current phase task, question, and response box.',
     callouts: [
       { number: 1, label: 'Current Phase Task', description: 'The active See, Think, Interpret, or Reflect task appears in Your Challenge.', left: '13%', top: '52%' },
@@ -152,7 +151,7 @@ const GUIDE_TABS: GuideTab[] = [
       'Unlocked avatar items can be equipped and saved.',
       'The next reward panel shows what the player is working toward.',
     ],
-    screenshotSrc: publicAssetUrl('images/screens/guide/inventory-rewards.png'),
+    screenshotSrc: './public/images/screens/guide/inventory-rewards.png',
     screenshotAlt: 'ArtQuest inventory screen showing avatar editor, Art Energy, trait badges, and reward progress.',
     callouts: [
       { number: 1, label: 'Trait Panel', description: 'Focus, Expression, Insight, and Imagination levels show learning progress.', left: '12%', top: '34%' },
@@ -172,7 +171,7 @@ const GUIDE_TABS: GuideTab[] = [
       'Learners can add extra notes and export entries for evidence.',
       'Journal progress shows how much reflection has been collected.',
     ],
-    screenshotSrc: publicAssetUrl('images/screens/guide/journal.png'),
+    screenshotSrc: './public/images/screens/guide/journal.png',
     screenshotAlt: 'ArtQuest journal screen showing the updated book-style journal layout.',
     callouts: [
       { number: 1, label: 'Your Journal', description: 'The left panel explains what the journal is collecting during play.', left: '9%', top: '43%' },
@@ -192,7 +191,7 @@ const GUIDE_TABS: GuideTab[] = [
       'Criteria connect gameplay evidence to visual arts learning goals.',
       'Teachers can use the summary as formative evidence alongside their own judgement.',
     ],
-    screenshotSrc: publicAssetUrl('images/screens/guide/assessment.png'),
+    screenshotSrc: './public/images/screens/guide/assessment.png',
     screenshotAlt: 'ArtQuest assessment summary screen showing rubric criteria and level descriptors.',
     callouts: [
       { number: 1, label: 'Assessment Context', description: 'The top panel explains how the selected level is assessed.', left: '50%', top: '22%' },
@@ -212,7 +211,7 @@ const GUIDE_TABS: GuideTab[] = [
       'Search the gallery for clue objects linked to the current case.',
       'Solving cases awards Art Energy, trait XP, and badges.',
     ],
-    screenshotSrc: publicAssetUrl('images/screens/guide/side-quests-pip.png'),
+    screenshotSrc: './public/images/screens/guide/side-quests-pip.png',
     screenshotAlt: 'ArtQuest map showing Pip the Case Keeper and side quest access.',
     callouts: [
       { number: 1, label: 'Pip', description: 'Pip is the case keeper who introduces optional mysteries.', left: '53%', top: '65%' },
@@ -232,7 +231,7 @@ const GUIDE_TABS: GuideTab[] = [
       'Ready cases unlock a final puzzle.',
       'Rewards show exactly what the case can add to Art Energy, traits, and badges.',
     ],
-    screenshotSrc: publicAssetUrl('images/screens/guide/case-files.png'),
+    screenshotSrc: './public/images/screens/guide/case-files.png',
     screenshotAlt: 'ArtQuest case files screen showing case list, objective, clue slots, final puzzle, and rewards.',
     callouts: [
       { number: 1, label: 'Case List', description: 'Choose a mystery and see locked, new, active, or complete status.', left: '23%', top: '42%' },

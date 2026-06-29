@@ -18,7 +18,6 @@ import {
 } from '../data/AvatarRewards';
 import AvatarAssetPreview from './AvatarAssetPreview';
 import AvatarLayeredPreview from './AvatarLayeredPreview';
-import { publicAssetUrl } from '../utils/publicAssets';
 
 const AVATARS: Omit<PlayerAvatar, 'selectedYearLevel' | 'selectedCoursePathway'>[] = [
   {
@@ -80,8 +79,8 @@ const AVATARS: Omit<PlayerAvatar, 'selectedYearLevel' | 'selectedCoursePathway'>
   },
 ];
 
-const PROFILE_SCREEN_BACKGROUND = publicAssetUrl('images/screens/character-selection-screen.png');
-const AVATAR_BUILDER_BACKGROUND = publicAssetUrl('images/screens/build-avatar-screen-v2.png');
+const PROFILE_SCREEN_BACKGROUND = './public/images/screens/character-selection-screen.png';
+const AVATAR_BUILDER_BACKGROUND = './public/images/screens/build-avatar-screen-v2.png';
 const DEFAULT_CUSTOM_AVATAR_NAME = 'Pixel Creator';
 const ARTIST_SETUP_SCREEN_FRAME_STYLE: React.CSSProperties = {
   width: 'min(100vw, calc(100vh * 1672 / 941))',

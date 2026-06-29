@@ -11,7 +11,6 @@ import {
   artQuestCx,
 } from './ArtQuestUI';
 import AvatarLayeredPreview from './AvatarLayeredPreview';
-import { publicAssetUrl } from '../utils/publicAssets';
 
 type JournalPhase = 1 | 2 | 3 | 4;
 type PageTurnDirection = 'forward' | 'backward' | null;
@@ -33,16 +32,16 @@ const PHASE_RESPONSE_SUBTITLES: Record<JournalPhase, string> = {
 
 const JOURNAL_PHASES = [1, 2, 3, 4] as const;
 
-const JOURNAL_BLANK_PLATE_SRC = publicAssetUrl('images/screens/journal-blank-plate.png');
-const JOURNAL_BOOK_REST_SRC = publicAssetUrl('images/screens/journal-page-turns/book-rest.png');
+const JOURNAL_BLANK_PLATE_SRC = './public/images/screens/journal-blank-plate.png';
+const JOURNAL_BOOK_REST_SRC = './public/images/screens/journal-page-turns/book-rest.png';
 const pageTurnFramesForward = [
-  publicAssetUrl('images/screens/journal-page-turns/frame-01.png'),
-  publicAssetUrl('images/screens/journal-page-turns/frame-02.png'),
-  publicAssetUrl('images/screens/journal-page-turns/frame-03.png'),
-  publicAssetUrl('images/screens/journal-page-turns/frame-04.png'),
-  publicAssetUrl('images/screens/journal-page-turns/frame-05.png'),
-  publicAssetUrl('images/screens/journal-page-turns/frame-06.png'),
-  publicAssetUrl('images/screens/journal-page-turns/frame-07.png'),
+  './public/images/screens/journal-page-turns/frame-01.png',
+  './public/images/screens/journal-page-turns/frame-02.png',
+  './public/images/screens/journal-page-turns/frame-03.png',
+  './public/images/screens/journal-page-turns/frame-04.png',
+  './public/images/screens/journal-page-turns/frame-05.png',
+  './public/images/screens/journal-page-turns/frame-06.png',
+  './public/images/screens/journal-page-turns/frame-07.png',
 ] as const;
 const pageTurnFramesBackward = [...pageTurnFramesForward].reverse();
 const PAGE_TURN_FRAME_COUNT = pageTurnFramesForward.length;

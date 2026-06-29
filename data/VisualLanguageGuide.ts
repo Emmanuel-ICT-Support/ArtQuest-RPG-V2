@@ -1,5 +1,4 @@
 import { QuestionPhase, SeniorCoursePathway, YearLevel } from '../types';
-import { publicAssetUrl } from '../utils/publicAssets';
 
 export type VisualLanguageSectionId =
   | 'wordsForWhatYouSee'
@@ -179,7 +178,7 @@ const lineVocabulary = [
   'foreground', 'middle ground', 'background',
 ];
 
-const VISUAL_LANGUAGE_HELP_IMAGE_BASE = publicAssetUrl('images/visual-language-guide');
+const VISUAL_LANGUAGE_HELP_IMAGE_BASE = './public/images/visual-language-guide';
 
 const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
   hall_of_line: {

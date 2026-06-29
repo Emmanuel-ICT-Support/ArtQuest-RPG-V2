@@ -7,7 +7,6 @@ import {
   GENERATED_AVATAR_OUTFITS,
   GENERATED_AVATAR_SKIN_TONES,
 } from './AvatarLayerManifest.generated';
-import { isPublicImageAssetUrl, publicAssetUrl } from '../utils/publicAssets';
 
 export type RewardTraitLevel = Exclude<TraitLevel, 'Locked'>;
 
@@ -70,12 +69,12 @@ export interface AvatarRewardMilestone {
 }
 
 export const AVATAR_ARCHETYPE_SPRITES: Record<AvatarArchetypeId, string> = {
-  nova: publicAssetUrl('images/Nova.png'),
-  leo: publicAssetUrl('images/Leo.png'),
-  zia: publicAssetUrl('images/Zia.png'),
+  nova: './public/images/Nova.png',
+  leo: './public/images/Leo.png',
+  zia: './public/images/Zia.png',
 };
 
-export const AVATAR_LAYER_BLANK_BASE_IMAGE_URL = publicAssetUrl('images/avatar-layers/generated/normalized/base/blank.png');
+export const AVATAR_LAYER_BLANK_BASE_IMAGE_URL = './public/images/avatar-layers/generated/normalized/base/blank.png';
 
 export interface AvatarPngLayerSlot {
   id: AvatarAssetTabId;
@@ -147,26 +146,20 @@ const getLayerUrlForSlot = (
   slotId: AvatarAssetTabId,
   config: AvatarBuilderConfig,
 ): string | undefined => {
-  const resolveLayerUrl = (url: string | undefined): string | undefined => (
-    url ? publicAssetUrl(url) : undefined
-  );
-
   if (slotId === 'faceId') {
     const faceSkinKey = `${config.faceId}_${config.skinToneId}`;
-    return resolveLayerUrl(
-      assetSet.layers.faceId?.[faceSkinKey]
-      || assetSet.layers.faceId?.[config.faceId]
-    );
+    return assetSet.layers.faceId?.[faceSkinKey]
+      || assetSet.layers.faceId?.[config.faceId];
   }
 
-  return resolveLayerUrl(assetSet.layers[slotId]?.[config[slotId]]);
+  return assetSet.layers[slotId]?.[config[slotId]];
 };
 
 const getGeneratedSkinDetailLayerUrl = (
   skinToneId: string,
   detailLayer: 'neck' | 'hands' | 'lower_hand' | 'raised_hand',
 ): string => (
-  publicAssetUrl(`images/avatar-layers/generated/normalized/Asset.skin/${detailLayer}/${skinToneId}.png`)
+  `./public/images/avatar-layers/generated/normalized/Asset.skin/${detailLayer}/${skinToneId}.png`
 );
 
 const getFrontHairLayerUrl = (hairUrl: string | undefined): string | undefined => (
@@ -650,7 +643,7 @@ export const getRewardAvatarImageSrc = (avatar: PlayerAvatar | null): string | n
 };
 
 export const isPixelAvatarSpriteSrc = (src: string | null): boolean => (
-  isPublicImageAssetUrl(src)
+  !!src && src.startsWith('./public/images/')
 );
 
 export const getAvatarBuildSummary = (config: AvatarBuilderConfig): string => {

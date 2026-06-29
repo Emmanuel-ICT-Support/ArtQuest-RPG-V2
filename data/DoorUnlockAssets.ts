@@ -1,5 +1,3 @@
-import { publicAssetUrl } from '../utils/publicAssets';
-
 export interface DoorUnlockAssetSet {
   frames: string[];
   prompt: string;
@@ -7,8 +5,8 @@ export interface DoorUnlockAssetSet {
   frameHeight: number;
 }
 
-const DOOR_SEQUENCE_BASE = 'assets/door-sequences-normalized';
-const DOOR_PROMPT_BASE = 'assets/door-prompts';
+const DOOR_SEQUENCE_BASE = './public/assets/door-sequences-normalized';
+const DOOR_PROMPT_BASE = './public/assets/door-prompts';
 
 const createDoorAssetSet = (
   sequenceFolder: string,
@@ -17,8 +15,8 @@ const createDoorAssetSet = (
   frameWidth = 1254,
   frameHeight = 1254,
 ): DoorUnlockAssetSet => ({
-  frames: frameNames.map((frameName) => publicAssetUrl(`${DOOR_SEQUENCE_BASE}/${sequenceFolder}/${frameName}`)),
-  prompt: publicAssetUrl(`${DOOR_PROMPT_BASE}/${promptName}`),
+  frames: frameNames.map((frameName) => `${DOOR_SEQUENCE_BASE}/${sequenceFolder}/${frameName}`),
+  prompt: `${DOOR_PROMPT_BASE}/${promptName}`,
   frameWidth,
   frameHeight,
 });

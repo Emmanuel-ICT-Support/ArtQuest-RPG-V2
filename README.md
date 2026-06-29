@@ -1,38 +1,14 @@
 # ArtQuest: The Gallery of Secrets
 
-This folder contains the ArtQuest game source configured for a Vite production build that can be published to GitHub Pages.
+This folder contains the original game structure plus a standalone `index.html` entry point that runs outside Google AI Studio.
 
-## Run Locally
+## Run From HTML
 
-Install dependencies and run the Vite dev server:
+Open `index.html` directly in a modern browser. Chrome is recommended. The page loads React, Tailwind, Babel, and jsPDF from public CDNs, then runs the existing game source embedded into the HTML file.
 
-```bash
-npm install
-npm run dev
-```
+ArtQuest now runs in offline Curator mode. It does not require a Gemini API key. Curator dialogue, progress feedback, vocabulary prompts, and the level artwork selections are generated locally from the files in this folder.
 
-Build and preview the same static files that GitHub Pages will serve:
-
-```bash
-npm run build
-npm run preview
-```
-
-The published GitHub Pages path is configured in `vite.config.ts` as `/ArtQuest-RPG-V2/`.
-
-## GitHub Pages Deployment
-
-Use this repository setting:
-
-```text
-Settings > Pages > Build and deployment > Source: GitHub Actions
-```
-
-Do not use `Deploy from a branch` for this project. The workflow in `.github/workflows/deploy-pages.yml` builds the Vite app and deploys the generated `dist/` folder.
-
-ArtQuest runs in offline Curator mode. It does not require a Gemini API key. Curator dialogue, progress feedback, vocabulary prompts, and the level artwork selections are generated locally from the files in this folder.
-
-The curated artwork manifest lives in `public/images/artworks/manifest.json`, and the app's source-facing artwork map lives in `data/ArtworkSelections.ts`. The current selection uses Art Institute of Chicago API records downloaded as local JPG files in `public/images/artworks`, so the built app can display the artworks without remote image requests. Each record includes `isPublicDomain` and `copyrightNotice` metadata for audit purposes.
+The curated artwork manifest lives in `public/images/artworks/manifest.json`, and the app's source-facing artwork map lives in `data/ArtworkSelections.ts`. The current selection uses Art Institute of Chicago API records downloaded as local JPG files in `public/images/artworks`, so the standalone HTML can display the artworks without running a local server. Each record includes `isPublicDomain` and `copyrightNotice` metadata for audit purposes.
 
 To refresh the curated artwork selections, run:
 
@@ -48,6 +24,20 @@ node --use-system-ca scripts/fetch-artic-artwork-assets.mjs --dry-run --verify-i
 node --use-system-ca scripts/fetch-artic-artwork-assets.mjs --public-domain-only
 ```
 
-If you specifically want to reference AIC IIIF URLs instead of saving local JPGs, add `--hotlink-only`.
+If you specifically want to reference AIC IIIF URLs instead of saving local JPGs, add `--hotlink-only`, but direct `file://` use is more reliable with the local files.
+
+Note: this removes the AI/API requirement, but the current standalone HTML still loads React, Tailwind, Babel, and jsPDF from public CDNs. To make the app work with no internet connection at all, those browser libraries would also need to be saved locally and referenced from the folder.
+
+On macOS, double-click `Launch ArtQuest.command` to open `index.html` directly in Google Chrome. If Chrome is not installed, it will use the default browser.
+
+You can also right-click `index.html`, choose **Open With**, and select Google Chrome.
+
+## Rebuild The HTML
+
+If you edit the `.tsx` or `.ts` source files, rebuild the standalone HTML with:
+
+```bash
+node scripts/build-standalone.mjs
+```
 
 The original folder structure is maintained: components remain in `components/`, offline Curator logic remains in `services/`, scripted content remains in `data/`, and images remain in `public/images/`.
