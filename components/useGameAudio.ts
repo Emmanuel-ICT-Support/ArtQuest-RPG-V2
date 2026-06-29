@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { publicAssetUrl } from '../utils/publicAssets';
 
 export type GameMusicTrack = 'start' | 'exploration' | null;
 
@@ -6,33 +7,33 @@ type ActiveGameMusicTrack = Exclude<GameMusicTrack, null>;
 
 const MUSIC_TRACKS: Record<ActiveGameMusicTrack, { src: string; volume: number }> = {
   start: {
-    src: './public/audio/start-music.mp3',
+    src: publicAssetUrl('audio/start-music.mp3'),
     volume: 0.24,
   },
   exploration: {
-    src: './public/audio/main-game-exploration.mp3',
+    src: publicAssetUrl('audio/main-game-exploration.mp3'),
     volume: 0.2,
   },
 };
 
-const WALKING_TAP_SRC = './public/audio/footstep.m4a';
+const WALKING_TAP_SRC = publicAssetUrl('audio/footstep.m4a');
 const WALKING_TAP_VOLUME = 0.44;
-const PAGE_TURN_SRC = './public/audio/page-turn.m4a';
+const PAGE_TURN_SRC = publicAssetUrl('audio/page-turn.m4a');
 const PAGE_TURN_VOLUME = 0.92;
 const PAGE_TURN_POOL_SIZE = 3;
-const FAST_PAGE_TURN_SRC = './public/audio/fast-page-turn.m4a';
+const FAST_PAGE_TURN_SRC = publicAssetUrl('audio/fast-page-turn.m4a');
 const FAST_PAGE_TURN_VOLUME = 1;
 const FAST_PAGE_TURN_POOL_SIZE = 2;
-const PHASE_COMPLETION_SRC = './public/audio/phase-completion.wav';
+const PHASE_COMPLETION_SRC = publicAssetUrl('audio/phase-completion.wav');
 const PHASE_COMPLETION_VOLUME = 0.82;
 const PHASE_COMPLETION_POOL_SIZE = 2;
-const ROOM_COMPLETION_SRC = './public/audio/room-completion.wav';
+const ROOM_COMPLETION_SRC = publicAssetUrl('audio/room-completion.wav');
 const ROOM_COMPLETION_VOLUME = 0.88;
 const ROOM_COMPLETION_POOL_SIZE = 2;
-const UNLOCK_DOOR_SRC = './public/audio/unlock-door.m4a';
+const UNLOCK_DOOR_SRC = publicAssetUrl('audio/unlock-door.m4a');
 const UNLOCK_DOOR_VOLUME = 0.9;
 const UNLOCK_DOOR_POOL_SIZE = 2;
-const DOOR_OPENING_SRC = './public/audio/door-opening.m4a';
+const DOOR_OPENING_SRC = publicAssetUrl('audio/door-opening.m4a');
 const DOOR_OPENING_VOLUME = 0.92;
 const DOOR_OPENING_POOL_SIZE = 2;
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { AvatarAssetTabId } from '../types';
 import { AVATAR_ASSET_BOUNDS_BY_URL } from '../data/AvatarAssetBounds.generated';
+import { publicAssetLookupKey } from '../utils/publicAssets';
 
 const assetPreviewCx = (...classes: Array<string | false | null | undefined>): string => (
   classes.filter(Boolean).join(' ')
@@ -89,6 +90,7 @@ const normalizeAssetUrl = (imageUrl: string): string => {
 const getBoundsForImageUrl = (imageUrl: string): AvatarAssetBounds | null => (
   AVATAR_ASSET_BOUNDS_BY_URL[imageUrl]
     || AVATAR_ASSET_BOUNDS_BY_URL[normalizeAssetUrl(imageUrl)]
+    || AVATAR_ASSET_BOUNDS_BY_URL[publicAssetLookupKey(imageUrl)]
     || null
 );
 

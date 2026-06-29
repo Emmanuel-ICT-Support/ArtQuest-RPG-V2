@@ -16,9 +16,10 @@ import { WING_DEFINITIONS, INITIAL_WING_ID, SAVE_FILE_VERSION } from './constant
 import { initializeChat as initializeAiChat } from './services/aiService';
 import { getAvatarBuildForAvatar, getAvatarSpriteUrl, getNewlyUnlockedRewardMilestones } from './data/AvatarRewards';
 import { SIDE_QUEST_CASES_BY_ID, createInitialSideQuestState, normalizeSideQuestState } from './data/SideQuests';
+import { publicAssetUrl } from './utils/publicAssets';
 
 const TEACHER_UNLOCK_CODE = '0554';
-const TEACHER_AVATAR_IMAGE_URL = './public/images/Teacher.png';
+const TEACHER_AVATAR_IMAGE_URL = publicAssetUrl('images/Teacher.png');
 type GuideReturnTarget = 'splash' | 'map' | 'returnMenu';
 type ReturnMenuTarget = 'map' | 'game';
 

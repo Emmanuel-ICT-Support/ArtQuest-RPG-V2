@@ -1,8 +1,9 @@
 import type { SideQuestCaseDefinition, SideQuestCaseProgress, SideQuestProgressState } from '../types';
+import { publicAssetUrl } from '../utils/publicAssets';
 
-const OBJECT_ASSET_ROOT = './public/images/side-quest-assets';
+const OBJECT_ASSET_ROOT = 'images/side-quest-assets';
 
-const objectAsset = (fileName: string): string => `${OBJECT_ASSET_ROOT}/${fileName}`;
+const objectAsset = (fileName: string): string => publicAssetUrl(`${OBJECT_ASSET_ROOT}/${fileName}`);
 
 const createEmptyCaseProgress = (): SideQuestCaseProgress => ({
   status: 'notStarted',

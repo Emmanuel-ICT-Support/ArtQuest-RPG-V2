@@ -2,6 +2,7 @@ import { WING_DEFINITIONS } from '../constants';
 import { ARTWORK_SELECTIONS } from './ArtworkSelections';
 import type { ArtworkSelection } from './ArtworkSelections';
 import { YearLevel } from '../types';
+import { publicAssetUrl } from '../utils/publicAssets';
 
 export const ARTQUEST_ARTWORK_MARKER = 'ARTQUEST_ARTWORK';
 
@@ -186,7 +187,7 @@ export const getArtworkAssetPath = (wingId: string, yearLevel: YearLevel): strin
   const relativePath = ARTWORK_SELECTIONS[wingId]?.[yearLevel]?.assetPath
     || `images/artworks/${getArtworkAssetFilename(wingId, yearLevel)}`;
   if (/^https?:\/\//i.test(relativePath)) return relativePath;
-  return `./public/${relativePath.replace(/^\/+/, '')}`;
+  return publicAssetUrl(relativePath);
 };
 
 const escapeAttribute = (value: string): string => value.replace(/"/g, "'");

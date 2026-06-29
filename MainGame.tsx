@@ -12,6 +12,7 @@ import Modal from './components/Modal';
 import PostLevelSummaryModal from './components/PostLevelSummaryModal'; 
 import PlayerStatsDisplay from './components/PlayerStatsDisplay'; 
 import AvatarLayeredPreview from './components/AvatarLayeredPreview';
+import { isPublicImageAssetUrl, publicAssetUrl } from './utils/publicAssets';
 
 const RESPONSE_DEPTH_TARGETS: Record<'junior' | 'middle' | 'senior', Record<QuestionPhase, number>> = {
   junior: { 1: 12, 2: 16, 3: 18, 4: 24 },
@@ -148,10 +149,10 @@ const getAvatarImageSrc = (avatar: PlayerAvatar | null): string | null => {
 };
 
 const isMainGamePixelAvatarSpriteSrc = (src: string | null): boolean => (
-  !!src && src.startsWith('./public/images/')
+  isPublicImageAssetUrl(src)
 );
 
-const CURATOR_PORTRAIT_SRC = './public/images/npcs/gallery-guide.png';
+const CURATOR_PORTRAIT_SRC = publicAssetUrl('images/npcs/gallery-guide.png');
 const ANALYSIS_PANEL_CLASS = 'analysis-panel';
 const ANALYSIS_INNER_PANEL_CLASS = 'analysis-inner-panel';
 const ANALYSIS_TITLE_CLASS = 'analysis-section-title';

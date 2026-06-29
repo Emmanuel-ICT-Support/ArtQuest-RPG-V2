@@ -30,6 +30,7 @@ import {
   ArtQuestSectionTitle,
   artQuestCx,
 } from './ArtQuestUI';
+import { isPublicImageAssetUrl, publicAssetUrl } from '../utils/publicAssets';
 
 interface DoorPosition {
   left: string;
@@ -118,12 +119,12 @@ const STAGE_ASPECT_RATIO = STAGE_IMAGE_WIDTH / STAGE_IMAGE_HEIGHT;
 const USE_GENERATED_SCENE_ART = false;
 
 const SCENE_BACKGROUND_IMAGES = {
-  foyer: './public/images/backgrounds/foyer.png',
+  foyer: publicAssetUrl('images/backgrounds/foyer.png'),
   galleries: [
-    './public/images/backgrounds/gallery-1.png',
-    './public/images/backgrounds/gallery-2.png',
-    './public/images/backgrounds/gallery-3.png',
-    './public/images/backgrounds/gallery-4.png',
+    publicAssetUrl('images/backgrounds/gallery-1.png'),
+    publicAssetUrl('images/backgrounds/gallery-2.png'),
+    publicAssetUrl('images/backgrounds/gallery-3.png'),
+    publicAssetUrl('images/backgrounds/gallery-4.png'),
   ],
 };
 
@@ -140,9 +141,9 @@ const DOOR_GUARD_TALK_DISTANCE = 11;
 const NAVIGATION_PROMPT_DISTANCE = 13;
 const PIP_TALK_DISTANCE = 11;
 const CLUE_INTERACTION_DISTANCE = 8.5;
-const NPC_SPRITE_SRC = './public/images/npcs/gallery-guide.png';
-const DOOR_GUARD_SPRITE_SRC = './public/images/npcs/gallery-guard.png';
-const PIP_SPRITE_SRC = './public/images/npcs/pip.png';
+const NPC_SPRITE_SRC = publicAssetUrl('images/npcs/gallery-guide.png');
+const DOOR_GUARD_SPRITE_SRC = publicAssetUrl('images/npcs/gallery-guard.png');
+const PIP_SPRITE_SRC = publicAssetUrl('images/npcs/pip.png');
 const FOYER_SPAWN: Point = { x: 50, y: 68 };
 const GALLERY_SPAWN: Point = { x: 50, y: 62 };
 
@@ -724,7 +725,7 @@ const avatarImageSrc = (avatar: PlayerAvatar | null): string | null => {
 };
 
 const isMapPixelAvatarSpriteSrc = (src: string | null): boolean => (
-  !!src && src.startsWith('./public/images/')
+  isPublicImageAssetUrl(src)
 );
 
 const getWingArtPrincipleSummary = (wingDef: WingDefinition): string => {

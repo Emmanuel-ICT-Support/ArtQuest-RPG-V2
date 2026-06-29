@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { ReturnToGameScreenProps } from '../types';
 import LoadingSpinner from './LoadingSpinner';
+import { publicAssetUrl } from '../utils/publicAssets';
 
-const RETURN_MENU_BACKGROUND = './public/images/screens/return-to-game-screen.png';
+const RETURN_MENU_BACKGROUND = publicAssetUrl('images/screens/return-to-game-screen.png');
 const RETURN_MENU_FRAME_STYLE: React.CSSProperties = {
   width: 'min(100vw, calc(100vh * 1672 / 941))',
   height: 'min(100vh, calc(100vw * 941 / 1672))',
