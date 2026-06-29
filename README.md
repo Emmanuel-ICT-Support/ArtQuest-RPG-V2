@@ -20,6 +20,16 @@ npm run preview
 
 The published GitHub Pages path is configured in `vite.config.ts` as `/ArtQuest-RPG-V2/`.
 
+## GitHub Pages Deployment
+
+Use this repository setting:
+
+```text
+Settings > Pages > Build and deployment > Source: GitHub Actions
+```
+
+Do not use `Deploy from a branch` for this project. The workflow in `.github/workflows/deploy-pages.yml` builds the Vite app and deploys the generated `dist/` folder.
+
 ArtQuest runs in offline Curator mode. It does not require a Gemini API key. Curator dialogue, progress feedback, vocabulary prompts, and the level artwork selections are generated locally from the files in this folder.
 
 The curated artwork manifest lives in `public/images/artworks/manifest.json`, and the app's source-facing artwork map lives in `data/ArtworkSelections.ts`. The current selection uses Art Institute of Chicago API records downloaded as local JPG files in `public/images/artworks`, so the built app can display the artworks without remote image requests. Each record includes `isPublicDomain` and `copyrightNotice` metadata for audit purposes.
