@@ -21,6 +21,8 @@ export interface VisualLanguagePracticeLabel {
   x: number;
   y: number;
   text: string;
+  anchorX?: 'left' | 'center' | 'right';
+  anchorY?: 'top' | 'center' | 'bottom';
 }
 
 export interface VisualLanguageHelpContent {
@@ -191,11 +193,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/hall-of-line-example.png`,
     practiceImageAlt: 'Ink-style city canal scene showing different uses of line.',
     practiceLabels: [
-      { x: 25, y: 74, text: 'Curving street lines guide the eye inward' },
-      { x: 55, y: 31, text: 'Vertical lamp lines feel tall and steady' },
-      { x: 69, y: 62, text: 'Bridge and rail lines create a pathway' },
-      { x: 46, y: 17, text: 'Swirling cloud lines suggest mood' },
-      { x: 14, y: 38, text: 'Repeated building lines add detail' },
+      { x: 25, y: 86, text: 'Curving street lines guide the eye inward', anchorX: 'left', anchorY: 'bottom' },
+      { x: 55, y: 31, text: 'Vertical lamp lines feel tall and steady', anchorX: 'left', anchorY: 'top' },
+      { x: 69, y: 62, text: 'Bridge and rail lines create a pathway', anchorX: 'right', anchorY: 'top' },
+      { x: 46, y: 17, text: 'Swirling cloud lines suggest mood', anchorX: 'center', anchorY: 'top' },
+      { x: 14, y: 38, text: 'Repeated building lines add detail', anchorX: 'left', anchorY: 'center' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find one line that guides your eye?',
@@ -215,11 +217,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/realm-of-colour-example.png`,
     practiceImageAlt: 'Fantasy landscape split between warm sunset colours and cool moonlit colours.',
     practiceLabels: [
-      { x: 20, y: 55, text: 'Warm reds and oranges feel energetic' },
-      { x: 79, y: 49, text: 'Cool blues create a calmer mood' },
-      { x: 51, y: 70, text: 'Warm and cool colours meet in contrast' },
-      { x: 43, y: 42, text: 'Glowing yellow draws attention' },
-      { x: 84, y: 15, text: 'Blue moonlight changes the atmosphere' },
+      { x: 20, y: 55, text: 'Warm reds and oranges feel energetic', anchorX: 'left', anchorY: 'center' },
+      { x: 79, y: 49, text: 'Cool blues create a calmer mood', anchorX: 'right', anchorY: 'center' },
+      { x: 51, y: 70, text: 'Warm and cool colours meet in contrast', anchorX: 'center', anchorY: 'bottom' },
+      { x: 43, y: 42, text: 'Glowing yellow draws attention', anchorX: 'right', anchorY: 'top' },
+      { x: 84, y: 15, text: 'Blue moonlight changes the atmosphere', anchorX: 'right', anchorY: 'top' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find a colour area that changes the mood?',
@@ -239,11 +241,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/shape-form-forge-example.png`,
     practiceImageAlt: 'Still life of geometric solids and organic objects showing shape and form.',
     practiceLabels: [
-      { x: 26, y: 49, text: 'Sphere: round form with highlight and shadow' },
-      { x: 36, y: 35, text: 'Cube: geometric form with flat planes' },
-      { x: 50, y: 48, text: 'Cone: pointed form with volume' },
-      { x: 61, y: 32, text: 'Cylinder: curved form with an ellipse top' },
-      { x: 66, y: 70, text: 'Leaf: organic shape with irregular edges' },
+      { x: 24, y: 50, text: 'Sphere: round form with highlight and shadow', anchorX: 'left', anchorY: 'center' },
+      { x: 36, y: 34, text: 'Cube: geometric form with flat planes', anchorX: 'right', anchorY: 'bottom' },
+      { x: 50, y: 58, text: 'Cone: pointed form with volume', anchorX: 'center', anchorY: 'top' },
+      { x: 62, y: 30, text: 'Cylinder: curved form with an ellipse top', anchorX: 'left', anchorY: 'bottom' },
+      { x: 66, y: 70, text: 'Leaf: organic shape with irregular edges', anchorX: 'right', anchorY: 'top' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find a flat shape or a solid-looking form?',
@@ -263,11 +265,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/texture-tower-example.png`,
     practiceImageAlt: 'Close still life of bark, fabric, metal, fur, stone, and flowers showing texture.',
     practiceLabels: [
-      { x: 29, y: 60, text: 'Rough bark looks hard and uneven' },
-      { x: 48, y: 59, text: 'Woven fabric suggests softness' },
-      { x: 70, y: 28, text: 'Glossy metal reflects light' },
-      { x: 82, y: 68, text: 'Fur looks soft and fine' },
-      { x: 34, y: 27, text: 'Stone appears bumpy and layered' },
+      { x: 28, y: 59, text: 'Rough bark looks hard and uneven', anchorX: 'right', anchorY: 'top' },
+      { x: 49, y: 61, text: 'Woven fabric suggests softness', anchorX: 'left', anchorY: 'bottom' },
+      { x: 70, y: 28, text: 'Glossy metal reflects light', anchorX: 'left', anchorY: 'bottom' },
+      { x: 82, y: 68, text: 'Fur looks soft and fine', anchorX: 'right', anchorY: 'center' },
+      { x: 34, y: 27, text: 'Stone appears bumpy and layered', anchorX: 'right', anchorY: 'top' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find one surface that looks touchable?',
@@ -287,11 +289,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/space-chamber-example.png`,
     practiceImageAlt: 'Architectural chamber with arches, foreground objects, and deep background space.',
     practiceLabels: [
-      { x: 17, y: 66, text: 'Foreground object feels closest' },
-      { x: 50, y: 56, text: 'Arches create depth into the distance' },
-      { x: 55, y: 31, text: 'Open sky shape acts like negative space' },
-      { x: 74, y: 50, text: 'Overlapping columns separate layers' },
-      { x: 48, y: 79, text: 'Floor lines pull the eye back' },
+      { x: 17, y: 66, text: 'Foreground object feels closest', anchorX: 'left', anchorY: 'center' },
+      { x: 50, y: 56, text: 'Arches create depth into the distance', anchorX: 'left', anchorY: 'top' },
+      { x: 55, y: 31, text: 'Open sky shape acts like negative space', anchorX: 'center', anchorY: 'top' },
+      { x: 74, y: 50, text: 'Overlapping columns separate layers', anchorX: 'right', anchorY: 'center' },
+      { x: 48, y: 79, text: 'Floor lines pull the eye back', anchorX: 'center', anchorY: 'bottom' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find what feels closest and what feels farthest away?',
@@ -311,11 +313,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/value-vault-example.png`,
     practiceImageAlt: 'Monochrome treasure vault scene showing light, dark, highlights, and shadows.',
     practiceLabels: [
-      { x: 20, y: 52, text: 'Bright lantern creates the lightest value' },
-      { x: 84, y: 29, text: 'Deep shadows hide parts of the chest' },
-      { x: 46, y: 49, text: 'Highlights make the crown sparkle' },
-      { x: 55, y: 70, text: 'Mid-tones sit between light and dark' },
-      { x: 72, y: 61, text: 'Strong contrast adds drama' },
+      { x: 20, y: 52, text: 'Bright lantern creates the lightest value', anchorX: 'left', anchorY: 'center' },
+      { x: 84, y: 29, text: 'Deep shadows hide parts of the chest', anchorX: 'right', anchorY: 'top' },
+      { x: 43, y: 45, text: 'Highlights make the crown sparkle', anchorX: 'right', anchorY: 'bottom' },
+      { x: 55, y: 72, text: 'Mid-tones sit between light and dark', anchorX: 'right', anchorY: 'top' },
+      { x: 72, y: 61, text: 'Strong contrast adds drama', anchorX: 'left', anchorY: 'bottom' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find the lightest and darkest areas?',
@@ -335,11 +337,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/balance-bridge-example.png`,
     practiceImageAlt: 'Still life with large vase on one side and grouped objects on the other showing balance.',
     practiceLabels: [
-      { x: 28, y: 46, text: 'Large vase carries strong visual weight' },
-      { x: 77, y: 59, text: 'Grouped objects counterbalance the vase' },
-      { x: 50, y: 44, text: 'Open space helps the sides breathe' },
-      { x: 18, y: 75, text: 'Small fruit and cloth anchor the left side' },
-      { x: 86, y: 53, text: 'Tall candle adds vertical weight' },
+      { x: 28, y: 46, text: 'Large vase carries strong visual weight', anchorX: 'left', anchorY: 'bottom' },
+      { x: 76, y: 62, text: 'Grouped objects counterbalance the vase', anchorX: 'right', anchorY: 'top' },
+      { x: 50, y: 36, text: 'Open space helps the sides breathe', anchorX: 'center', anchorY: 'bottom' },
+      { x: 18, y: 75, text: 'Small fruit and cloth anchor the left side', anchorX: 'left', anchorY: 'bottom' },
+      { x: 88, y: 48, text: 'Tall candle adds vertical weight', anchorX: 'right', anchorY: 'bottom' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find where the visual weight feels strongest?',
@@ -359,11 +361,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/emphasis-hall-example.png`,
     practiceImageAlt: 'Dim interior with bright red flowers acting as a focal point.',
     practiceLabels: [
-      { x: 52, y: 42, text: 'Bright red flowers become the focal point' },
-      { x: 52, y: 55, text: 'Light circle spotlights the table' },
-      { x: 83, y: 34, text: 'Darker background increases contrast' },
-      { x: 22, y: 57, text: 'Muted furniture stays secondary' },
-      { x: 50, y: 68, text: 'Central placement strengthens emphasis' },
+      { x: 52, y: 40, text: 'Bright red flowers become the focal point', anchorX: 'center', anchorY: 'bottom' },
+      { x: 44, y: 57, text: 'Light circle spotlights the table', anchorX: 'right', anchorY: 'bottom' },
+      { x: 90, y: 23, text: 'Darker background increases contrast', anchorX: 'right', anchorY: 'top' },
+      { x: 21, y: 60, text: 'Muted furniture stays secondary', anchorX: 'left', anchorY: 'top' },
+      { x: 58, y: 70, text: 'Central placement strengthens emphasis', anchorX: 'left', anchorY: 'top' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find where your eye goes first?',
@@ -383,11 +385,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/unity-gallery-example.png`,
     practiceImageAlt: 'Garden scene with repeated leaves, flowers, birds, bridge, and path creating unity and variety.',
     practiceLabels: [
-      { x: 21, y: 21, text: 'Repeated hanging flowers create unity' },
-      { x: 71, y: 23, text: 'Similar leaves connect different areas' },
-      { x: 50, y: 67, text: 'Path links the whole composition' },
-      { x: 84, y: 58, text: 'Stone lantern adds variety' },
-      { x: 15, y: 82, text: 'Birds repeat but appear in different places' },
+      { x: 16, y: 21, text: 'Repeated hanging flowers create unity', anchorX: 'left', anchorY: 'top' },
+      { x: 71, y: 23, text: 'Similar leaves connect different areas', anchorX: 'right', anchorY: 'top' },
+      { x: 50, y: 67, text: 'Path links the whole composition', anchorX: 'center', anchorY: 'bottom' },
+      { x: 89, y: 58, text: 'Stone lantern adds variety', anchorX: 'right', anchorY: 'top' },
+      { x: 15, y: 82, text: 'Birds repeat but appear in different places', anchorX: 'left', anchorY: 'bottom' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find something repeated or connected across the image?',
@@ -407,11 +409,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/pattern-pavilion-example.png`,
     practiceImageAlt: 'Decorative pavilion with repeated arches, stripes, flowers, columns, and tiled floor.',
     practiceLabels: [
-      { x: 39, y: 31, text: 'Repeated arches create a steady rhythm' },
-      { x: 26, y: 30, text: 'Alternating stripes form a clear pattern' },
-      { x: 56, y: 75, text: 'Floor tiles make a visual beat' },
-      { x: 72, y: 15, text: 'Floral border repeats across the top' },
-      { x: 19, y: 57, text: 'Column motifs echo from front to back' },
+      { x: 42, y: 32, text: 'Repeated arches create a steady rhythm', anchorX: 'left', anchorY: 'top' },
+      { x: 26, y: 30, text: 'Alternating stripes form a clear pattern', anchorX: 'right', anchorY: 'bottom' },
+      { x: 56, y: 75, text: 'Floor tiles make a visual beat', anchorX: 'center', anchorY: 'bottom' },
+      { x: 72, y: 15, text: 'Floral border repeats across the top', anchorX: 'right', anchorY: 'top' },
+      { x: 19, y: 57, text: 'Column motifs echo from front to back', anchorX: 'left', anchorY: 'center' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find a repeated shape, mark, colour, or motif?',
@@ -432,11 +434,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/hall-of-movement-example.png`,
     practiceImageAlt: 'Painted dancers, birds, and sweeping marks showing visual movement.',
     practiceLabels: [
-      { x: 22, y: 42, text: 'Sweeping marks pull the eye around' },
-      { x: 70, y: 45, text: 'Extended arms create direction' },
-      { x: 43, y: 48, text: 'Repeated poses suggest action' },
-      { x: 35, y: 17, text: 'Birds add upward movement' },
-      { x: 66, y: 22, text: 'Curving strokes create flow' },
+      { x: 22, y: 42, text: 'Sweeping marks pull the eye around', anchorX: 'left', anchorY: 'center' },
+      { x: 76, y: 45, text: 'Extended arms create direction', anchorX: 'right', anchorY: 'center' },
+      { x: 43, y: 52, text: 'Repeated poses suggest action', anchorX: 'center', anchorY: 'top' },
+      { x: 35, y: 17, text: 'Birds add upward movement', anchorX: 'right', anchorY: 'top' },
+      { x: 66, y: 22, text: 'Curving strokes create flow', anchorX: 'left', anchorY: 'bottom' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find a path your eye follows?',
@@ -457,11 +459,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/final-room-example.png`,
     practiceImageAlt: 'Layered abstract composition combining colour, line, shape, form, texture, space, value, balance, and movement.',
     practiceLabels: [
-      { x: 47, y: 34, text: 'Layered shapes and forms build structure' },
-      { x: 69, y: 18, text: 'Curving lines create movement' },
-      { x: 57, y: 43, text: 'Colour contrast creates emphasis' },
-      { x: 75, y: 71, text: 'Textured surfaces add visual evidence' },
-      { x: 33, y: 59, text: 'Overlapping space links many ideas' },
+      { x: 47, y: 34, text: 'Layered shapes and forms build structure', anchorX: 'right', anchorY: 'bottom' },
+      { x: 69, y: 18, text: 'Curving lines create movement', anchorX: 'left', anchorY: 'top' },
+      { x: 58, y: 45, text: 'Colour contrast creates emphasis', anchorX: 'left', anchorY: 'top' },
+      { x: 75, y: 82, text: 'Textured surfaces add visual evidence', anchorX: 'right', anchorY: 'bottom' },
+      { x: 33, y: 59, text: 'Overlapping space links many ideas', anchorX: 'left', anchorY: 'top' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you choose two visual ideas that work together?',

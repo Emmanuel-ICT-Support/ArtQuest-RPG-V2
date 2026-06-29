@@ -306,7 +306,7 @@ const GameGuideScreen: React.FC<GameGuideScreenProps> = ({
   onReturnToMap,
   selectedAvatar,
   playerStats,
-  returnLabel = 'Back to Map',
+  returnLabel = 'Return to Map',
 }) => {
   const [activeTabId, setActiveTabId] = useState<GuideTabId>(GUIDE_TABS[0].id);
   const activeTabIndex = Math.max(0, GUIDE_TABS.findIndex(tab => tab.id === activeTabId));

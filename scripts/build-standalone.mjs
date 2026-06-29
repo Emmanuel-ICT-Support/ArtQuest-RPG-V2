@@ -907,7 +907,7 @@ const html = `<!DOCTYPE html>
       position: absolute;
       z-index: 2;
       display: inline-flex;
-      max-width: 13.5rem;
+      max-width: 11.75rem;
       align-items: center;
       gap: 0.32rem;
       transform: translate(-50%, -50%);
@@ -915,11 +915,11 @@ const html = `<!DOCTYPE html>
       border-radius: 0.375rem;
       background: rgba(4, 9, 24, 0.88);
       color: #fff4d0;
-      font-size: 0.72rem;
+      font-size: 0.66rem;
       font-weight: 900;
       line-height: 1.15;
       overflow-wrap: anywhere;
-      padding: 0.34rem 0.46rem;
+      padding: 0.3rem 0.42rem;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.42);
     }
     .analysis-guide-practice-label-dot {
@@ -1039,9 +1039,9 @@ const html = `<!DOCTYPE html>
         line-height: 1.16;
       }
       .analysis-guide-practice-label {
-        max-width: 9.75rem;
-        font-size: 0.58rem;
-        padding: 0.26rem 0.34rem;
+        max-width: 8.5rem;
+        font-size: 0.54rem;
+        padding: 0.22rem 0.3rem;
       }
     }
   </style>

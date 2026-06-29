@@ -131,7 +131,7 @@ export const ArtQuestHeader: React.FC<ArtQuestHeaderProps> = ({
   showPlayerPanel = true,
 }) => (
   <header className="mb-4 grid items-start gap-3 lg:grid-cols-[minmax(210px,0.28fr)_minmax(0,1fr)_minmax(280px,0.32fr)]">
-    <div className="flex min-h-20 items-center lg:justify-start">
+    <div className="flex min-h-20 items-center pl-7 pt-2 sm:pl-8 lg:justify-start">
       {onReturnToMap && (
         <ArtQuestReturnButton onClick={onReturnToMap}>
           {returnLabel}
@@ -154,7 +154,7 @@ export const ArtQuestHeader: React.FC<ArtQuestHeaderProps> = ({
       )}
     </div>
 
-    <div className="flex min-h-20 items-start justify-start lg:justify-end lg:pr-8 xl:pr-10 2xl:pr-12">
+    <div className="flex min-h-20 items-start justify-start pt-2 lg:justify-end lg:pr-8 xl:pr-10 2xl:pr-12">
       {showPlayerPanel && <ArtQuestPlayerPanel selectedAvatar={selectedAvatar} playerStats={playerStats} />}
     </div>
   </header>

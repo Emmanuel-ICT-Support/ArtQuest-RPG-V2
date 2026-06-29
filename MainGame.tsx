@@ -159,6 +159,12 @@ const ANALYSIS_BUTTON_CLASS = 'analysis-button analysis-button-blue';
 const ANALYSIS_PURPLE_BUTTON_CLASS = 'analysis-button analysis-button-purple';
 const CURATOR_GUIDANCE_QUESTION_PROMPT = "The Curator can only check your challenge response in this room. If you are unsure, ask your teacher for guidance, then return to the prompt and write your own response.";
 
+const getPracticeLabelTransform = (anchorX?: string, anchorY?: string): string => {
+  const x = anchorX === 'left' ? '0' : anchorX === 'right' ? '-100%' : '-50%';
+  const y = anchorY === 'top' ? '0' : anchorY === 'bottom' ? '-100%' : '-50%';
+  return `translate(${x}, ${y})`;
+};
+
 const normalizeCuratorQuestionText = (value: string): string => value
   .toLowerCase()
   .replace(/[’']/g, '')
@@ -1384,7 +1390,11 @@ const MainGameComponent: React.FC<MainGameProps> = ({
                       <span
                         key={`practice-label-${index}`}
                         className="analysis-guide-practice-label"
-                        style={{ left: `${label.x}%`, top: `${label.y}%` }}
+                        style={{
+                          left: `${label.x}%`,
+                          top: `${label.y}%`,
+                          transform: getPracticeLabelTransform(label.anchorX, label.anchorY),
+                        }}
                       >
                         <span className="analysis-guide-practice-label-dot" aria-hidden="true"></span>
                         {label.text}

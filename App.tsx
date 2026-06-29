@@ -1070,7 +1070,7 @@ export const App: React.FC = () => {
           selectedAvatar={appGameState.selectedAvatar || null}
           playerStats={appGameState.playerStats}
           onReturnToMap={handleReturnFromGuide}
-          returnLabel={guideReturnTarget === 'splash' ? 'Back to Start' : 'Back to Map'}
+          returnLabel={guideReturnTarget === 'splash' ? 'Back to Start' : 'Return to Map'}
         />
       );
       break;

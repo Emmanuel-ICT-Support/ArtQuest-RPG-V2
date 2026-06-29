@@ -158,23 +158,79 @@ const FOYER_FIXED_BLOCKING_RECTS: Rect[] = [
   { x: 0, y: 0, width: 100, height: 31 },
   { x: 0, y: 0, width: 10, height: 100 },
   { x: 90, y: 0, width: 10, height: 100 },
-  { x: 30, y: 23, width: 7, height: 20 },
-  { x: 68, y: 23, width: 7, height: 20 },
-  { x: 29, y: 46, width: 4, height: 10 },
-  { x: 70, y: 46, width: 4, height: 10 },
+  { x: 30.6, y: 31.6, width: 5.8, height: 10.5 },
+  { x: 68.1, y: 31.6, width: 5.8, height: 10.5 },
+  { x: 30.2, y: 49.5, width: 1.8, height: 5.6 },
+  { x: 70.3, y: 49.5, width: 1.8, height: 5.6 },
   { x: 17, y: 83, width: 25, height: 14 },
   { x: 61, y: 83, width: 25, height: 14 },
 ];
 
-const GALLERY_FIXED_BLOCKING_RECTS: Rect[] = [
+const GALLERY_BOUNDARY_BLOCKING_RECTS: Rect[] = [
   { x: 0, y: 0, width: 100, height: 32 },
   { x: 0, y: 0, width: 6, height: 100 },
   { x: 94, y: 0, width: 6, height: 100 },
-  { x: 31, y: 31, width: 6, height: 19 },
-  { x: 63, y: 31, width: 6, height: 19 },
-  { x: 28.5, y: 45, width: 4, height: 10 },
-  { x: 70, y: 45, width: 4, height: 10 },
-  { x: 44, y: 82, width: 14, height: 10 },
+];
+
+// Collision uses the avatar's feet, so these boxes track floor footprints rather than full prop artwork.
+const GALLERY_FIXED_BLOCKING_RECTS_BY_INDEX: Rect[][] = [
+  [
+    { x: 34.2, y: 34.8, width: 3.8, height: 10.2 },
+    { x: 61.7, y: 34.8, width: 3.8, height: 10.2 },
+    { x: 32.3, y: 48, width: 1.7, height: 4.8 },
+    { x: 66.2, y: 48, width: 1.7, height: 4.8 },
+    { x: 44.3, y: 81, width: 11.5, height: 7.5 },
+  ],
+  [
+    { x: 34.5, y: 32.4, width: 4, height: 12.6 },
+    { x: 63.7, y: 32.4, width: 4, height: 12.6 },
+    { x: 31.1, y: 41.1, width: 2.1, height: 4.5 },
+    { x: 67.7, y: 41.1, width: 2.1, height: 4.5 },
+    { x: 43.7, y: 78.8, width: 12.6, height: 9.2 },
+  ],
+  [
+    { x: 34, y: 34.5, width: 3.5, height: 8.5 },
+    { x: 62.4, y: 34.5, width: 3.5, height: 8.5 },
+    { x: 31.2, y: 38.6, width: 2.1, height: 4.4 },
+    { x: 41.2, y: 38.3, width: 1.8, height: 4.3 },
+    { x: 57.8, y: 38.3, width: 1.8, height: 4.3 },
+    { x: 67.1, y: 38.6, width: 2.1, height: 4.4 },
+    { x: 43.4, y: 79.6, width: 13.2, height: 8.8 },
+  ],
+  [
+    { x: 35.7, y: 35.3, width: 3.6, height: 7.8 },
+    { x: 61.6, y: 35.3, width: 3.6, height: 7.8 },
+    { x: 34.3, y: 38.7, width: 2.2, height: 4.6 },
+    { x: 64.8, y: 38.7, width: 2.2, height: 4.6 },
+    { x: 42.6, y: 77.2, width: 14.8, height: 10.8 },
+  ],
+];
+
+// The right-side gallery doorway is an interaction target, but its wall/frame should stay solid.
+// These blockers start to the right of the nearby torches so the main walking lane remains open.
+const GALLERY_SIDE_DOOR_BLOCKING_RECTS_BY_INDEX: Rect[][] = [
+  [
+    { x: 76.8, y: 40.5, width: 17.2, height: 7 },
+    { x: 78.8, y: 47, width: 15.2, height: 30.5 },
+  ],
+  [
+    { x: 78, y: 39.2, width: 16, height: 7.5 },
+    { x: 78.8, y: 46.7, width: 15.2, height: 31.5 },
+  ],
+  [
+    { x: 76.5, y: 40.8, width: 17.5, height: 7.2 },
+    { x: 78.8, y: 48, width: 15.2, height: 30 },
+  ],
+  [
+    { x: 77.4, y: 40.8, width: 16.6, height: 7.2 },
+    { x: 78.8, y: 48, width: 15.2, height: 30 },
+  ],
+];
+
+const getGalleryFixedBlockingRects = (galleryIndex: number): Rect[] => [
+  ...GALLERY_BOUNDARY_BLOCKING_RECTS,
+  ...(GALLERY_FIXED_BLOCKING_RECTS_BY_INDEX[galleryIndex] || GALLERY_FIXED_BLOCKING_RECTS_BY_INDEX[0]),
+  ...(GALLERY_SIDE_DOOR_BLOCKING_RECTS_BY_INDEX[galleryIndex] || GALLERY_SIDE_DOOR_BLOCKING_RECTS_BY_INDEX[0]),
 ];
 
 const NPC_DEFINITIONS: NPCDefinition[] = [
@@ -1727,15 +1783,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           })
       : [];
 
-    const nextGallery = activeGallery ? galleryGroups[activeGallery.index + 1] : null;
-    const nextGalleryBlocks = activeGallery && (!nextGallery || !isGalleryComplete(activeGallery.index))
-      ? [{ x: 80, y: 47, width: 14, height: 30 }]
-      : [];
-
     return [
-      ...GALLERY_FIXED_BLOCKING_RECTS,
+      ...getGalleryFixedBlockingRects(activeGallery?.index || 0),
       ...blockedDoors,
-      ...nextGalleryBlocks,
     ];
   };
 

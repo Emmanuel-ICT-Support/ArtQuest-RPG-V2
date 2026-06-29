@@ -476,7 +476,7 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
         @media (max-height: 700px) {
           .assessment-v3-root { padding: 8px; }
           .assessment-v3-header { grid-template-columns: 170px minmax(0, 1fr) 220px; gap: 8px; }
-          .assessment-v3-return-wrap { padding-top: 8px; }
+          .assessment-v3-return-wrap { padding-top: 24px; padding-left: 36px; }
           .assessment-v3-return-wrap button { min-height: 32px; padding: 4px 16px; font-size: 12px; }
           .assessment-v3-title { font-size: 30px; }
           .assessment-v3-understand { margin-top: 2px; max-width: 620px; padding: 4px 8px; }
@@ -490,7 +490,7 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
           .assessment-v3-table td { padding: 3px 6px; font-size: 8px; line-height: 1.05; }
           .assessment-v3-criteria-icon { width: 24px; height: 24px; font-size: 14px; }
           .assessment-v3-criteria-name { font-size: 8px; }
-          .assessment-v3-feedback-strip { padding: 2px; }
+          .assessment-v3-feedback-strip { margin-right: 32px; margin-bottom: 24px; margin-left: 32px; padding: 2px; }
           .assessment-v3-feedback-title { font-size: 12px; }
           .assessment-v3-feedback-subtitle { display: none; }
           .assessment-v3-wing-button { min-height: 24px; padding: 1px 3px; font-size: 7px; }
@@ -536,7 +536,7 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
 
       <div className="relative z-10 flex h-full min-h-0 flex-col gap-2">
         <header className="assessment-v3-header grid shrink-0 grid-cols-[200px_minmax(0,1fr)_260px] items-start gap-3 max-[700px]:grid-cols-[170px_minmax(0,1fr)_220px] max-[700px]:gap-2">
-          <div className="assessment-v3-return-wrap pt-4 max-[700px]:pt-2">
+          <div className="assessment-v3-return-wrap pl-12 pt-9 max-[700px]:pl-9 max-[700px]:pt-6">
             <ArtQuestReturnButton onClick={onReturnToMap} className="min-h-10 px-6 py-1.5 text-sm max-[700px]:min-h-8 max-[700px]:px-4 max-[700px]:py-1 max-[700px]:text-xs">
               Return to Map
             </ArtQuestReturnButton>
@@ -667,7 +667,7 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
             </div>
           </section>
 
-          <section className="assessment-v3-feedback-strip shrink-0 rounded-md border border-[#a66c2b]/80 bg-[#061125]/88 p-1.5 shadow-[inset_0_0_0_1px_rgba(255,236,176,0.08),inset_0_0_34px_rgba(105,46,150,0.12),0_10px_24px_rgba(0,0,0,0.34)] max-[700px]:p-0.5">
+          <section className="assessment-v3-feedback-strip mx-12 mb-8 shrink-0 rounded-md border border-[#a66c2b]/80 bg-[#061125]/88 p-1.5 shadow-[inset_0_0_0_1px_rgba(255,236,176,0.08),inset_0_0_34px_rgba(105,46,150,0.12),0_10px_24px_rgba(0,0,0,0.34)] max-[700px]:mx-8 max-[700px]:mb-6 max-[700px]:p-0.5">
             <div className="mb-0.5 text-center max-[700px]:mb-0">
               <div className="flex items-center justify-center gap-2">
                 <span className="h-2 w-2 rotate-45 border border-[#ffd978] bg-[#772aa8] shadow-[0_0_8px_rgba(217,70,239,0.5)]" aria-hidden="true" />

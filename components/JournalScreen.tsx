@@ -6,6 +6,7 @@ import { getAssessmentDisplayLabel } from '../data/SCSACurriculum';
 import {
   ArtQuestButton,
   ArtQuestPage,
+  ArtQuestReturnButton,
   ArtQuestSectionTitle,
   artQuestCx,
 } from './ArtQuestUI';
@@ -1759,14 +1760,22 @@ const JOURNAL_BOOK_STYLES = `
   z-index: 30;
   width: 16.5%;
   height: 6.9%;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
+  box-sizing: border-box;
+  min-height: 0;
+  padding: 0 1.35%;
+  font-size: clamp(0.58rem, 0.95vw, 1rem);
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .journal-plate-return:focus-visible {
   outline: 2px solid rgba(255, 231, 167, 0.92);
   outline-offset: 3px;
+}
+
+.journal-plate-return span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .journal-live-avatar-panel,
@@ -1973,15 +1982,6 @@ const JOURNAL_BOOK_STYLES = `
   font-weight: 900;
   line-height: 1.08;
   text-transform: uppercase;
-}
-
-.journal-visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
 }
 
 .journal-book-layout {
@@ -2984,14 +2984,13 @@ const JournalScreen: React.FC<JournalScreenProps> = ({
         footerText=""
       >
         <div className="journal-book-layout">
-          <button
-            type="button"
+          <ArtQuestReturnButton
             className="journal-plate-return"
             onClick={onReturnToMap}
             aria-label="Return to map"
           >
-            <span className="journal-visually-hidden">Return to Map</span>
-          </button>
+            Return to Map
+          </ArtQuestReturnButton>
 
           <aside className="journal-live-avatar-panel" aria-label="Player profile and XP">
             <div className="journal-live-avatar-portrait" aria-hidden="true">

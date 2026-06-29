@@ -823,7 +823,7 @@
       position: absolute;
       z-index: 2;
       display: inline-flex;
-      max-width: 13.5rem;
+      max-width: 11.75rem;
       align-items: center;
       gap: 0.32rem;
       transform: translate(-50%, -50%);
@@ -831,11 +831,11 @@
       border-radius: 0.375rem;
       background: rgba(4, 9, 24, 0.88);
       color: #fff4d0;
-      font-size: 0.72rem;
+      font-size: 0.66rem;
       font-weight: 900;
       line-height: 1.15;
       overflow-wrap: anywhere;
-      padding: 0.34rem 0.46rem;
+      padding: 0.3rem 0.42rem;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.42);
     }
     .analysis-guide-practice-label-dot {
@@ -955,9 +955,9 @@
         line-height: 1.16;
       }
       .analysis-guide-practice-label {
-        max-width: 9.75rem;
-        font-size: 0.58rem;
-        padding: 0.26rem 0.34rem;
+        max-width: 8.5rem;
+        font-size: 0.54rem;
+        padding: 0.22rem 0.3rem;
       }
     }
   </style>
@@ -8693,6 +8693,8 @@ interface VisualLanguagePracticeLabel {
   x: number;
   y: number;
   text: string;
+  anchorX?: 'left' | 'center' | 'right';
+  anchorY?: 'top' | 'center' | 'bottom';
 }
 
 interface VisualLanguageHelpContent {
@@ -8863,11 +8865,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/hall-of-line-example.png`,
     practiceImageAlt: 'Ink-style city canal scene showing different uses of line.',
     practiceLabels: [
-      { x: 25, y: 74, text: 'Curving street lines guide the eye inward' },
-      { x: 55, y: 31, text: 'Vertical lamp lines feel tall and steady' },
-      { x: 69, y: 62, text: 'Bridge and rail lines create a pathway' },
-      { x: 46, y: 17, text: 'Swirling cloud lines suggest mood' },
-      { x: 14, y: 38, text: 'Repeated building lines add detail' },
+      { x: 25, y: 86, text: 'Curving street lines guide the eye inward', anchorX: 'left', anchorY: 'bottom' },
+      { x: 55, y: 31, text: 'Vertical lamp lines feel tall and steady', anchorX: 'left', anchorY: 'top' },
+      { x: 69, y: 62, text: 'Bridge and rail lines create a pathway', anchorX: 'right', anchorY: 'top' },
+      { x: 46, y: 17, text: 'Swirling cloud lines suggest mood', anchorX: 'center', anchorY: 'top' },
+      { x: 14, y: 38, text: 'Repeated building lines add detail', anchorX: 'left', anchorY: 'center' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find one line that guides your eye?',
@@ -8887,11 +8889,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/realm-of-colour-example.png`,
     practiceImageAlt: 'Fantasy landscape split between warm sunset colours and cool moonlit colours.',
     practiceLabels: [
-      { x: 20, y: 55, text: 'Warm reds and oranges feel energetic' },
-      { x: 79, y: 49, text: 'Cool blues create a calmer mood' },
-      { x: 51, y: 70, text: 'Warm and cool colours meet in contrast' },
-      { x: 43, y: 42, text: 'Glowing yellow draws attention' },
-      { x: 84, y: 15, text: 'Blue moonlight changes the atmosphere' },
+      { x: 20, y: 55, text: 'Warm reds and oranges feel energetic', anchorX: 'left', anchorY: 'center' },
+      { x: 79, y: 49, text: 'Cool blues create a calmer mood', anchorX: 'right', anchorY: 'center' },
+      { x: 51, y: 70, text: 'Warm and cool colours meet in contrast', anchorX: 'center', anchorY: 'bottom' },
+      { x: 43, y: 42, text: 'Glowing yellow draws attention', anchorX: 'right', anchorY: 'top' },
+      { x: 84, y: 15, text: 'Blue moonlight changes the atmosphere', anchorX: 'right', anchorY: 'top' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find a colour area that changes the mood?',
@@ -8911,11 +8913,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/shape-form-forge-example.png`,
     practiceImageAlt: 'Still life of geometric solids and organic objects showing shape and form.',
     practiceLabels: [
-      { x: 26, y: 49, text: 'Sphere: round form with highlight and shadow' },
-      { x: 36, y: 35, text: 'Cube: geometric form with flat planes' },
-      { x: 50, y: 48, text: 'Cone: pointed form with volume' },
-      { x: 61, y: 32, text: 'Cylinder: curved form with an ellipse top' },
-      { x: 66, y: 70, text: 'Leaf: organic shape with irregular edges' },
+      { x: 24, y: 50, text: 'Sphere: round form with highlight and shadow', anchorX: 'left', anchorY: 'center' },
+      { x: 36, y: 34, text: 'Cube: geometric form with flat planes', anchorX: 'right', anchorY: 'bottom' },
+      { x: 50, y: 58, text: 'Cone: pointed form with volume', anchorX: 'center', anchorY: 'top' },
+      { x: 62, y: 30, text: 'Cylinder: curved form with an ellipse top', anchorX: 'left', anchorY: 'bottom' },
+      { x: 66, y: 70, text: 'Leaf: organic shape with irregular edges', anchorX: 'right', anchorY: 'top' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find a flat shape or a solid-looking form?',
@@ -8935,11 +8937,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/texture-tower-example.png`,
     practiceImageAlt: 'Close still life of bark, fabric, metal, fur, stone, and flowers showing texture.',
     practiceLabels: [
-      { x: 29, y: 60, text: 'Rough bark looks hard and uneven' },
-      { x: 48, y: 59, text: 'Woven fabric suggests softness' },
-      { x: 70, y: 28, text: 'Glossy metal reflects light' },
-      { x: 82, y: 68, text: 'Fur looks soft and fine' },
-      { x: 34, y: 27, text: 'Stone appears bumpy and layered' },
+      { x: 28, y: 59, text: 'Rough bark looks hard and uneven', anchorX: 'right', anchorY: 'top' },
+      { x: 49, y: 61, text: 'Woven fabric suggests softness', anchorX: 'left', anchorY: 'bottom' },
+      { x: 70, y: 28, text: 'Glossy metal reflects light', anchorX: 'left', anchorY: 'bottom' },
+      { x: 82, y: 68, text: 'Fur looks soft and fine', anchorX: 'right', anchorY: 'center' },
+      { x: 34, y: 27, text: 'Stone appears bumpy and layered', anchorX: 'right', anchorY: 'top' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find one surface that looks touchable?',
@@ -8959,11 +8961,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/space-chamber-example.png`,
     practiceImageAlt: 'Architectural chamber with arches, foreground objects, and deep background space.',
     practiceLabels: [
-      { x: 17, y: 66, text: 'Foreground object feels closest' },
-      { x: 50, y: 56, text: 'Arches create depth into the distance' },
-      { x: 55, y: 31, text: 'Open sky shape acts like negative space' },
-      { x: 74, y: 50, text: 'Overlapping columns separate layers' },
-      { x: 48, y: 79, text: 'Floor lines pull the eye back' },
+      { x: 17, y: 66, text: 'Foreground object feels closest', anchorX: 'left', anchorY: 'center' },
+      { x: 50, y: 56, text: 'Arches create depth into the distance', anchorX: 'left', anchorY: 'top' },
+      { x: 55, y: 31, text: 'Open sky shape acts like negative space', anchorX: 'center', anchorY: 'top' },
+      { x: 74, y: 50, text: 'Overlapping columns separate layers', anchorX: 'right', anchorY: 'center' },
+      { x: 48, y: 79, text: 'Floor lines pull the eye back', anchorX: 'center', anchorY: 'bottom' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find what feels closest and what feels farthest away?',
@@ -8983,11 +8985,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/value-vault-example.png`,
     practiceImageAlt: 'Monochrome treasure vault scene showing light, dark, highlights, and shadows.',
     practiceLabels: [
-      { x: 20, y: 52, text: 'Bright lantern creates the lightest value' },
-      { x: 84, y: 29, text: 'Deep shadows hide parts of the chest' },
-      { x: 46, y: 49, text: 'Highlights make the crown sparkle' },
-      { x: 55, y: 70, text: 'Mid-tones sit between light and dark' },
-      { x: 72, y: 61, text: 'Strong contrast adds drama' },
+      { x: 20, y: 52, text: 'Bright lantern creates the lightest value', anchorX: 'left', anchorY: 'center' },
+      { x: 84, y: 29, text: 'Deep shadows hide parts of the chest', anchorX: 'right', anchorY: 'top' },
+      { x: 43, y: 45, text: 'Highlights make the crown sparkle', anchorX: 'right', anchorY: 'bottom' },
+      { x: 55, y: 72, text: 'Mid-tones sit between light and dark', anchorX: 'right', anchorY: 'top' },
+      { x: 72, y: 61, text: 'Strong contrast adds drama', anchorX: 'left', anchorY: 'bottom' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find the lightest and darkest areas?',
@@ -9007,11 +9009,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/balance-bridge-example.png`,
     practiceImageAlt: 'Still life with large vase on one side and grouped objects on the other showing balance.',
     practiceLabels: [
-      { x: 28, y: 46, text: 'Large vase carries strong visual weight' },
-      { x: 77, y: 59, text: 'Grouped objects counterbalance the vase' },
-      { x: 50, y: 44, text: 'Open space helps the sides breathe' },
-      { x: 18, y: 75, text: 'Small fruit and cloth anchor the left side' },
-      { x: 86, y: 53, text: 'Tall candle adds vertical weight' },
+      { x: 28, y: 46, text: 'Large vase carries strong visual weight', anchorX: 'left', anchorY: 'bottom' },
+      { x: 76, y: 62, text: 'Grouped objects counterbalance the vase', anchorX: 'right', anchorY: 'top' },
+      { x: 50, y: 36, text: 'Open space helps the sides breathe', anchorX: 'center', anchorY: 'bottom' },
+      { x: 18, y: 75, text: 'Small fruit and cloth anchor the left side', anchorX: 'left', anchorY: 'bottom' },
+      { x: 88, y: 48, text: 'Tall candle adds vertical weight', anchorX: 'right', anchorY: 'bottom' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find where the visual weight feels strongest?',
@@ -9031,11 +9033,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/emphasis-hall-example.png`,
     practiceImageAlt: 'Dim interior with bright red flowers acting as a focal point.',
     practiceLabels: [
-      { x: 52, y: 42, text: 'Bright red flowers become the focal point' },
-      { x: 52, y: 55, text: 'Light circle spotlights the table' },
-      { x: 83, y: 34, text: 'Darker background increases contrast' },
-      { x: 22, y: 57, text: 'Muted furniture stays secondary' },
-      { x: 50, y: 68, text: 'Central placement strengthens emphasis' },
+      { x: 52, y: 40, text: 'Bright red flowers become the focal point', anchorX: 'center', anchorY: 'bottom' },
+      { x: 44, y: 57, text: 'Light circle spotlights the table', anchorX: 'right', anchorY: 'bottom' },
+      { x: 90, y: 23, text: 'Darker background increases contrast', anchorX: 'right', anchorY: 'top' },
+      { x: 21, y: 60, text: 'Muted furniture stays secondary', anchorX: 'left', anchorY: 'top' },
+      { x: 58, y: 70, text: 'Central placement strengthens emphasis', anchorX: 'left', anchorY: 'top' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find where your eye goes first?',
@@ -9055,11 +9057,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/unity-gallery-example.png`,
     practiceImageAlt: 'Garden scene with repeated leaves, flowers, birds, bridge, and path creating unity and variety.',
     practiceLabels: [
-      { x: 21, y: 21, text: 'Repeated hanging flowers create unity' },
-      { x: 71, y: 23, text: 'Similar leaves connect different areas' },
-      { x: 50, y: 67, text: 'Path links the whole composition' },
-      { x: 84, y: 58, text: 'Stone lantern adds variety' },
-      { x: 15, y: 82, text: 'Birds repeat but appear in different places' },
+      { x: 16, y: 21, text: 'Repeated hanging flowers create unity', anchorX: 'left', anchorY: 'top' },
+      { x: 71, y: 23, text: 'Similar leaves connect different areas', anchorX: 'right', anchorY: 'top' },
+      { x: 50, y: 67, text: 'Path links the whole composition', anchorX: 'center', anchorY: 'bottom' },
+      { x: 89, y: 58, text: 'Stone lantern adds variety', anchorX: 'right', anchorY: 'top' },
+      { x: 15, y: 82, text: 'Birds repeat but appear in different places', anchorX: 'left', anchorY: 'bottom' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find something repeated or connected across the image?',
@@ -9079,11 +9081,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/pattern-pavilion-example.png`,
     practiceImageAlt: 'Decorative pavilion with repeated arches, stripes, flowers, columns, and tiled floor.',
     practiceLabels: [
-      { x: 39, y: 31, text: 'Repeated arches create a steady rhythm' },
-      { x: 26, y: 30, text: 'Alternating stripes form a clear pattern' },
-      { x: 56, y: 75, text: 'Floor tiles make a visual beat' },
-      { x: 72, y: 15, text: 'Floral border repeats across the top' },
-      { x: 19, y: 57, text: 'Column motifs echo from front to back' },
+      { x: 42, y: 32, text: 'Repeated arches create a steady rhythm', anchorX: 'left', anchorY: 'top' },
+      { x: 26, y: 30, text: 'Alternating stripes form a clear pattern', anchorX: 'right', anchorY: 'bottom' },
+      { x: 56, y: 75, text: 'Floor tiles make a visual beat', anchorX: 'center', anchorY: 'bottom' },
+      { x: 72, y: 15, text: 'Floral border repeats across the top', anchorX: 'right', anchorY: 'top' },
+      { x: 19, y: 57, text: 'Column motifs echo from front to back', anchorX: 'left', anchorY: 'center' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find a repeated shape, mark, colour, or motif?',
@@ -9104,11 +9106,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/hall-of-movement-example.png`,
     practiceImageAlt: 'Painted dancers, birds, and sweeping marks showing visual movement.',
     practiceLabels: [
-      { x: 22, y: 42, text: 'Sweeping marks pull the eye around' },
-      { x: 70, y: 45, text: 'Extended arms create direction' },
-      { x: 43, y: 48, text: 'Repeated poses suggest action' },
-      { x: 35, y: 17, text: 'Birds add upward movement' },
-      { x: 66, y: 22, text: 'Curving strokes create flow' },
+      { x: 22, y: 42, text: 'Sweeping marks pull the eye around', anchorX: 'left', anchorY: 'center' },
+      { x: 76, y: 45, text: 'Extended arms create direction', anchorX: 'right', anchorY: 'center' },
+      { x: 43, y: 52, text: 'Repeated poses suggest action', anchorX: 'center', anchorY: 'top' },
+      { x: 35, y: 17, text: 'Birds add upward movement', anchorX: 'right', anchorY: 'top' },
+      { x: 66, y: 22, text: 'Curving strokes create flow', anchorX: 'left', anchorY: 'bottom' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you find a path your eye follows?',
@@ -9129,11 +9131,11 @@ const VISUAL_LANGUAGE_HELP: Record<string, VisualLanguageHelpContent> = {
     practiceImageSrc: `${VISUAL_LANGUAGE_HELP_IMAGE_BASE}/final-room-example.png`,
     practiceImageAlt: 'Layered abstract composition combining colour, line, shape, form, texture, space, value, balance, and movement.',
     practiceLabels: [
-      { x: 47, y: 34, text: 'Layered shapes and forms build structure' },
-      { x: 69, y: 18, text: 'Curving lines create movement' },
-      { x: 57, y: 43, text: 'Colour contrast creates emphasis' },
-      { x: 75, y: 71, text: 'Textured surfaces add visual evidence' },
-      { x: 33, y: 59, text: 'Overlapping space links many ideas' },
+      { x: 47, y: 34, text: 'Layered shapes and forms build structure', anchorX: 'right', anchorY: 'bottom' },
+      { x: 69, y: 18, text: 'Curving lines create movement', anchorX: 'left', anchorY: 'top' },
+      { x: 58, y: 45, text: 'Colour contrast creates emphasis', anchorX: 'left', anchorY: 'top' },
+      { x: 75, y: 82, text: 'Textured surfaces add visual evidence', anchorX: 'right', anchorY: 'bottom' },
+      { x: 33, y: 59, text: 'Overlapping space links many ideas', anchorX: 'left', anchorY: 'top' },
     ],
     tryItYourselfPrompts: [
       'Now return to your artwork. Can you choose two visual ideas that work together?',
@@ -10342,7 +10344,7 @@ const ArtQuestHeader: React.FC<ArtQuestHeaderProps> = ({
   showPlayerPanel = true,
 }) => (
   <header className="mb-4 grid items-start gap-3 lg:grid-cols-[minmax(210px,0.28fr)_minmax(0,1fr)_minmax(280px,0.32fr)]">
-    <div className="flex min-h-20 items-center lg:justify-start">
+    <div className="flex min-h-20 items-center pl-7 pt-2 sm:pl-8 lg:justify-start">
       {onReturnToMap && (
         <ArtQuestReturnButton onClick={onReturnToMap}>
           {returnLabel}
@@ -10365,7 +10367,7 @@ const ArtQuestHeader: React.FC<ArtQuestHeaderProps> = ({
       )}
     </div>
 
-    <div className="flex min-h-20 items-start justify-start lg:justify-end lg:pr-8 xl:pr-10 2xl:pr-12">
+    <div className="flex min-h-20 items-start justify-start pt-2 lg:justify-end lg:pr-8 xl:pr-10 2xl:pr-12">
       {showPlayerPanel && <ArtQuestPlayerPanel selectedAvatar={selectedAvatar} playerStats={playerStats} />}
     </div>
   </header>
@@ -13128,23 +13130,79 @@ const FOYER_FIXED_BLOCKING_RECTS: Rect[] = [
   { x: 0, y: 0, width: 100, height: 31 },
   { x: 0, y: 0, width: 10, height: 100 },
   { x: 90, y: 0, width: 10, height: 100 },
-  { x: 30, y: 23, width: 7, height: 20 },
-  { x: 68, y: 23, width: 7, height: 20 },
-  { x: 29, y: 46, width: 4, height: 10 },
-  { x: 70, y: 46, width: 4, height: 10 },
+  { x: 30.6, y: 31.6, width: 5.8, height: 10.5 },
+  { x: 68.1, y: 31.6, width: 5.8, height: 10.5 },
+  { x: 30.2, y: 49.5, width: 1.8, height: 5.6 },
+  { x: 70.3, y: 49.5, width: 1.8, height: 5.6 },
   { x: 17, y: 83, width: 25, height: 14 },
   { x: 61, y: 83, width: 25, height: 14 },
 ];
 
-const GALLERY_FIXED_BLOCKING_RECTS: Rect[] = [
+const GALLERY_BOUNDARY_BLOCKING_RECTS: Rect[] = [
   { x: 0, y: 0, width: 100, height: 32 },
   { x: 0, y: 0, width: 6, height: 100 },
   { x: 94, y: 0, width: 6, height: 100 },
-  { x: 31, y: 31, width: 6, height: 19 },
-  { x: 63, y: 31, width: 6, height: 19 },
-  { x: 28.5, y: 45, width: 4, height: 10 },
-  { x: 70, y: 45, width: 4, height: 10 },
-  { x: 44, y: 82, width: 14, height: 10 },
+];
+
+// Collision uses the avatar's feet, so these boxes track floor footprints rather than full prop artwork.
+const GALLERY_FIXED_BLOCKING_RECTS_BY_INDEX: Rect[][] = [
+  [
+    { x: 34.2, y: 34.8, width: 3.8, height: 10.2 },
+    { x: 61.7, y: 34.8, width: 3.8, height: 10.2 },
+    { x: 32.3, y: 48, width: 1.7, height: 4.8 },
+    { x: 66.2, y: 48, width: 1.7, height: 4.8 },
+    { x: 44.3, y: 81, width: 11.5, height: 7.5 },
+  ],
+  [
+    { x: 34.5, y: 32.4, width: 4, height: 12.6 },
+    { x: 63.7, y: 32.4, width: 4, height: 12.6 },
+    { x: 31.1, y: 41.1, width: 2.1, height: 4.5 },
+    { x: 67.7, y: 41.1, width: 2.1, height: 4.5 },
+    { x: 43.7, y: 78.8, width: 12.6, height: 9.2 },
+  ],
+  [
+    { x: 34, y: 34.5, width: 3.5, height: 8.5 },
+    { x: 62.4, y: 34.5, width: 3.5, height: 8.5 },
+    { x: 31.2, y: 38.6, width: 2.1, height: 4.4 },
+    { x: 41.2, y: 38.3, width: 1.8, height: 4.3 },
+    { x: 57.8, y: 38.3, width: 1.8, height: 4.3 },
+    { x: 67.1, y: 38.6, width: 2.1, height: 4.4 },
+    { x: 43.4, y: 79.6, width: 13.2, height: 8.8 },
+  ],
+  [
+    { x: 35.7, y: 35.3, width: 3.6, height: 7.8 },
+    { x: 61.6, y: 35.3, width: 3.6, height: 7.8 },
+    { x: 34.3, y: 38.7, width: 2.2, height: 4.6 },
+    { x: 64.8, y: 38.7, width: 2.2, height: 4.6 },
+    { x: 42.6, y: 77.2, width: 14.8, height: 10.8 },
+  ],
+];
+
+// The right-side gallery doorway is an interaction target, but its wall/frame should stay solid.
+// These blockers start to the right of the nearby torches so the main walking lane remains open.
+const GALLERY_SIDE_DOOR_BLOCKING_RECTS_BY_INDEX: Rect[][] = [
+  [
+    { x: 76.8, y: 40.5, width: 17.2, height: 7 },
+    { x: 78.8, y: 47, width: 15.2, height: 30.5 },
+  ],
+  [
+    { x: 78, y: 39.2, width: 16, height: 7.5 },
+    { x: 78.8, y: 46.7, width: 15.2, height: 31.5 },
+  ],
+  [
+    { x: 76.5, y: 40.8, width: 17.5, height: 7.2 },
+    { x: 78.8, y: 48, width: 15.2, height: 30 },
+  ],
+  [
+    { x: 77.4, y: 40.8, width: 16.6, height: 7.2 },
+    { x: 78.8, y: 48, width: 15.2, height: 30 },
+  ],
+];
+
+const getGalleryFixedBlockingRects = (galleryIndex: number): Rect[] => [
+  ...GALLERY_BOUNDARY_BLOCKING_RECTS,
+  ...(GALLERY_FIXED_BLOCKING_RECTS_BY_INDEX[galleryIndex] || GALLERY_FIXED_BLOCKING_RECTS_BY_INDEX[0]),
+  ...(GALLERY_SIDE_DOOR_BLOCKING_RECTS_BY_INDEX[galleryIndex] || GALLERY_SIDE_DOOR_BLOCKING_RECTS_BY_INDEX[0]),
 ];
 
 const NPC_DEFINITIONS: NPCDefinition[] = [
@@ -14697,15 +14755,9 @@ const MapScreen: React.FC<MapScreenProps> = ({
           })
       : [];
 
-    const nextGallery = activeGallery ? galleryGroups[activeGallery.index + 1] : null;
-    const nextGalleryBlocks = activeGallery && (!nextGallery || !isGalleryComplete(activeGallery.index))
-      ? [{ x: 80, y: 47, width: 14, height: 30 }]
-      : [];
-
     return [
-      ...GALLERY_FIXED_BLOCKING_RECTS,
+      ...getGalleryFixedBlockingRects(activeGallery?.index || 0),
       ...blockedDoors,
-      ...nextGalleryBlocks,
     ];
   };
 
@@ -18533,14 +18585,22 @@ const JOURNAL_BOOK_STYLES = `
   z-index: 30;
   width: 16.5%;
   height: 6.9%;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
+  box-sizing: border-box;
+  min-height: 0;
+  padding: 0 1.35%;
+  font-size: clamp(0.58rem, 0.95vw, 1rem);
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .journal-plate-return:focus-visible {
   outline: 2px solid rgba(255, 231, 167, 0.92);
   outline-offset: 3px;
+}
+
+.journal-plate-return span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .journal-live-avatar-panel,
@@ -18747,15 +18807,6 @@ const JOURNAL_BOOK_STYLES = `
   font-weight: 900;
   line-height: 1.08;
   text-transform: uppercase;
-}
-
-.journal-visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
 }
 
 .journal-book-layout {
@@ -19758,14 +19809,13 @@ const JournalScreen: React.FC<JournalScreenProps> = ({
         footerText=""
       >
         <div className="journal-book-layout">
-          <button
-            type="button"
+          <ArtQuestReturnButton
             className="journal-plate-return"
             onClick={onReturnToMap}
             aria-label="Return to map"
           >
-            <span className="journal-visually-hidden">Return to Map</span>
-          </button>
+            Return to Map
+          </ArtQuestReturnButton>
 
           <aside className="journal-live-avatar-panel" aria-label="Player profile and XP">
             <div className="journal-live-avatar-portrait" aria-hidden="true">
@@ -21103,7 +21153,7 @@ const GameGuideScreen: React.FC<GameGuideScreenProps> = ({
   onReturnToMap,
   selectedAvatar,
   playerStats,
-  returnLabel = 'Back to Map',
+  returnLabel = 'Return to Map',
 }) => {
   const [activeTabId, setActiveTabId] = useState<GuideTabId>(GUIDE_TABS[0].id);
   const activeTabIndex = Math.max(0, GUIDE_TABS.findIndex(tab => tab.id === activeTabId));
@@ -21725,7 +21775,7 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
         @media (max-height: 700px) {
           .assessment-v3-root { padding: 8px; }
           .assessment-v3-header { grid-template-columns: 170px minmax(0, 1fr) 220px; gap: 8px; }
-          .assessment-v3-return-wrap { padding-top: 8px; }
+          .assessment-v3-return-wrap { padding-top: 24px; padding-left: 36px; }
           .assessment-v3-return-wrap button { min-height: 32px; padding: 4px 16px; font-size: 12px; }
           .assessment-v3-title { font-size: 30px; }
           .assessment-v3-understand { margin-top: 2px; max-width: 620px; padding: 4px 8px; }
@@ -21739,7 +21789,7 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
           .assessment-v3-table td { padding: 3px 6px; font-size: 8px; line-height: 1.05; }
           .assessment-v3-criteria-icon { width: 24px; height: 24px; font-size: 14px; }
           .assessment-v3-criteria-name { font-size: 8px; }
-          .assessment-v3-feedback-strip { padding: 2px; }
+          .assessment-v3-feedback-strip { margin-right: 32px; margin-bottom: 24px; margin-left: 32px; padding: 2px; }
           .assessment-v3-feedback-title { font-size: 12px; }
           .assessment-v3-feedback-subtitle { display: none; }
           .assessment-v3-wing-button { min-height: 24px; padding: 1px 3px; font-size: 7px; }
@@ -21785,7 +21835,7 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
 
       <div className="relative z-10 flex h-full min-h-0 flex-col gap-2">
         <header className="assessment-v3-header grid shrink-0 grid-cols-[200px_minmax(0,1fr)_260px] items-start gap-3 max-[700px]:grid-cols-[170px_minmax(0,1fr)_220px] max-[700px]:gap-2">
-          <div className="assessment-v3-return-wrap pt-4 max-[700px]:pt-2">
+          <div className="assessment-v3-return-wrap pl-12 pt-9 max-[700px]:pl-9 max-[700px]:pt-6">
             <ArtQuestReturnButton onClick={onReturnToMap} className="min-h-10 px-6 py-1.5 text-sm max-[700px]:min-h-8 max-[700px]:px-4 max-[700px]:py-1 max-[700px]:text-xs">
               Return to Map
             </ArtQuestReturnButton>
@@ -21916,7 +21966,7 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
             </div>
           </section>
 
-          <section className="assessment-v3-feedback-strip shrink-0 rounded-md border border-[#a66c2b]/80 bg-[#061125]/88 p-1.5 shadow-[inset_0_0_0_1px_rgba(255,236,176,0.08),inset_0_0_34px_rgba(105,46,150,0.12),0_10px_24px_rgba(0,0,0,0.34)] max-[700px]:p-0.5">
+          <section className="assessment-v3-feedback-strip mx-12 mb-8 shrink-0 rounded-md border border-[#a66c2b]/80 bg-[#061125]/88 p-1.5 shadow-[inset_0_0_0_1px_rgba(255,236,176,0.08),inset_0_0_34px_rgba(105,46,150,0.12),0_10px_24px_rgba(0,0,0,0.34)] max-[700px]:mx-8 max-[700px]:mb-6 max-[700px]:p-0.5">
             <div className="mb-0.5 text-center max-[700px]:mb-0">
               <div className="flex items-center justify-center gap-2">
                 <span className="h-2 w-2 rotate-45 border border-[#ffd978] bg-[#772aa8] shadow-[0_0_8px_rgba(217,70,239,0.5)]" aria-hidden="true" />
@@ -23470,6 +23520,12 @@ const ANALYSIS_BUTTON_CLASS = 'analysis-button analysis-button-blue';
 const ANALYSIS_PURPLE_BUTTON_CLASS = 'analysis-button analysis-button-purple';
 const CURATOR_GUIDANCE_QUESTION_PROMPT = "The Curator can only check your challenge response in this room. If you are unsure, ask your teacher for guidance, then return to the prompt and write your own response.";
 
+const getPracticeLabelTransform = (anchorX?: string, anchorY?: string): string => {
+  const x = anchorX === 'left' ? '0' : anchorX === 'right' ? '-100%' : '-50%';
+  const y = anchorY === 'top' ? '0' : anchorY === 'bottom' ? '-100%' : '-50%';
+  return `translate(${x}, ${y})`;
+};
+
 const normalizeCuratorQuestionText = (value: string): string => value
   .toLowerCase()
   .replace(/[’']/g, '')
@@ -24695,7 +24751,11 @@ const MainGameComponent: React.FC<MainGameProps> = ({
                       <span
                         key={`practice-label-${index}`}
                         className="analysis-guide-practice-label"
-                        style={{ left: `${label.x}%`, top: `${label.y}%` }}
+                        style={{
+                          left: `${label.x}%`,
+                          top: `${label.y}%`,
+                          transform: getPracticeLabelTransform(label.anchorX, label.anchorY),
+                        }}
                       >
                         <span className="analysis-guide-practice-label-dot" aria-hidden="true"></span>
                         {label.text}
@@ -25800,7 +25860,7 @@ const App: React.FC = () => {
           selectedAvatar={appGameState.selectedAvatar || null}
           playerStats={appGameState.playerStats}
           onReturnToMap={handleReturnFromGuide}
-          returnLabel={guideReturnTarget === 'splash' ? 'Back to Start' : 'Back to Map'}
+          returnLabel={guideReturnTarget === 'splash' ? 'Back to Start' : 'Return to Map'}
         />
       );
       break;
