@@ -673,18 +673,28 @@ const createFrontHairLayer = (hairLayer, relativePath) => {
         isPonytail
         && insideFaceWindow
         && y >= fringeBottom
-        && y <= 330
+        && y <= 335
         && x >= 390
         && x <= 700
       );
-      const ponytailEarStrand = (
+      const ponytailLeftSideLock = (
         isPonytail
-        && x >= 635
-        && y >= 300
-        && y <= 475
+        && x <= 470
+        && y >= 248
+        && y <= 445
         && !protectedEyeBand
       );
-      const keepAsFront = !insideFaceWindow || y < fringeBottom || ponytailEarStrand;
+      const ponytailRightSideLock = (
+        isPonytail
+        && x >= 625
+        && y >= 286
+        && y <= 480
+        && !protectedEyeBand
+      );
+      const keepAsFront = !insideFaceWindow
+        || y < fringeBottom
+        || ponytailLeftSideLock
+        || ponytailRightSideLock;
 
       if (!keepAsFront) continue;
 
