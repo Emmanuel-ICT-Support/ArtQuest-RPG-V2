@@ -15,7 +15,7 @@ import { GameMusicTrack, useGameAudio } from './components/useGameAudio';
 import { PlayerAvatar, WingState, AppGameState, NarrativeEntry, GameScreen, GalleryScene, JournalEntry, YearLevel, SeniorCoursePathway, PlayerStats, TraitName, TraitLevel, SaveGameData, CoreSavedGameState, SideQuestReward } from './types';
 import { WING_DEFINITIONS, INITIAL_WING_ID, SAVE_FILE_VERSION } from './constants';
 import { initializeChat as initializeAiChat } from './services/aiService';
-import { getAvatarBuildForAvatar, getAvatarLayerImageUrls, getAvatarSpriteUrl, getNewlyUnlockedRewardMilestones } from './data/AvatarRewards';
+import { AVATAR_REWARD_DEFAULT_BUILD, getAvatarBuildForAvatar, getAvatarLayerImageUrls, getAvatarSpriteUrl, getNewlyUnlockedRewardMilestones } from './data/AvatarRewards';
 import { getArtworkBrief } from './data/ArtworkLibrary';
 import { getVisualLanguageGuideForWing } from './data/VisualLanguageGuide';
 import { SIDE_QUEST_CASES_BY_ID, createInitialSideQuestState, normalizeSideQuestState } from './data/SideQuests';
@@ -34,6 +34,7 @@ interface LoadTransitionState {
   tone: GalleryLoadingTone;
   compact?: boolean;
   minimumMs?: number;
+  steps?: readonly string[];
 }
 
 const MAP_BACKGROUND_IMAGES = {
@@ -74,6 +75,14 @@ const PANEL_IMAGE_ASSETS: Record<PanelScreen, string[]> = {
   ],
   assessment: [],
 };
+
+const NEW_GAME_SETUP_IMAGE_ASSETS = [
+  './public/images/screens/character-selection-screen.png',
+  './public/images/screens/build-avatar-screen-v2.png',
+  './public/images/Nova.png',
+  './public/images/Leo.png',
+  './public/images/Zia.png',
+];
 
 const imageAsset = (src: string | null | undefined): PreloadAsset => ({ type: 'image', src });
 const audioAsset = (src: string | null | undefined): PreloadAsset => ({ type: 'audio', src });
@@ -160,6 +169,20 @@ const getPanelPreloadAssets = (screen: PanelScreen, avatar?: PlayerAvatar | null
   ...PANEL_IMAGE_ASSETS[screen].map(imageAsset),
   ...getAvatarPreloadAssets(avatar),
 ];
+
+const getNewGameSetupPreloadAssets = (): PreloadAsset[] => [
+  ...NEW_GAME_SETUP_IMAGE_ASSETS.map(imageAsset),
+  ...getAvatarLayerImageUrls(AVATAR_REWARD_DEFAULT_BUILD).map(imageAsset),
+];
+
+const getNewGameSetupTransition = (): LoadTransitionState => ({
+  title: 'Preparing Artist Setup',
+  message: 'Laying out the avatar cards and mixing your first palette.',
+  detail: 'Portraits, setup panels, and starter avatar pieces are being prepared.',
+  tone: 'setup',
+  minimumMs: 560,
+  steps: ['Setting cards', 'Mixing palette', 'Sharpening pencil'],
+});
 
 const getPanelTransition = (screen: PanelScreen): LoadTransitionState => {
   const labels: Record<PanelScreen, string> = {
@@ -559,18 +582,22 @@ export const App: React.FC = () => {
     }
   }, [runLoadTransition]);
 
-  const handleNavigateToNewGameSetup = useCallback(() => {
-    // Optionally confirm if a game is in progress and will be lost
-    // For now, directly navigate, assuming StartScreen will handle confirmation or App will reset.
-    setAppGameState(() => ({
-      ...initialAppGameState,
-      isLoading: false,
-      error: null,
-      sideQuestState: createInitialSideQuestState(),
-    })); // Reset game state for a new game
-    setCurrentGalleryScene('foyer');
-    setCurrentScreen('newGameSetup');
-  }, []);
+  const handleNavigateToNewGameSetup = useCallback(async () => {
+    await runLoadTransition(getNewGameSetupTransition(), async () => {
+      await preloadAssets(getNewGameSetupPreloadAssets(), {
+        timeoutMs: 2200,
+      });
+
+      setAppGameState(() => ({
+        ...initialAppGameState,
+        isLoading: false,
+        error: null,
+        sideQuestState: createInitialSideQuestState(),
+      }));
+      setCurrentGalleryScene('foyer');
+      setCurrentScreen('newGameSetup');
+    });
+  }, [runLoadTransition]);
 
   const handleTeacherUnlock = useCallback(async (code: string): Promise<boolean> => {
     if (code.trim() !== TEACHER_UNLOCK_CODE) {
@@ -1428,6 +1455,7 @@ export const App: React.FC = () => {
           detail={loadTransition.detail}
           tone={loadTransition.tone}
           compact={loadTransition.compact}
+          steps={loadTransition.steps}
         />
       )}
       <Modal

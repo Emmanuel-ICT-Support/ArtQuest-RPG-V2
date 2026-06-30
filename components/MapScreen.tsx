@@ -112,6 +112,13 @@ const LEVEL_DOOR_POSITIONS: DoorPosition[] = [
   { left: '72%', top: '14%', width: '18%', height: '22%' },
 ];
 
+const DOOR_GUARD_POSITION_OFFSETS_BY_GALLERY: Point[][] = [
+  [{ x: -4, y: 0 }, { x: -4, y: 3.5 }, { x: 0, y: 0 }],
+  [{ x: -4, y: 0 }, { x: -5, y: 3.5 }, { x: 2.5, y: 0 }],
+  [{ x: -4, y: 0 }, { x: -5, y: 3.5 }, { x: 2, y: 0 }],
+  [{ x: -4, y: 0 }, { x: -2.5, y: 0 }, { x: 0, y: 0 }],
+];
+
 const STAGE_IMAGE_WIDTH = 1672;
 const STAGE_IMAGE_HEIGHT = 941;
 const STAGE_ASPECT_RATIO = STAGE_IMAGE_WIDTH / STAGE_IMAGE_HEIGHT;
@@ -810,13 +817,14 @@ const getOptionsInOrder = (
   return orderedOptions.length === options.length ? orderedOptions : options;
 };
 
-const getDoorGuardPoint = (doorIndex: number): Point => {
+const getDoorGuardPoint = (doorIndex: number, galleryIndex = 0): Point => {
   const doorRect = doorRectFromPosition(LEVEL_DOOR_POSITIONS[doorIndex]);
   const isRightmostDoor = doorIndex === LEVEL_DOOR_POSITIONS.length - 1;
+  const offset = DOOR_GUARD_POSITION_OFFSETS_BY_GALLERY[galleryIndex]?.[doorIndex] || { x: 0, y: 0 };
 
   return {
-    x: isRightmostDoor ? doorRect.x - 2.5 : doorRect.x + doorRect.width + 2.5,
-    y: doorRect.y + doorRect.height - 10,
+    x: (isRightmostDoor ? doorRect.x - 2.5 : doorRect.x + doorRect.width + 2.5) + offset.x,
+    y: doorRect.y + doorRect.height - 10 + offset.y,
   };
 };
 
@@ -958,6 +966,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     return {
       wingId,
       doorIndex: activeGallery.wingIds.indexOf(wingId),
+      galleryIndex: activeGallery.index,
     };
   }, [activeGallery, wingsState]);
   const nearbyNpc = useMemo(() => {
@@ -1210,7 +1219,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         if (!wing) return;
 
         const isGuardedDoor = currentDoorGuardTarget?.wingId === wingId;
-        const promptPoint = isGuardedDoor ? getDoorGuardPoint(doorIndex) : getDoorInteractionPoint(doorIndex);
+        const promptPoint = isGuardedDoor ? getDoorGuardPoint(doorIndex, activeGallery.index) : getDoorInteractionPoint(doorIndex);
         const point = isGuardedDoor
           ? { x: promptPoint.x, y: promptPoint.y + 10 }
           : promptPoint;
@@ -1594,7 +1603,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       return;
     }
 
-    if (distanceBetween(getPlayerFeet(playerPosition), getDoorGuardPoint(currentDoorGuardTarget.doorIndex)) > DOOR_GUARD_TALK_DISTANCE + 8) {
+    if (distanceBetween(getPlayerFeet(playerPosition), getDoorGuardPoint(currentDoorGuardTarget.doorIndex, currentDoorGuardTarget.galleryIndex)) > DOOR_GUARD_TALK_DISTANCE + 8) {
       setActiveDoorGuardWingId(null);
     }
   }, [activeDoorGuardWingId, currentDoorGuardTarget, playerPosition]);
@@ -1987,12 +1996,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     return () => clearWalkingStopTimer();
   }, []);
 
-  const renderDoorGuard = (wingId: string, doorIndex: number) => {
+  const renderDoorGuard = (wingId: string, doorIndex: number, galleryIndex: number) => {
     const wing = getWingById(wingId);
     if (!wing) return null;
 
     const challenge = getDoorChallenge(wingId);
-    const position = getDoorGuardPoint(doorIndex);
+    const position = getDoorGuardPoint(doorIndex, galleryIndex);
     const wingState = wingsState[wingId];
     const canEnter = isWingAccessible(wingId);
     const isPrepared = !!wingState?.entryChallengeCompleted || !!wingState?.isSolved;
@@ -2093,7 +2102,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
   const renderDoorGuards = () => {
     if (!currentDoorGuardTarget) return null;
-    return renderDoorGuard(currentDoorGuardTarget.wingId, currentDoorGuardTarget.doorIndex);
+    return renderDoorGuard(currentDoorGuardTarget.wingId, currentDoorGuardTarget.doorIndex, currentDoorGuardTarget.galleryIndex);
   };
 
   const renderSortChallengeItem = (

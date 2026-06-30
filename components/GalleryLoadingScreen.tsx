@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type GalleryLoadingTone = 'foyer' | 'gallery' | 'analysis' | 'return' | 'panel';
+export type GalleryLoadingTone = 'foyer' | 'gallery' | 'analysis' | 'return' | 'panel' | 'setup';
 
 export interface GalleryLoadingScreenProps {
   title: string;
@@ -8,6 +8,7 @@ export interface GalleryLoadingScreenProps {
   detail?: string;
   tone?: GalleryLoadingTone;
   compact?: boolean;
+  steps?: readonly string[];
 }
 
 const LOADING_STEPS = [
@@ -76,6 +77,7 @@ const toneClasses: Record<GalleryLoadingTone, string> = {
   analysis: 'from-pink-200 via-violet-200 to-cyan-200',
   return: 'from-emerald-200 via-cyan-200 to-amber-200',
   panel: 'from-amber-100 via-purple-200 to-pink-200',
+  setup: 'from-amber-200 via-lime-200 to-pink-200',
 };
 
 const GalleryLoadingScreen: React.FC<GalleryLoadingScreenProps> = ({
@@ -84,6 +86,7 @@ const GalleryLoadingScreen: React.FC<GalleryLoadingScreenProps> = ({
   detail,
   tone = 'gallery',
   compact = false,
+  steps,
 }) => (
   <div
     className="artquest-loading-shell fixed inset-0 z-[120] flex items-center justify-center p-4 text-slate-100"
@@ -127,7 +130,7 @@ const GalleryLoadingScreen: React.FC<GalleryLoadingScreenProps> = ({
 
       {!compact && (
         <div className="relative z-10 mt-4 grid gap-2 text-[11px] font-black uppercase tracking-normal text-slate-200 sm:grid-cols-3">
-          {LOADING_STEPS.map((step, index) => (
+          {(steps && steps.length > 0 ? steps : LOADING_STEPS).slice(0, 3).map((step, index) => (
             <div key={step} className="flex items-center justify-center gap-2 rounded-sm border border-slate-500/50 bg-slate-950/45 px-2 py-2">
               <span
                 className="artquest-loading-dot h-2.5 w-2.5 rounded-full bg-cyan-200"
