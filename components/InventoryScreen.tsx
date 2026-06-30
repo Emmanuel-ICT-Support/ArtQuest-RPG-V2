@@ -205,6 +205,13 @@ const getInventoryTabById = (tabId: AvatarAssetTabId) => (
   AVATAR_REWARD_BUILDER_TABS.find(tab => tab.id === tabId) || AVATAR_REWARD_BUILDER_TABS[0]
 );
 
+const getInventoryIconInitials = (name: string): string => {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '??';
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return words.slice(0, 2).map(word => word[0]).join('').toUpperCase();
+};
+
 const InventoryScreen: React.FC<InventoryScreenProps> = ({
   playerStats,
   selectedAvatar,
@@ -216,9 +223,13 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
   ));
   const [activeTabId, setActiveTabId] = useState<AvatarAssetTabId>('hairStyleId');
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [isEditingAvatarName, setIsEditingAvatarName] = useState<boolean>(false);
+  const [avatarNameDraft, setAvatarNameDraft] = useState<string>(selectedAvatar?.name || '');
 
   useEffect(() => {
     setAvatarBuild({ ...getAvatarBuildForAvatar(selectedAvatar), accessoryId: 'none' });
+    setAvatarNameDraft(selectedAvatar?.name || '');
+    setIsEditingAvatarName(false);
   }, [selectedAvatar]);
 
   const activeTab = useMemo(
@@ -308,6 +319,36 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
     if (matchingStyle) {
       updateAvatarBuild('hairStyleId', matchingStyle.id);
     }
+  };
+
+  const handleStartEditingAvatarName = () => {
+    setAvatarNameDraft(selectedAvatar.name);
+    setIsEditingAvatarName(true);
+    setSaveMessage(null);
+  };
+
+  const handleCancelEditingAvatarName = () => {
+    setAvatarNameDraft(selectedAvatar.name);
+    setIsEditingAvatarName(false);
+  };
+
+  const handleSaveAvatarName = () => {
+    const nextName = avatarNameDraft.trim() || selectedAvatar.name || 'Artist';
+
+    if (nextName === selectedAvatar.name) {
+      setIsEditingAvatarName(false);
+      setAvatarNameDraft(nextName);
+      return;
+    }
+
+    onUpdateAvatar({
+      ...selectedAvatar,
+      name: nextName,
+      iconInitial: getInventoryIconInitials(nextName),
+    });
+    setIsEditingAvatarName(false);
+    setAvatarNameDraft(nextName);
+    setSaveMessage('Name updated.');
   };
 
   const renderTraitCard = (trait: PlayerTrait) => {
@@ -634,6 +675,46 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
                   <p className="truncate text-sm font-bold text-[#f7d9ff]" title={selectedAvatar.title}>
                     {selectedAvatar.title}
                   </p>
+                  {isEditingAvatarName ? (
+                    <div className="mt-2 space-y-1.5">
+                      <input
+                        type="text"
+                        value={avatarNameDraft}
+                        onChange={(event) => setAvatarNameDraft(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') handleSaveAvatarName();
+                          if (event.key === 'Escape') handleCancelEditingAvatarName();
+                        }}
+                        maxLength={32}
+                        className="h-8 w-full rounded-md border border-[#dba44a]/70 bg-[#071226] px-2 text-center text-sm font-bold text-white outline-none focus:ring-2 focus:ring-fuchsia-300"
+                        aria-label="Edit avatar name"
+                      />
+                      <div className="flex justify-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={handleSaveAvatarName}
+                          className="min-h-7 rounded-md border border-emerald-300/70 bg-emerald-700/80 px-2 text-[10px] font-black uppercase text-white shadow-[0_2px_0_rgba(0,0,0,0.35)] transition hover:brightness-115 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleCancelEditingAvatarName}
+                          className="min-h-7 rounded-md border border-[#9a6328]/70 bg-[#08162e]/85 px-2 text-[10px] font-black uppercase text-[#ffe8ad] shadow-[0_2px_0_rgba(0,0,0,0.35)] transition hover:border-[#f2c15c] hover:bg-[#102245] focus:outline-none focus:ring-2 focus:ring-[#ffd978]"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleStartEditingAvatarName}
+                      className="mt-2 min-h-7 rounded-md border border-[#9a6328]/70 bg-[#08162e]/85 px-3 text-[10px] font-black uppercase text-[#ffe8ad] shadow-[0_2px_0_rgba(0,0,0,0.35)] transition hover:border-[#f2c15c] hover:bg-[#102245] focus:outline-none focus:ring-2 focus:ring-[#ffd978]"
+                    >
+                      Edit Name
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

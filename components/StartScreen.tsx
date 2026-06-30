@@ -724,6 +724,7 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
   const [creationModeActive, setCreationModeActive] = useState<boolean>(false);
   const [builderScreenActive, setBuilderScreenActive] = useState<boolean>(false);
   const [customAvatarName, setCustomAvatarName] = useState<string>(AVATARS[0].name);
+  const [hasEditedAvatarName, setHasEditedAvatarName] = useState<boolean>(false);
   const [customArtistType, setCustomArtistType] = useState<ArtistType>(ARTIST_TYPES[0]);
   const [customCreativityFuel, setCustomCreativityFuel] = useState<CreativityFuel>(CREATIVITY_FUELS[0]);
   const [avatarBuild, setAvatarBuild] = useState<AvatarBuilderConfig>(DEFAULT_AVATAR_BUILD);
@@ -753,10 +754,16 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
     setSelectedCoursePathway(option.coursePathway);
   };
 
+  const handleAvatarNameChange = (value: string) => {
+    setCustomAvatarName(value);
+    setHasEditedAvatarName(true);
+  };
+
   const handleSelectAvatar = (avatarId: string) => {
     const selectedAvatar = AVATARS.find(avatar => avatar.id === avatarId);
     setSelectedAvatarId(avatarId);
     setCustomAvatarName(selectedAvatar?.name || '');
+    setHasEditedAvatarName(false);
     setCreationModeActive(false);
     setBuilderScreenActive(false);
   };
@@ -764,7 +771,7 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
   const handleSelectCreateOwn = () => {
     setCreationModeActive(true);
     setSelectedAvatarId(null);
-    setCustomAvatarName(DEFAULT_CUSTOM_AVATAR_NAME);
+    setCustomAvatarName(hasEditedAvatarName && customAvatarName.trim() ? customAvatarName : DEFAULT_CUSTOM_AVATAR_NAME);
     setBuilderScreenActive(true);
   };
 
@@ -1047,19 +1054,15 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
             type="text"
             id="builderAvatarName"
             value={customAvatarName}
-            onChange={(e) => setCustomAvatarName(e.target.value)}
+            onChange={(e) => handleAvatarNameChange(e.target.value)}
             placeholder="Enter Name"
             className={BUILDER_OVERLAY_NAME_INPUT_CLASS}
             style={{ left: '19.4%', top: '64.2%', width: '9.8%', height: '4.5%' }}
             aria-label="Enter your artist name"
           />
 
-          <div className="absolute left-[12.1%] top-[69.2%] z-30 h-[12.5%] w-[16.7%] overflow-hidden bg-[#111126] px-2 py-1 text-center">
+          <div className="absolute left-[12.1%] top-[69.2%] z-30 flex h-[12.5%] w-[16.7%] items-center justify-center overflow-hidden bg-[#111126] px-2 py-1 text-center">
             <p className="text-sm font-bold italic leading-tight text-purple-100 sm:text-base">{selectedArtistIdentity.title}</p>
-            <p className="mt-3 text-xs font-semibold leading-relaxed text-slate-200 sm:text-sm">
-              {getHairDescription(selectedHairStyle)}, {selectedFaceStyle.name.toLowerCase()} face,<br />
-              {selectedOutfit.name.toLowerCase()}, {getHeldObjectDescription(selectedHeldObject)}
-            </p>
           </div>
 
           <select
@@ -1175,7 +1178,7 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
           type="text"
           id="avatarName"
           value={customAvatarName}
-          onChange={(e) => setCustomAvatarName(e.target.value)}
+          onChange={(e) => handleAvatarNameChange(e.target.value)}
           placeholder="Enter your artist name"
           className={PROFILE_TEXT_INPUT_CLASS}
           style={{ left: '26.6%', top: '85.8%', width: '45.8%', height: '6.2%' }}
