@@ -229,12 +229,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/Auburn/ponytail.Auburn.png": {
-    "height": 383,
-    "left": 353,
+    "height": 410,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 89,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/Auburn/spikeslong.Auburn.png": {
     "height": 509,
@@ -285,12 +285,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/black/ponytail.black.png": {
-    "height": 405,
-    "left": 353,
+    "height": 410,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 88,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/black/spikeslong.black.png": {
     "height": 513,
@@ -341,12 +341,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/blonde/ponytail.blonde.png": {
-    "height": 549,
-    "left": 353,
+    "height": 410,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 89,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/blonde/spikeslong.blonde.png": {
     "height": 511,
@@ -397,12 +397,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/brown/ponytail.brown.png": {
-    "height": 381,
-    "left": 353,
+    "height": 410,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 88,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/brown/spikeslong.brown.png": {
     "height": 510,
@@ -453,12 +453,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/pink/ponytail.pink.png": {
-    "height": 380,
-    "left": 354,
+    "height": 410,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 89,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/pink/spikeslong.pink.png": {
     "height": 512,
@@ -509,12 +509,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/red/ponytail.red.png": {
-    "height": 385,
-    "left": 354,
+    "height": 410,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 89,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/red/spikeslong.red.png": {
     "height": 511,
@@ -565,12 +565,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/teal/ponytail.teal.png": {
-    "height": 383,
-    "left": 354,
+    "height": 410,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 88,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/teal/spikeslong.teal.png": {
     "height": 510,
@@ -621,12 +621,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/Auburn/ponytail.Auburn.png": {
-    "height": 383,
-    "left": 353,
+    "height": 411,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 89,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/Auburn/spikeslong.Auburn.png": {
     "height": 509,
@@ -677,12 +677,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/black/ponytail.black.png": {
-    "height": 405,
-    "left": 353,
+    "height": 411,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 88,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/black/spikeslong.black.png": {
     "height": 513,
@@ -733,12 +733,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/blonde/ponytail.blonde.png": {
-    "height": 549,
-    "left": 353,
+    "height": 411,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 89,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/blonde/spikeslong.blonde.png": {
     "height": 511,
@@ -789,12 +789,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/brown/ponytail.brown.png": {
-    "height": 381,
-    "left": 353,
+    "height": 411,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 88,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/brown/spikeslong.brown.png": {
     "height": 510,
@@ -845,12 +845,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/pink/ponytail.pink.png": {
-    "height": 380,
-    "left": 354,
+    "height": 411,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 89,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/pink/spikeslong.pink.png": {
     "height": 512,
@@ -901,12 +901,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/red/ponytail.red.png": {
-    "height": 385,
-    "left": 353,
+    "height": 411,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 89,
-    "width": 391
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/red/spikeslong.red.png": {
     "height": 511,
@@ -957,12 +957,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/teal/ponytail.teal.png": {
-    "height": 383,
-    "left": 354,
+    "height": 411,
+    "left": 338,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 88,
-    "width": 390
+    "top": 104,
+    "width": 420
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/teal/spikeslong.teal.png": {
     "height": 510,
@@ -1099,6 +1099,1542 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "naturalWidth": 1024,
     "top": 430,
     "width": 740
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/lower_hand/amber.png": {
+    "height": 84,
+    "left": 255,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 704,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/lower_hand/deep_brown.png": {
+    "height": 84,
+    "left": 255,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 704,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/lower_hand/fair.png": {
+    "height": 84,
+    "left": 255,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 704,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/lower_hand/golden.png": {
+    "height": 84,
+    "left": 255,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 704,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/lower_hand/medium_brown.png": {
+    "height": 84,
+    "left": 255,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 704,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/lower_hand/porcelain.png": {
+    "height": 84,
+    "left": 255,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 704,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/lower_hand/tan.png": {
+    "height": 84,
+    "left": 255,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 704,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/lower_hand/warm_beige.png": {
+    "height": 84,
+    "left": 255,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 704,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/raised_hand/amber.png": {
+    "height": 101,
+    "left": 770,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/raised_hand/deep_brown.png": {
+    "height": 101,
+    "left": 770,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/raised_hand/fair.png": {
+    "height": 101,
+    "left": 770,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/raised_hand/golden.png": {
+    "height": 101,
+    "left": 770,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/raised_hand/medium_brown.png": {
+    "height": 101,
+    "left": 770,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/raised_hand/porcelain.png": {
+    "height": 101,
+    "left": 770,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/raised_hand/tan.png": {
+    "height": 101,
+    "left": 770,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/archivist_vest/raised_hand/warm_beige.png": {
+    "height": 101,
+    "left": 770,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/lower_hand/amber.png": {
+    "height": 103,
+    "left": 195,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 755,
+    "width": 95
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/lower_hand/deep_brown.png": {
+    "height": 103,
+    "left": 195,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 755,
+    "width": 95
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/lower_hand/fair.png": {
+    "height": 103,
+    "left": 195,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 755,
+    "width": 95
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/lower_hand/golden.png": {
+    "height": 103,
+    "left": 195,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 755,
+    "width": 95
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/lower_hand/medium_brown.png": {
+    "height": 103,
+    "left": 195,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 755,
+    "width": 95
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/lower_hand/porcelain.png": {
+    "height": 103,
+    "left": 195,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 755,
+    "width": 95
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/lower_hand/tan.png": {
+    "height": 103,
+    "left": 195,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 755,
+    "width": 95
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/lower_hand/warm_beige.png": {
+    "height": 103,
+    "left": 195,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 755,
+    "width": 95
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/raised_hand/amber.png": {
+    "height": 126,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 519,
+    "width": 92
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/raised_hand/deep_brown.png": {
+    "height": 126,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 519,
+    "width": 92
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/raised_hand/fair.png": {
+    "height": 126,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 519,
+    "width": 92
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/raised_hand/golden.png": {
+    "height": 126,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 519,
+    "width": 92
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/raised_hand/medium_brown.png": {
+    "height": 126,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 519,
+    "width": 92
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/raised_hand/porcelain.png": {
+    "height": 126,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 519,
+    "width": 92
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/raised_hand/tan.png": {
+    "height": 126,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 519,
+    "width": 92
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/artist_apron/raised_hand/warm_beige.png": {
+    "height": 126,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 519,
+    "width": 92
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/lower_hand/amber.png": {
+    "height": 82,
+    "left": 209,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 777,
+    "width": 79
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/lower_hand/deep_brown.png": {
+    "height": 82,
+    "left": 209,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 777,
+    "width": 79
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/lower_hand/fair.png": {
+    "height": 82,
+    "left": 209,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 777,
+    "width": 79
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/lower_hand/golden.png": {
+    "height": 82,
+    "left": 209,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 777,
+    "width": 79
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/lower_hand/medium_brown.png": {
+    "height": 82,
+    "left": 209,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 777,
+    "width": 79
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/lower_hand/porcelain.png": {
+    "height": 82,
+    "left": 209,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 777,
+    "width": 79
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/lower_hand/tan.png": {
+    "height": 82,
+    "left": 209,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 777,
+    "width": 79
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/lower_hand/warm_beige.png": {
+    "height": 82,
+    "left": 209,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 777,
+    "width": 79
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/raised_hand/amber.png": {
+    "height": 96,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 528,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/raised_hand/deep_brown.png": {
+    "height": 96,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 528,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/raised_hand/fair.png": {
+    "height": 96,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 528,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/raised_hand/golden.png": {
+    "height": 96,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 528,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/raised_hand/medium_brown.png": {
+    "height": 96,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 528,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/raised_hand/porcelain.png": {
+    "height": 96,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 528,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/raised_hand/tan.png": {
+    "height": 96,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 528,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/dream_painter/raised_hand/warm_beige.png": {
+    "height": 96,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 528,
+    "width": 73
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/lower_hand/amber.png": {
+    "height": 101,
+    "left": 248,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 746,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/lower_hand/deep_brown.png": {
+    "height": 101,
+    "left": 248,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 746,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/lower_hand/fair.png": {
+    "height": 101,
+    "left": 248,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 746,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/lower_hand/golden.png": {
+    "height": 101,
+    "left": 248,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 746,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/lower_hand/medium_brown.png": {
+    "height": 101,
+    "left": 248,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 746,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/lower_hand/porcelain.png": {
+    "height": 101,
+    "left": 248,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 746,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/lower_hand/tan.png": {
+    "height": 101,
+    "left": 248,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 746,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/lower_hand/warm_beige.png": {
+    "height": 101,
+    "left": 248,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 746,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/amber.png": {
+    "height": 72,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 588,
+    "width": 32
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/deep_brown.png": {
+    "height": 72,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 588,
+    "width": 32
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/fair.png": {
+    "height": 72,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 588,
+    "width": 32
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/golden.png": {
+    "height": 72,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 588,
+    "width": 32
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/medium_brown.png": {
+    "height": 72,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 588,
+    "width": 32
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/porcelain.png": {
+    "height": 72,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 588,
+    "width": 32
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/tan.png": {
+    "height": 72,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 588,
+    "width": 32
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/warm_beige.png": {
+    "height": 72,
+    "left": 818,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 588,
+    "width": 32
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/lower_hand/amber.png": {
+    "height": 104,
+    "left": 203,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 769,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/lower_hand/deep_brown.png": {
+    "height": 104,
+    "left": 203,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 769,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/lower_hand/fair.png": {
+    "height": 104,
+    "left": 203,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 769,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/lower_hand/golden.png": {
+    "height": 104,
+    "left": 203,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 769,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/lower_hand/medium_brown.png": {
+    "height": 104,
+    "left": 203,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 769,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/lower_hand/porcelain.png": {
+    "height": 104,
+    "left": 203,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 769,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/lower_hand/tan.png": {
+    "height": 104,
+    "left": 203,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 769,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/lower_hand/warm_beige.png": {
+    "height": 104,
+    "left": 203,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 769,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/raised_hand/amber.png": {
+    "height": 96,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 482,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/raised_hand/deep_brown.png": {
+    "height": 96,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 482,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/raised_hand/fair.png": {
+    "height": 96,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 482,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/raised_hand/golden.png": {
+    "height": 96,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 482,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/raised_hand/medium_brown.png": {
+    "height": 96,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 482,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/raised_hand/porcelain.png": {
+    "height": 96,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 482,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/raised_hand/tan.png": {
+    "height": 96,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 482,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/raised_hand/warm_beige.png": {
+    "height": 96,
+    "left": 811,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 482,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/lower_hand/amber.png": {
+    "height": 93,
+    "left": 247,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 690,
+    "width": 75
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/lower_hand/deep_brown.png": {
+    "height": 93,
+    "left": 247,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 690,
+    "width": 75
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/lower_hand/fair.png": {
+    "height": 93,
+    "left": 247,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 690,
+    "width": 75
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/lower_hand/golden.png": {
+    "height": 93,
+    "left": 247,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 690,
+    "width": 75
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/lower_hand/medium_brown.png": {
+    "height": 93,
+    "left": 247,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 690,
+    "width": 75
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/lower_hand/porcelain.png": {
+    "height": 93,
+    "left": 247,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 690,
+    "width": 75
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/lower_hand/tan.png": {
+    "height": 93,
+    "left": 247,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 690,
+    "width": 75
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/lower_hand/warm_beige.png": {
+    "height": 93,
+    "left": 247,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 690,
+    "width": 75
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/raised_hand/amber.png": {
+    "height": 105,
+    "left": 782,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 69
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/raised_hand/deep_brown.png": {
+    "height": 105,
+    "left": 782,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 69
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/raised_hand/fair.png": {
+    "height": 105,
+    "left": 782,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 69
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/raised_hand/golden.png": {
+    "height": 105,
+    "left": 782,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 69
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/raised_hand/medium_brown.png": {
+    "height": 105,
+    "left": 782,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 69
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/raised_hand/porcelain.png": {
+    "height": 105,
+    "left": 782,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 69
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/raised_hand/tan.png": {
+    "height": 105,
+    "left": 782,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 69
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/herbologist/raised_hand/warm_beige.png": {
+    "height": 105,
+    "left": 782,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 490,
+    "width": 69
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/lower_hand/amber.png": {
+    "height": 102,
+    "left": 206,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 720,
+    "width": 103
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/lower_hand/deep_brown.png": {
+    "height": 102,
+    "left": 206,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 720,
+    "width": 103
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/lower_hand/fair.png": {
+    "height": 102,
+    "left": 206,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 720,
+    "width": 103
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/lower_hand/golden.png": {
+    "height": 102,
+    "left": 206,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 720,
+    "width": 103
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/lower_hand/medium_brown.png": {
+    "height": 102,
+    "left": 206,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 720,
+    "width": 103
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/lower_hand/porcelain.png": {
+    "height": 102,
+    "left": 206,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 720,
+    "width": 103
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/lower_hand/tan.png": {
+    "height": 102,
+    "left": 206,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 720,
+    "width": 103
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/lower_hand/warm_beige.png": {
+    "height": 102,
+    "left": 206,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 720,
+    "width": 103
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/raised_hand/amber.png": {
+    "height": 105,
+    "left": 817,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 462,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/raised_hand/deep_brown.png": {
+    "height": 105,
+    "left": 817,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 462,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/raised_hand/fair.png": {
+    "height": 105,
+    "left": 817,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 462,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/raised_hand/golden.png": {
+    "height": 105,
+    "left": 817,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 462,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/raised_hand/medium_brown.png": {
+    "height": 105,
+    "left": 817,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 462,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/raised_hand/porcelain.png": {
+    "height": 105,
+    "left": 817,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 462,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/raised_hand/tan.png": {
+    "height": 105,
+    "left": 817,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 462,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/inventors_apron/raised_hand/warm_beige.png": {
+    "height": 105,
+    "left": 817,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 462,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/lower_hand/amber.png": {
+    "height": 95,
+    "left": 222,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 760,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/lower_hand/deep_brown.png": {
+    "height": 95,
+    "left": 222,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 760,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/lower_hand/fair.png": {
+    "height": 95,
+    "left": 222,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 760,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/lower_hand/golden.png": {
+    "height": 95,
+    "left": 222,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 760,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/lower_hand/medium_brown.png": {
+    "height": 95,
+    "left": 222,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 760,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/lower_hand/porcelain.png": {
+    "height": 95,
+    "left": 222,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 760,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/lower_hand/tan.png": {
+    "height": 95,
+    "left": 222,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 760,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/lower_hand/warm_beige.png": {
+    "height": 95,
+    "left": 222,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 760,
+    "width": 74
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/raised_hand/amber.png": {
+    "height": 82,
+    "left": 796,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 516,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/raised_hand/deep_brown.png": {
+    "height": 82,
+    "left": 796,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 516,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/raised_hand/fair.png": {
+    "height": 82,
+    "left": 796,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 516,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/raised_hand/golden.png": {
+    "height": 82,
+    "left": 796,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 516,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/raised_hand/medium_brown.png": {
+    "height": 82,
+    "left": 796,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 516,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/raised_hand/porcelain.png": {
+    "height": 82,
+    "left": 796,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 516,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/raised_hand/tan.png": {
+    "height": 82,
+    "left": 796,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 516,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/magic_explorer/raised_hand/warm_beige.png": {
+    "height": 82,
+    "left": 796,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 516,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/lower_hand/amber.png": {
+    "height": 118,
+    "left": 229,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 695,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/lower_hand/deep_brown.png": {
+    "height": 118,
+    "left": 229,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 695,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/lower_hand/fair.png": {
+    "height": 118,
+    "left": 229,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 695,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/lower_hand/golden.png": {
+    "height": 118,
+    "left": 229,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 695,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/lower_hand/medium_brown.png": {
+    "height": 118,
+    "left": 229,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 695,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/lower_hand/porcelain.png": {
+    "height": 118,
+    "left": 229,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 695,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/lower_hand/tan.png": {
+    "height": 118,
+    "left": 229,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 695,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/lower_hand/warm_beige.png": {
+    "height": 118,
+    "left": 229,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 695,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/raised_hand/amber.png": {
+    "height": 127,
+    "left": 791,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 506,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/raised_hand/deep_brown.png": {
+    "height": 127,
+    "left": 791,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 506,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/raised_hand/fair.png": {
+    "height": 127,
+    "left": 791,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 506,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/raised_hand/golden.png": {
+    "height": 127,
+    "left": 791,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 506,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/raised_hand/medium_brown.png": {
+    "height": 127,
+    "left": 791,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 506,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/raised_hand/porcelain.png": {
+    "height": 127,
+    "left": 791,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 506,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/raised_hand/tan.png": {
+    "height": 127,
+    "left": 791,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 506,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/masonry_overalls/raised_hand/warm_beige.png": {
+    "height": 127,
+    "left": 791,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 506,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/lower_hand/amber.png": {
+    "height": 97,
+    "left": 191,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 772,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/lower_hand/deep_brown.png": {
+    "height": 97,
+    "left": 191,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 772,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/lower_hand/fair.png": {
+    "height": 97,
+    "left": 191,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 772,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/lower_hand/golden.png": {
+    "height": 97,
+    "left": 191,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 772,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/lower_hand/medium_brown.png": {
+    "height": 97,
+    "left": 191,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 772,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/lower_hand/porcelain.png": {
+    "height": 97,
+    "left": 191,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 772,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/lower_hand/tan.png": {
+    "height": 97,
+    "left": 191,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 772,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/lower_hand/warm_beige.png": {
+    "height": 97,
+    "left": 191,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 772,
+    "width": 85
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/raised_hand/amber.png": {
+    "height": 101,
+    "left": 822,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 533,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/raised_hand/deep_brown.png": {
+    "height": 101,
+    "left": 822,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 533,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/raised_hand/fair.png": {
+    "height": 101,
+    "left": 822,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 533,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/raised_hand/golden.png": {
+    "height": 101,
+    "left": 822,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 533,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/raised_hand/medium_brown.png": {
+    "height": 101,
+    "left": 822,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 533,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/raised_hand/porcelain.png": {
+    "height": 101,
+    "left": 822,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 533,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/raised_hand/tan.png": {
+    "height": 101,
+    "left": 822,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 533,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/mystic_robe/raised_hand/warm_beige.png": {
+    "height": 101,
+    "left": 822,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 533,
+    "width": 80
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/lower_hand/amber.png": {
+    "height": 94,
+    "left": 245,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 806,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/lower_hand/deep_brown.png": {
+    "height": 94,
+    "left": 245,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 806,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/lower_hand/fair.png": {
+    "height": 94,
+    "left": 245,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 806,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/lower_hand/golden.png": {
+    "height": 94,
+    "left": 245,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 806,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/lower_hand/medium_brown.png": {
+    "height": 94,
+    "left": 245,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 806,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/lower_hand/porcelain.png": {
+    "height": 94,
+    "left": 245,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 806,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/lower_hand/tan.png": {
+    "height": 94,
+    "left": 245,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 806,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/lower_hand/warm_beige.png": {
+    "height": 94,
+    "left": 245,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 806,
+    "width": 86
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/raised_hand/amber.png": {
+    "height": 83,
+    "left": 802,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 607,
+    "width": 51
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/raised_hand/deep_brown.png": {
+    "height": 83,
+    "left": 802,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 607,
+    "width": 51
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/raised_hand/fair.png": {
+    "height": 83,
+    "left": 802,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 607,
+    "width": 51
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/raised_hand/golden.png": {
+    "height": 83,
+    "left": 802,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 607,
+    "width": 51
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/raised_hand/medium_brown.png": {
+    "height": 83,
+    "left": 802,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 607,
+    "width": 51
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/raised_hand/porcelain.png": {
+    "height": 83,
+    "left": 802,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 607,
+    "width": 51
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/raised_hand/tan.png": {
+    "height": 83,
+    "left": 802,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 607,
+    "width": 51
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painted_hoodie/raised_hand/warm_beige.png": {
+    "height": 83,
+    "left": 802,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 607,
+    "width": 51
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/lower_hand/amber.png": {
+    "height": 92,
+    "left": 234,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 757,
+    "width": 72
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/lower_hand/deep_brown.png": {
+    "height": 92,
+    "left": 234,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 757,
+    "width": 72
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/lower_hand/fair.png": {
+    "height": 92,
+    "left": 234,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 757,
+    "width": 72
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/lower_hand/golden.png": {
+    "height": 92,
+    "left": 234,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 757,
+    "width": 72
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/lower_hand/medium_brown.png": {
+    "height": 92,
+    "left": 234,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 757,
+    "width": 72
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/lower_hand/porcelain.png": {
+    "height": 92,
+    "left": 234,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 757,
+    "width": 72
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/lower_hand/tan.png": {
+    "height": 92,
+    "left": 234,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 757,
+    "width": 72
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/lower_hand/warm_beige.png": {
+    "height": 92,
+    "left": 234,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 757,
+    "width": 72
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/raised_hand/amber.png": {
+    "height": 114,
+    "left": 779,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 489,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/raised_hand/deep_brown.png": {
+    "height": 114,
+    "left": 779,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 489,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/raised_hand/fair.png": {
+    "height": 114,
+    "left": 779,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 489,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/raised_hand/golden.png": {
+    "height": 114,
+    "left": 779,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 489,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/raised_hand/medium_brown.png": {
+    "height": 114,
+    "left": 779,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 489,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/raised_hand/porcelain.png": {
+    "height": 114,
+    "left": 779,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 489,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/raised_hand/tan.png": {
+    "height": 114,
+    "left": 779,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 489,
+    "width": 84
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/painters_smock/raised_hand/warm_beige.png": {
+    "height": 114,
+    "left": 779,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 489,
+    "width": 84
   },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/deep_brown.png": {
     "height": 440,

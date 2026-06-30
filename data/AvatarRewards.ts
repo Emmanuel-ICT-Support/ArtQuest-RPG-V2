@@ -158,8 +158,11 @@ const getLayerUrlForSlot = (
 const getGeneratedSkinDetailLayerUrl = (
   skinToneId: string,
   detailLayer: 'neck' | 'hands' | 'lower_hand' | 'raised_hand',
+  outfitId?: string,
 ): string => (
-  `./public/images/avatar-layers/generated/normalized/Asset.skin/${detailLayer}/${skinToneId}.png`
+  (outfitId && (detailLayer === 'lower_hand' || detailLayer === 'raised_hand'))
+    ? `./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/${outfitId}/${detailLayer}/${skinToneId}.png`
+    : `./public/images/avatar-layers/generated/normalized/Asset.skin/${detailLayer}/${skinToneId}.png`
 );
 
 const getFrontHairLayerUrl = (hairUrl: string | undefined): string | undefined => (
@@ -188,8 +191,8 @@ export const getAvatarLayerImageUrls = (config: AvatarBuilderConfig): string[] =
   const archetypeId = normalizedConfig.archetypeId || 'nova';
   const assetSet = AVATAR_LAYER_ASSETS[archetypeId];
   const skinNeckUrl = getGeneratedSkinDetailLayerUrl(normalizedConfig.skinToneId, 'neck');
-  const lowerHandUrl = getGeneratedSkinDetailLayerUrl(normalizedConfig.skinToneId, 'lower_hand');
-  const raisedHandUrl = getGeneratedSkinDetailLayerUrl(normalizedConfig.skinToneId, 'raised_hand');
+  const lowerHandUrl = getGeneratedSkinDetailLayerUrl(normalizedConfig.skinToneId, 'lower_hand', normalizedConfig.outfitId);
+  const raisedHandUrl = getGeneratedSkinDetailLayerUrl(normalizedConfig.skinToneId, 'raised_hand', normalizedConfig.outfitId);
   const faceUrl = getLayerUrlForSlot(assetSet, 'faceId', normalizedConfig);
   const hairUrl = getLayerUrlForSlot(assetSet, 'hairStyleId', normalizedConfig);
   const frontHairUrl = getFrontHairLayerUrl(hairUrl);
@@ -226,8 +229,8 @@ export const getAvatarAssetPreviewImageUrls = (
     return [
       getLayerUrlForSlot(assetSet, 'skinToneId', normalizedConfig),
       getGeneratedSkinDetailLayerUrl(normalizedConfig.skinToneId, 'neck'),
-      getGeneratedSkinDetailLayerUrl(normalizedConfig.skinToneId, 'lower_hand'),
-      getGeneratedSkinDetailLayerUrl(normalizedConfig.skinToneId, 'raised_hand'),
+      getGeneratedSkinDetailLayerUrl(normalizedConfig.skinToneId, 'lower_hand', normalizedConfig.outfitId),
+      getGeneratedSkinDetailLayerUrl(normalizedConfig.skinToneId, 'raised_hand', normalizedConfig.outfitId),
     ].filter((url): url is string => !!url);
   }
 

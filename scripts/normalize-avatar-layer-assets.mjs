@@ -24,6 +24,31 @@ const SKIN_LAYER_COLORS = {
   warm_beige: { fill: '#d9a06f', shadow: '#a8663f', highlight: '#f4c28e' },
 };
 
+const HAIR_RECOLOR_PALETTES = {
+  auburn: { shadow: '#5f210b', fill: '#9a3412', highlight: '#d97706' },
+  black: { shadow: '#030712', fill: '#111827', highlight: '#4b5563' },
+  blonde: { shadow: '#a16207', fill: '#facc15', highlight: '#fde68a' },
+  brown: { shadow: '#3f1f13', fill: '#7c2d12', highlight: '#a16207' },
+  pink: { shadow: '#831843', fill: '#ec4899', highlight: '#f9a8d4' },
+  red: { shadow: '#7f1d1d', fill: '#dc2626', highlight: '#f87171' },
+  teal: { shadow: '#134e4a', fill: '#0f766e', highlight: '#5eead4' },
+};
+
+const WORD_SPLITS = new Map([
+  ['coinpouch', 'coin pouch'],
+  ['crystalstaff', 'crystal staff'],
+  ['starstaff', 'star staff'],
+  ['spikeslong', 'long spikes'],
+  ['spikesshort', 'short spikes'],
+]);
+
+const PONYTAIL_CANONICAL_SOURCE_PATH = path.join(sourceRoot, 'Asset.Hair/brown/ponytail.brown.png');
+
+const HAND_HOLE_REGIONS = {
+  lower_hand: { minX: 0, minY: 610, maxX: 390, maxY: 950 },
+  raised_hand: { minX: 620, minY: 430, maxX: 1010, maxY: 830 },
+};
+
 const pngModuleCandidates = [
   'pngjs',
   '/Users/andrew.middleton/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs/lib/png.js',
@@ -70,6 +95,42 @@ const collectPngs = async (dir) => {
   }
 
   return files.sort((first, second) => first.localeCompare(second));
+};
+
+const slugify = (value) => {
+  const cleanValue = WORD_SPLITS.get(value.toLowerCase()) || value;
+  return cleanValue
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .replace(/_+/g, '_');
+};
+
+const stripExtension = (filename) => filename.replace(/\.[^.]+$/, '');
+
+const stripKnownPrefix = (value, prefix) => (
+  value.replace(new RegExp(`^${prefix}\\.?\\s*`, 'i'), '').trim()
+);
+
+const getHairStyleName = (relativePath) => {
+  const filename = path.basename(relativePath).toLowerCase();
+  const [styleName] = filename.split('.');
+  return styleName;
+};
+
+const getHairColorSlug = (relativePath) => {
+  const normalizedPath = relativePath.split(path.sep).join('/');
+  const [, colorName = 'brown'] = normalizedPath.split('/');
+  return slugify(colorName);
+};
+
+const getOutfitIdFromPath = (absolutePath) => {
+  const rawName = stripKnownPrefix(stripExtension(path.basename(absolutePath)), 'Outfit');
+  return slugify(rawName);
 };
 
 const getAlphaBounds = (png) => {
@@ -124,11 +185,10 @@ const containTransform = (png) => {
 };
 
 const getHairRig = (relativePath) => {
-  const filename = path.basename(relativePath).toLowerCase();
-  const [styleName] = filename.split('.');
+  const styleName = getHairStyleName(relativePath);
 
   if (styleName === 'ponytail') {
-    return { maxWidth: 390, top: 88, centerX: 548 };
+    return { maxWidth: 420, top: 104, centerX: 548 };
   }
   if (styleName === 'spikeslong') {
     return { maxWidth: 350, top: 64, centerX: 548 };
@@ -217,6 +277,72 @@ const hexToRgba = (hex, alpha = 255) => {
   };
 };
 
+const clonePng = (png) => {
+  const clone = new PNG({ width: png.width, height: png.height });
+  png.data.copy(clone.data);
+  return clone;
+};
+
+const mixChannel = (first, second, ratio) => (
+  Math.round(first + ((second - first) * ratio))
+);
+
+const mixColor = (first, second, ratio) => ({
+  r: mixChannel(first.r, second.r, ratio),
+  g: mixChannel(first.g, second.g, ratio),
+  b: mixChannel(first.b, second.b, ratio),
+  a: first.a,
+});
+
+const getPixelLuma = (r, g, b) => (
+  (0.299 * r) + (0.587 * g) + (0.114 * b)
+);
+
+const isGoldAccentPixel = (r, g, b) => (
+  r > 140 && g > 80 && b < 90 && r > b * 1.8
+);
+
+const getRecoloredPonytailSource = (() => {
+  let canonicalSourcePromise;
+
+  return async (relativePath, fallbackSource) => {
+    if (getHairStyleName(relativePath) !== 'ponytail') return fallbackSource;
+
+    canonicalSourcePromise ||= readFile(PONYTAIL_CANONICAL_SOURCE_PATH)
+      .then(buffer => PNG.sync.read(buffer));
+
+    const canonicalSource = await canonicalSourcePromise;
+    const colorSlug = getHairColorSlug(relativePath);
+    const palette = HAIR_RECOLOR_PALETTES[colorSlug] || HAIR_RECOLOR_PALETTES.brown;
+    const shadow = hexToRgba(palette.shadow);
+    const fill = hexToRgba(palette.fill);
+    const highlight = hexToRgba(palette.highlight);
+    const output = clonePng(canonicalSource);
+
+    for (let index = 0; index < output.data.length; index += 4) {
+      const alpha = output.data[index + 3];
+      if (alpha <= ALPHA_THRESHOLD) continue;
+
+      const r = output.data[index];
+      const g = output.data[index + 1];
+      const b = output.data[index + 2];
+      const luma = getPixelLuma(r, g, b);
+
+      if (luma < 42 || isGoldAccentPixel(r, g, b)) continue;
+
+      const color = luma < 95
+        ? mixColor(shadow, fill, Math.max(0, Math.min(1, (luma - 42) / 53)))
+        : mixColor(fill, highlight, Math.max(0, Math.min(1, (luma - 95) / 85)));
+
+      output.data[index] = color.r;
+      output.data[index + 1] = color.g;
+      output.data[index + 2] = color.b;
+    }
+
+    return output;
+  };
+})();
+
 const drawRect = (png, x, y, width, height, color) => {
   const rgba = typeof color === 'string' ? hexToRgba(color) : color;
   const startX = Math.max(0, Math.round(x));
@@ -283,6 +409,169 @@ const createSkinLayer = (skinColor, layerType = 'combined') => {
   return png;
 };
 
+const isTransparentAt = (png, x, y) => (
+  png.data[(png.width * y + x) * 4 + 3] <= ALPHA_THRESHOLD
+);
+
+const getLocalIndex = (x, y, region, regionWidth) => (
+  ((y - region.minY) * regionWidth) + (x - region.minX)
+);
+
+const findTransparentComponents = (png, region) => {
+  const regionWidth = region.maxX - region.minX;
+  const regionHeight = region.maxY - region.minY;
+  const seen = new Uint8Array(regionWidth * regionHeight);
+  const components = [];
+
+  for (let y = region.minY; y < region.maxY; y += 1) {
+    for (let x = region.minX; x < region.maxX; x += 1) {
+      const startIndex = getLocalIndex(x, y, region, regionWidth);
+      if (seen[startIndex] || !isTransparentAt(png, x, y)) continue;
+
+      const queue = [{ x, y }];
+      const points = [];
+      let head = 0;
+      let componentMinX = x;
+      let componentMinY = y;
+      let componentMaxX = x;
+      let componentMaxY = y;
+      let touchesRegionEdge = false;
+
+      seen[startIndex] = 1;
+
+      while (head < queue.length) {
+        const current = queue[head];
+        head += 1;
+
+        points.push((current.y * TARGET_WIDTH) + current.x);
+        componentMinX = Math.min(componentMinX, current.x);
+        componentMinY = Math.min(componentMinY, current.y);
+        componentMaxX = Math.max(componentMaxX, current.x);
+        componentMaxY = Math.max(componentMaxY, current.y);
+
+        if (
+          current.x === region.minX
+          || current.x === region.maxX - 1
+          || current.y === region.minY
+          || current.y === region.maxY - 1
+        ) {
+          touchesRegionEdge = true;
+        }
+
+        const neighbors = [
+          { x: current.x + 1, y: current.y },
+          { x: current.x - 1, y: current.y },
+          { x: current.x, y: current.y + 1 },
+          { x: current.x, y: current.y - 1 },
+        ];
+
+        for (const neighbor of neighbors) {
+          if (
+            neighbor.x < region.minX
+            || neighbor.x >= region.maxX
+            || neighbor.y < region.minY
+            || neighbor.y >= region.maxY
+          ) {
+            continue;
+          }
+
+          const neighborIndex = getLocalIndex(neighbor.x, neighbor.y, region, regionWidth);
+          if (seen[neighborIndex] || !isTransparentAt(png, neighbor.x, neighbor.y)) continue;
+
+          seen[neighborIndex] = 1;
+          queue.push(neighbor);
+        }
+      }
+
+      components.push({
+        points,
+        minX: componentMinX,
+        minY: componentMinY,
+        maxX: componentMaxX + 1,
+        maxY: componentMaxY + 1,
+        area: points.length,
+        touchesRegionEdge,
+      });
+    }
+  }
+
+  return components;
+};
+
+const isHandHoleComponent = (component) => {
+  const width = component.maxX - component.minX;
+  const height = component.maxY - component.minY;
+
+  return (
+    !component.touchesRegionEdge
+    && component.area >= 30
+    && width >= 6
+    && height >= 6
+    && width <= 140
+    && height <= 140
+  );
+};
+
+const chooseHandHoleComponent = (components, detailLayer) => {
+  const candidates = components.filter(isHandHoleComponent);
+  if (candidates.length === 0) return null;
+
+  if (detailLayer === 'lower_hand') {
+    return candidates.reduce((best, candidate) => {
+      const bestCenterX = (best.minX + best.maxX) / 2;
+      const candidateCenterX = (candidate.minX + candidate.maxX) / 2;
+      const bestCenterY = (best.minY + best.maxY) / 2;
+      const candidateCenterY = (candidate.minY + candidate.maxY) / 2;
+      const bestScore = bestCenterX + (Math.abs(bestCenterY - 800) * 0.1) - (best.area * 0.001);
+      const candidateScore = candidateCenterX + (Math.abs(candidateCenterY - 800) * 0.1) - (candidate.area * 0.001);
+      return candidateScore < bestScore ? candidate : best;
+    });
+  }
+
+  return candidates.reduce((best, candidate) => {
+    const bestCenterX = (best.minX + best.maxX) / 2;
+    const candidateCenterX = (candidate.minX + candidate.maxX) / 2;
+    const bestCenterY = (best.minY + best.maxY) / 2;
+    const candidateCenterY = (candidate.minY + candidate.maxY) / 2;
+    const bestScore = bestCenterX - (Math.abs(bestCenterY - 620) * 0.1) + (best.area * 0.001);
+    const candidateScore = candidateCenterX - (Math.abs(candidateCenterY - 620) * 0.1) + (candidate.area * 0.001);
+    return candidateScore > bestScore ? candidate : best;
+  });
+};
+
+const getOutfitHandPixelColor = (component, x, y, skinColor) => {
+  const fill = hexToRgba(skinColor.fill);
+  const highlight = hexToRgba(skinColor.highlight);
+  const shadow = hexToRgba(skinColor.shadow);
+  const width = Math.max(1, component.maxX - component.minX - 1);
+  const height = Math.max(1, component.maxY - component.minY - 1);
+  const relativeX = (x - component.minX) / width;
+  const relativeY = (y - component.minY) / height;
+
+  if (relativeY < 0.28 && relativeX < 0.72) return highlight;
+  if (relativeX > 0.74 || relativeY > 0.76) return shadow;
+  return fill;
+};
+
+const createOutfitHandLayer = (component, skinColor) => {
+  const output = new PNG({ width: TARGET_WIDTH, height: TARGET_HEIGHT });
+  if (!component) return output;
+
+  for (const point of component.points) {
+    const x = point % TARGET_WIDTH;
+    const y = Math.floor(point / TARGET_WIDTH);
+    const color = getOutfitHandPixelColor(component, x, y, skinColor);
+    const index = (TARGET_WIDTH * y + x) * 4;
+
+    output.data[index] = color.r;
+    output.data[index + 1] = color.g;
+    output.data[index + 2] = color.b;
+    output.data[index + 3] = color.a;
+  }
+
+  return output;
+};
+
 const drawScaledNearest = (source, transform) => {
   const output = new PNG({ width: TARGET_WIDTH, height: TARGET_HEIGHT });
   const destStartX = Math.max(0, Math.floor(transform.offsetX));
@@ -344,9 +633,12 @@ const createFrontHairLayer = (hairLayer) => {
 const normalizeAsset = async (sourcePath) => {
   const relativePath = path.relative(sourceRoot, sourcePath);
   const outputPath = path.join(outputRoot, relativePath);
-  const source = PNG.sync.read(await readFile(sourcePath));
-  const bounds = getAlphaBounds(source);
   const category = inferCategory(relativePath);
+  const rawSource = PNG.sync.read(await readFile(sourcePath));
+  const source = category === 'hair'
+    ? await getRecoloredPonytailSource(relativePath, rawSource)
+    : rawSource;
+  const bounds = getAlphaBounds(source);
   const transform = getTransform(category, source, bounds, relativePath);
   const output = drawScaledNearest(source, transform);
 
@@ -398,6 +690,37 @@ const writeSkinLayers = async () => {
   }
 };
 
+const writeOutfitHandLayers = async () => {
+  const outfitDir = path.join(outputRoot, 'Asset.outfit');
+  const outfitPaths = await collectPngs(outfitDir);
+  const handOutputRoot = path.join(outputRoot, 'Asset.skin/by_outfit');
+
+  for (const outfitPath of outfitPaths) {
+    const outfitId = getOutfitIdFromPath(outfitPath);
+    const outfit = PNG.sync.read(await readFile(outfitPath));
+    const handComponents = {
+      lower_hand: chooseHandHoleComponent(
+        findTransparentComponents(outfit, HAND_HOLE_REGIONS.lower_hand),
+        'lower_hand',
+      ),
+      raised_hand: chooseHandHoleComponent(
+        findTransparentComponents(outfit, HAND_HOLE_REGIONS.raised_hand),
+        'raised_hand',
+      ),
+    };
+
+    for (const [detailLayer, component] of Object.entries(handComponents)) {
+      const detailOutputDir = path.join(handOutputRoot, outfitId, detailLayer);
+      await mkdir(detailOutputDir, { recursive: true });
+
+      for (const [skinId, colors] of Object.entries(SKIN_LAYER_COLORS)) {
+        const layer = createOutfitHandLayer(component, colors);
+        await writeFile(path.join(detailOutputDir, `${skinId}.png`), PNG.sync.write(layer));
+      }
+    }
+  }
+};
+
 const main = async () => {
   if (!existsSync(sourceRoot)) {
     throw new Error(`Avatar layer source folder does not exist: ${sourceRoot}`);
@@ -412,6 +735,7 @@ const main = async () => {
 
   await writeBlankBase();
   await writeSkinLayers();
+  await writeOutfitHandLayers();
 
   const byCategory = results.reduce((counts, result) => ({
     ...counts,
