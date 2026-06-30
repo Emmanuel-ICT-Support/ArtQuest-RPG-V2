@@ -1,4 +1,4 @@
-name: Deploy Vite build to GitHub Pages
+name: Deploy standalone build to GitHub Pages
 
 on:
   push:
@@ -27,16 +27,20 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - name: Build standalone HTML
+        run: node scripts/build-standalone.mjs
 
-      - name: Build
-        run: npm run build
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p pages-dist
+          cp index.html pages-dist/index.html
+          cp -R public pages-dist/public
+          touch pages-dist/.nojekyll
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: pages-dist
 
   deploy:
     needs: build
