@@ -49,6 +49,16 @@ const HAND_HOLE_REGIONS = {
   raised_hand: { minX: 620, minY: 430, maxX: 1010, maxY: 830 },
 };
 
+const MANUAL_OUTFIT_HAND_COMPONENTS = {
+  explorer: {
+    raised_hand: { x: 805, y: 585, width: 86, height: 118, transparentOnly: true },
+  },
+  explorers_jacket: {
+    lower_hand: { x: 150, y: 810, width: 70, height: 72, avoidDarkPixels: true },
+    raised_hand: { x: 806, y: 535, width: 78, height: 88, avoidDarkPixels: true },
+  },
+};
+
 const pngModuleCandidates = [
   'pngjs',
   '/Users/andrew.middleton/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs/lib/png.js',
@@ -413,6 +423,13 @@ const isTransparentAt = (png, x, y) => (
   png.data[(png.width * y + x) * 4 + 3] <= ALPHA_THRESHOLD
 );
 
+const isDarkPixelAt = (png, x, y) => {
+  const index = (png.width * y + x) * 4;
+  const alpha = png.data[index + 3];
+  if (alpha <= ALPHA_THRESHOLD) return false;
+  return getPixelLuma(png.data[index], png.data[index + 1], png.data[index + 2]) < 58;
+};
+
 const getLocalIndex = (x, y, region, regionWidth) => (
   ((y - region.minY) * regionWidth) + (x - region.minX)
 );
@@ -539,6 +556,41 @@ const chooseHandHoleComponent = (components, detailLayer) => {
   });
 };
 
+const createManualHandComponent = (png, config) => {
+  const points = [];
+  const minX = Math.max(0, Math.round(config.x));
+  const minY = Math.max(0, Math.round(config.y));
+  const maxX = Math.min(TARGET_WIDTH, Math.round(config.x + config.width));
+  const maxY = Math.min(TARGET_HEIGHT, Math.round(config.y + config.height));
+  const radiusX = Math.max(1, (maxX - minX) / 2);
+  const radiusY = Math.max(1, (maxY - minY) / 2);
+  const centerX = minX + radiusX;
+  const centerY = minY + radiusY;
+
+  for (let y = minY; y < maxY; y += 1) {
+    for (let x = minX; x < maxX; x += 1) {
+      const normalizedX = (x - centerX) / radiusX;
+      const normalizedY = (y - centerY) / radiusY;
+      if ((normalizedX * normalizedX) + (normalizedY * normalizedY) > 1) continue;
+      if (config.transparentOnly && !isTransparentAt(png, x, y)) continue;
+      if (config.avoidDarkPixels && isDarkPixelAt(png, x, y)) continue;
+      points.push((y * TARGET_WIDTH) + x);
+    }
+  }
+
+  if (points.length === 0) return null;
+
+  return {
+    points,
+    minX,
+    minY,
+    maxX,
+    maxY,
+    area: points.length,
+    touchesRegionEdge: false,
+  };
+};
+
 const getOutfitHandPixelColor = (component, x, y, skinColor) => {
   const fill = hexToRgba(skinColor.fill);
   const highlight = hexToRgba(skinColor.highlight);
@@ -599,13 +651,14 @@ const drawScaledNearest = (source, transform) => {
   return output;
 };
 
-const createFrontHairLayer = (hairLayer) => {
+const createFrontHairLayer = (hairLayer, relativePath) => {
   const frontLayer = new PNG({ width: TARGET_WIDTH, height: TARGET_HEIGHT });
   const faceCenterX = 548;
   const faceCenterY = 306;
   const faceRadiusX = 174;
   const faceRadiusY = 166;
   const fringeBottom = 245;
+  const isPonytail = getHairStyleName(relativePath) === 'ponytail';
 
   for (let y = 0; y < TARGET_HEIGHT; y += 1) {
     for (let x = 0; x < TARGET_WIDTH; x += 1) {
@@ -616,7 +669,22 @@ const createFrontHairLayer = (hairLayer) => {
       const normalizedX = (x - faceCenterX) / faceRadiusX;
       const normalizedY = (y - faceCenterY) / faceRadiusY;
       const insideFaceWindow = (normalizedX * normalizedX) + (normalizedY * normalizedY) < 1;
-      const keepAsFront = !insideFaceWindow || y < fringeBottom;
+      const protectedEyeBand = (
+        isPonytail
+        && insideFaceWindow
+        && y >= fringeBottom
+        && y <= 330
+        && x >= 390
+        && x <= 700
+      );
+      const ponytailEarStrand = (
+        isPonytail
+        && x >= 635
+        && y >= 300
+        && y <= 475
+        && !protectedEyeBand
+      );
+      const keepAsFront = !insideFaceWindow || y < fringeBottom || ponytailEarStrand;
 
       if (!keepAsFront) continue;
 
@@ -651,7 +719,7 @@ const normalizeAsset = async (sourcePath) => {
       relativePath.replace(/^Asset\.Hair/, 'Asset.Hair.front'),
     );
     await mkdir(path.dirname(frontOutputPath), { recursive: true });
-    await writeFile(frontOutputPath, PNG.sync.write(createFrontHairLayer(output)));
+    await writeFile(frontOutputPath, PNG.sync.write(createFrontHairLayer(output, relativePath)));
   }
 
   return {
@@ -699,14 +767,18 @@ const writeOutfitHandLayers = async () => {
     const outfitId = getOutfitIdFromPath(outfitPath);
     const outfit = PNG.sync.read(await readFile(outfitPath));
     const handComponents = {
-      lower_hand: chooseHandHoleComponent(
-        findTransparentComponents(outfit, HAND_HOLE_REGIONS.lower_hand),
-        'lower_hand',
-      ),
-      raised_hand: chooseHandHoleComponent(
-        findTransparentComponents(outfit, HAND_HOLE_REGIONS.raised_hand),
-        'raised_hand',
-      ),
+      lower_hand: MANUAL_OUTFIT_HAND_COMPONENTS[outfitId]?.lower_hand
+        ? createManualHandComponent(outfit, MANUAL_OUTFIT_HAND_COMPONENTS[outfitId].lower_hand)
+        : chooseHandHoleComponent(
+          findTransparentComponents(outfit, HAND_HOLE_REGIONS.lower_hand),
+          'lower_hand',
+        ),
+      raised_hand: MANUAL_OUTFIT_HAND_COMPONENTS[outfitId]?.raised_hand
+        ? createManualHandComponent(outfit, MANUAL_OUTFIT_HAND_COMPONENTS[outfitId].raised_hand)
+        : chooseHandHoleComponent(
+          findTransparentComponents(outfit, HAND_HOLE_REGIONS.raised_hand),
+          'raised_hand',
+        ),
     };
 
     for (const [detailLayer, component] of Object.entries(handComponents)) {

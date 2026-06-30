@@ -1549,68 +1549,196 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 85
   },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/amber.png": {
-    "height": 72,
-    "left": 818,
+    "height": 115,
+    "left": 812,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
     "top": 588,
-    "width": 32
+    "width": 79
   },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/deep_brown.png": {
-    "height": 72,
-    "left": 818,
+    "height": 115,
+    "left": 812,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
     "top": 588,
-    "width": 32
+    "width": 79
   },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/fair.png": {
-    "height": 72,
-    "left": 818,
+    "height": 115,
+    "left": 812,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
     "top": 588,
-    "width": 32
+    "width": 79
   },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/golden.png": {
-    "height": 72,
-    "left": 818,
+    "height": 115,
+    "left": 812,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
     "top": 588,
-    "width": 32
+    "width": 79
   },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/medium_brown.png": {
-    "height": 72,
-    "left": 818,
+    "height": 115,
+    "left": 812,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
     "top": 588,
-    "width": 32
+    "width": 79
   },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/porcelain.png": {
-    "height": 72,
-    "left": 818,
+    "height": 115,
+    "left": 812,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
     "top": 588,
-    "width": 32
+    "width": 79
   },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/tan.png": {
-    "height": 72,
-    "left": 818,
+    "height": 115,
+    "left": 812,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
     "top": 588,
-    "width": 32
+    "width": 79
   },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorer/raised_hand/warm_beige.png": {
-    "height": 72,
-    "left": 818,
+    "height": 115,
+    "left": 812,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
     "top": 588,
-    "width": 32
+    "width": 79
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/lower_hand/amber.png": {
+    "height": 71,
+    "left": 150,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 811,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/lower_hand/deep_brown.png": {
+    "height": 71,
+    "left": 150,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 811,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/lower_hand/fair.png": {
+    "height": 71,
+    "left": 150,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 811,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/lower_hand/golden.png": {
+    "height": 71,
+    "left": 150,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 811,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/lower_hand/medium_brown.png": {
+    "height": 71,
+    "left": 150,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 811,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/lower_hand/porcelain.png": {
+    "height": 71,
+    "left": 150,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 811,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/lower_hand/tan.png": {
+    "height": 71,
+    "left": 150,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 811,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/lower_hand/warm_beige.png": {
+    "height": 71,
+    "left": 150,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 811,
+    "width": 70
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/raised_hand/amber.png": {
+    "height": 86,
+    "left": 806,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 537,
+    "width": 78
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/raised_hand/deep_brown.png": {
+    "height": 86,
+    "left": 806,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 537,
+    "width": 78
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/raised_hand/fair.png": {
+    "height": 86,
+    "left": 806,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 537,
+    "width": 78
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/raised_hand/golden.png": {
+    "height": 86,
+    "left": 806,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 537,
+    "width": 78
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/raised_hand/medium_brown.png": {
+    "height": 86,
+    "left": 806,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 537,
+    "width": 78
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/raised_hand/porcelain.png": {
+    "height": 86,
+    "left": 806,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 537,
+    "width": 78
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/raised_hand/tan.png": {
+    "height": 86,
+    "left": 806,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 537,
+    "width": 78
+  },
+  "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/explorers_jacket/raised_hand/warm_beige.png": {
+    "height": 86,
+    "left": 806,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 537,
+    "width": 78
   },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/by_outfit/gallery_guard/lower_hand/amber.png": {
     "height": 104,
