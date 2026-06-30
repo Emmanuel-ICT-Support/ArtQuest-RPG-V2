@@ -23,7 +23,7 @@ import { PreloadAsset, preloadAssets, waitForMinimum, warmAssets } from './utils
 
 const TEACHER_UNLOCK_CODE = '0554';
 const TEACHER_AVATAR_IMAGE_URL = './public/images/Teacher.png';
-type GuideReturnTarget = 'splash' | 'map' | 'returnMenu';
+type GuideReturnTarget = 'splash' | 'map' | 'game' | 'returnMenu';
 type ReturnMenuTarget = 'map' | 'game';
 type PanelScreen = Extract<GameScreen, 'guide' | 'journal' | 'inventory' | 'assessment'>;
 
@@ -1117,6 +1117,13 @@ export const App: React.FC = () => {
     });
   }, [runPanelTransition]);
 
+  const handleNavigateToGuideFromGame = useCallback(async () => {
+    await runPanelTransition('guide', () => {
+      setGuideReturnTarget('game');
+      setCurrentScreen('guide');
+    });
+  }, [runPanelTransition]);
+
   const handleNavigateToGuideFromStart = useCallback(async () => {
     await runPanelTransition('guide', () => {
       setGuideReturnTarget('splash');
@@ -1142,8 +1149,26 @@ export const App: React.FC = () => {
       return;
     }
 
+    if (
+      guideReturnTarget === 'game' &&
+      appGameState.geminiChat &&
+      appGameState.currentWingIdForGame &&
+      appGameState.selectedAvatar &&
+      appGameState.wings[appGameState.currentWingIdForGame]
+    ) {
+      setCurrentScreen('game');
+      return;
+    }
+
     handleReturnToMap();
-  }, [guideReturnTarget, handleReturnToMap]);
+  }, [
+    appGameState.currentWingIdForGame,
+    appGameState.geminiChat,
+    appGameState.selectedAvatar,
+    appGameState.wings,
+    guideReturnTarget,
+    handleReturnToMap,
+  ]);
 
   const handleNavigateToAssessment = useCallback(async () => {
     await runPanelTransition('assessment', () => {
@@ -1324,7 +1349,7 @@ export const App: React.FC = () => {
             setIsGeneratingWingArt={setIsGeneratingWingArt}
             onSaveJournalEntry={handleSaveJournalEntry}
             onNavigateToJournalEntry={handleNavigateToJournalEntry}
-            onNavigateToGuide={handleNavigateToGuide}
+            onNavigateToGuide={handleNavigateToGuideFromGame}
             playerStats={appGameState.playerStats}
             onUpdatePlayerStats={handleUpdatePlayerStats}
             avatarImageUrl={appGameState.avatarImageUrl}
@@ -1419,7 +1444,7 @@ export const App: React.FC = () => {
           selectedAvatar={appGameState.selectedAvatar || null}
           playerStats={appGameState.playerStats}
           onReturnToMap={handleReturnFromGuide}
-          returnLabel={guideReturnTarget === 'splash' ? 'Back to Start' : 'Return to Map'}
+          returnLabel={guideReturnTarget === 'splash' ? 'Back to Start' : guideReturnTarget === 'game' ? 'Return' : 'Return to Map'}
         />
       );
       break;
