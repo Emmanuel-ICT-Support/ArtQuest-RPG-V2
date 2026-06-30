@@ -5208,70 +5208,6 @@ const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifestEntry>
     "top": 430,
     "width": 740
   },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/hands/amber.png": {
-    "height": 292,
-    "left": 164,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 578,
-    "width": 740
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/hands/deep_brown.png": {
-    "height": 292,
-    "left": 164,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 578,
-    "width": 740
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/hands/fair.png": {
-    "height": 292,
-    "left": 164,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 578,
-    "width": 740
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/hands/golden.png": {
-    "height": 292,
-    "left": 164,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 578,
-    "width": 740
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/hands/medium_brown.png": {
-    "height": 292,
-    "left": 164,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 578,
-    "width": 740
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/hands/porcelain.png": {
-    "height": 292,
-    "left": 164,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 578,
-    "width": 740
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/hands/tan.png": {
-    "height": 292,
-    "left": 164,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 578,
-    "width": 740
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/hands/warm_beige.png": {
-    "height": 292,
-    "left": 164,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 578,
-    "width": 740
-  },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/lower_hand/amber.png": {
     "height": 80,
     "left": 164,
@@ -5487,70 +5423,6 @@ const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifestEntry>
     "naturalWidth": 1024,
     "top": 430,
     "width": 740
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/under/amber.png": {
-    "height": 70,
-    "left": 512,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 430,
-    "width": 42
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/under/deep_brown.png": {
-    "height": 70,
-    "left": 512,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 430,
-    "width": 42
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/under/fair.png": {
-    "height": 70,
-    "left": 512,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 430,
-    "width": 42
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/under/golden.png": {
-    "height": 70,
-    "left": 512,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 430,
-    "width": 42
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/under/medium_brown.png": {
-    "height": 70,
-    "left": 512,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 430,
-    "width": 42
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/under/porcelain.png": {
-    "height": 70,
-    "left": 512,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 430,
-    "width": 42
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/under/tan.png": {
-    "height": 70,
-    "left": 512,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 430,
-    "width": 42
-  },
-  "./public/images/avatar-layers/generated/normalized/Asset.skin/under/warm_beige.png": {
-    "height": 70,
-    "left": 512,
-    "naturalHeight": 1536,
-    "naturalWidth": 1024,
-    "top": 430,
-    "width": 42
   },
   "./public/images/avatar-layers/generated/normalized/Asset.skin/warm_beige.png": {
     "height": 440,
@@ -8514,7 +8386,7 @@ const getLayerUrlForSlot = (
 
 const getGeneratedSkinDetailLayerUrl = (
   skinToneId: string,
-  detailLayer: 'neck' | 'hands' | 'lower_hand' | 'raised_hand',
+  detailLayer: 'neck' | 'lower_hand' | 'raised_hand',
   outfitId?: string,
 ): string => (
   (outfitId && (detailLayer === 'lower_hand' || detailLayer === 'raised_hand'))

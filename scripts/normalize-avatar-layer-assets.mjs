@@ -408,13 +408,13 @@ const drawRaisedHand = (png, skinColor) => {
 const createSkinLayer = (skinColor, layerType = 'combined') => {
   const png = new PNG({ width: TARGET_WIDTH, height: TARGET_HEIGHT });
 
-  if (layerType === 'neck' || layerType === 'under' || layerType === 'combined') {
+  if (layerType === 'neck' || layerType === 'combined') {
     drawNeck(png, skinColor);
   }
-  if (layerType === 'lowerHand' || layerType === 'hands' || layerType === 'combined') {
+  if (layerType === 'lowerHand' || layerType === 'combined') {
     drawLowerHand(png, skinColor);
   }
-  if (layerType === 'raisedHand' || layerType === 'hands' || layerType === 'combined') {
+  if (layerType === 'raisedHand' || layerType === 'combined') {
     drawRaisedHand(png, skinColor);
   }
 
@@ -794,17 +794,13 @@ const writeBlankBase = async () => {
 const writeSkinLayers = async () => {
   const outputDir = path.join(outputRoot, 'Asset.skin');
   await mkdir(outputDir, { recursive: true });
-  await mkdir(path.join(outputDir, 'under'), { recursive: true });
   await mkdir(path.join(outputDir, 'neck'), { recursive: true });
-  await mkdir(path.join(outputDir, 'hands'), { recursive: true });
   await mkdir(path.join(outputDir, 'lower_hand'), { recursive: true });
   await mkdir(path.join(outputDir, 'raised_hand'), { recursive: true });
 
   for (const [skinId, colors] of Object.entries(SKIN_LAYER_COLORS)) {
     await writeFile(path.join(outputDir, `${skinId}.png`), PNG.sync.write(createSkinLayer(colors)));
-    await writeFile(path.join(outputDir, 'under', `${skinId}.png`), PNG.sync.write(createSkinLayer(colors, 'under')));
     await writeFile(path.join(outputDir, 'neck', `${skinId}.png`), PNG.sync.write(createSkinLayer(colors, 'neck')));
-    await writeFile(path.join(outputDir, 'hands', `${skinId}.png`), PNG.sync.write(createSkinLayer(colors, 'hands')));
     await writeFile(path.join(outputDir, 'lower_hand', `${skinId}.png`), PNG.sync.write(createSkinLayer(colors, 'lowerHand')));
     await writeFile(path.join(outputDir, 'raised_hand', `${skinId}.png`), PNG.sync.write(createSkinLayer(colors, 'raisedHand')));
   }

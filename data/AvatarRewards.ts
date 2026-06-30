@@ -157,7 +157,7 @@ const getLayerUrlForSlot = (
 
 const getGeneratedSkinDetailLayerUrl = (
   skinToneId: string,
-  detailLayer: 'neck' | 'hands' | 'lower_hand' | 'raised_hand',
+  detailLayer: 'neck' | 'lower_hand' | 'raised_hand',
   outfitId?: string,
 ): string => (
   (outfitId && (detailLayer === 'lower_hand' || detailLayer === 'raised_hand'))
