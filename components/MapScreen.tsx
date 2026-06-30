@@ -835,6 +835,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   wingsState,
   currentGalleryScene,
   onGallerySceneChange,
+  onSceneTransition,
   onSelectWing,
   wingDefinitions,
   learningJournal,
@@ -889,10 +890,12 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   const [isFinalSolved, setIsFinalSolved] = useState<boolean>(false);
   const [isCaseFilesOpen, setIsCaseFilesOpen] = useState<boolean>(false);
   const [selectedCaseFileCaseId, setSelectedCaseFileCaseId] = useState<string>(SIDE_QUEST_CASES[0]?.id || '');
+  const [isSceneTransitioning, setIsSceneTransitioning] = useState<boolean>(false);
   const [stageSize, setStageSize] = useState<{ width: number; height: number }>({ width: 1280, height: 720 });
   const mainRef = useRef<HTMLDivElement | null>(null);
   const playerPositionRef = useRef<Point>(FOYER_SPAWN);
   const activeNpcIdRef = useRef<string | null>(null);
+  const sceneTransitionRef = useRef<boolean>(false);
   const pressedMovementKeysRef = useRef<Set<string>>(new Set());
   const walkingStopTimerRef = useRef<number | null>(null);
 
@@ -1011,8 +1014,35 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   }, []);
 
   const setScene = (nextScene: GalleryScene) => {
-    setLocalScene(nextScene);
-    onGallerySceneChange(nextScene);
+    if (nextScene === scene || sceneTransitionRef.current) return;
+
+    const commitSceneChange = () => {
+      setLocalScene(nextScene);
+      onGallerySceneChange(nextScene);
+    };
+
+    if (!onSceneTransition) {
+      commitSceneChange();
+      return;
+    }
+
+    let didCommit = false;
+    const commitOnce = () => {
+      if (didCommit) return;
+      didCommit = true;
+      commitSceneChange();
+    };
+
+    sceneTransitionRef.current = true;
+    setIsSceneTransitioning(true);
+    stopWalking();
+
+    void onSceneTransition(nextScene, scene, commitOnce)
+      .catch(() => commitOnce())
+      .finally(() => {
+        sceneTransitionRef.current = false;
+        setIsSceneTransitioning(false);
+      });
   };
 
   const getWingById = (wingId: string): WingDefinition | undefined => {
@@ -1608,7 +1638,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
   };
 
   const requestWingEntry = (wingId: string) => {
-    if (activeDoorUnlockWingId) return;
+    if (activeDoorUnlockWingId || isSceneTransitioning) return;
 
     if (!isWingAccessible(wingId)) {
       setActiveDoorGuardWingId(wingId);
@@ -1810,6 +1840,11 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       if (isTypingTarget(event.target)) return;
 
       if (activeDoorUnlockWingId) {
+        event.preventDefault();
+        return;
+      }
+
+      if (isSceneTransitioning) {
         event.preventDefault();
         return;
       }
@@ -3744,7 +3779,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <button
             type="button"
             onClick={() => firstGalleryUnlocked && setScene(0)}
-            disabled={!firstGalleryUnlocked}
+            disabled={!firstGalleryUnlocked || isSceneTransitioning}
             className={interactionHotspotClass}
             style={{ left: '12%', top: '9%', width: '21%', height: '26%' }}
             aria-label="Enter Gallery One"
@@ -3776,7 +3811,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
         key={wing.id}
         type="button"
         onClick={() => canEnter && requestWingEntry(wing.id)}
-        disabled={!canEnter}
+        disabled={!canEnter || isSceneTransitioning}
+        aria-disabled={!canEnter || isSceneTransitioning}
         className={interactionHotspotClass}
         style={{
           left: position.left,
@@ -3815,7 +3851,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
             <button
               type="button"
               onClick={() => canEnterNextGallery && setScene(activeGallery.index + 1)}
-              disabled={!canEnterNextGallery}
+              disabled={!canEnterNextGallery || isSceneTransitioning}
               className={interactionHotspotClass}
               style={{ left: '80%', top: '46%', width: '14%', height: '31%' }}
               aria-label={`${nextGallery.name}. ${canEnterNextGallery ? 'Open' : 'Locked'}.`}
@@ -3833,6 +3869,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
           <button
             type="button"
             onClick={() => setScene(returnScene)}
+            disabled={isSceneTransitioning}
             className={interactionHotspotClass}
             style={{ left: '41.5%', top: '78%', width: '19%', height: '14%' }}
             aria-label={`Return to ${returnDoorLabel}`}

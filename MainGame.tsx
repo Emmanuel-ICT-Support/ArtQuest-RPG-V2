@@ -216,7 +216,6 @@ const MainGameComponent: React.FC<MainGameProps> = ({
   onOpenGameMenu,
   onGameWon,
   onError,
-  isLoading, 
   setIsLoading, 
   isGeneratingWingArt, 
   setIsGeneratingWingArt, 

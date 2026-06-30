@@ -333,6 +333,11 @@ export interface MapScreenProps {
   wingsState: Record<string, WingState>;
   currentGalleryScene: GalleryScene;
   onGallerySceneChange: (scene: GalleryScene) => void;
+  onSceneTransition?: (
+    nextScene: GalleryScene,
+    fromScene: GalleryScene,
+    commitSceneChange: () => void,
+  ) => Promise<void>;
   onSelectWing: (wingId: string) => void;
   wingDefinitions: WingDefinition[];
   learningJournal: JournalEntry[]; // Added this line

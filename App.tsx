@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import SplashScreen from './components/SplashScreen';
 import ReturnToGameScreen from './components/ReturnToGameScreen';
 import NewGameSetupScreen from './components/StartScreen'; // Renamed from StartScreen, actual file is StartScreen.tsx
@@ -9,18 +9,208 @@ import JournalScreen from './components/JournalScreen';
 import InventoryScreen from './components/InventoryScreen';
 import GameGuideScreen from './components/GameGuideScreen';
 import AssessmentScreen from './components/AssessmentScreen';
+import GalleryLoadingScreen, { GalleryLoadingTone } from './components/GalleryLoadingScreen';
 import Modal from './components/Modal';
 import { GameMusicTrack, useGameAudio } from './components/useGameAudio';
 import { PlayerAvatar, WingState, AppGameState, NarrativeEntry, GameScreen, GalleryScene, JournalEntry, YearLevel, SeniorCoursePathway, PlayerStats, TraitName, TraitLevel, SaveGameData, CoreSavedGameState, SideQuestReward } from './types';
 import { WING_DEFINITIONS, INITIAL_WING_ID, SAVE_FILE_VERSION } from './constants';
 import { initializeChat as initializeAiChat } from './services/aiService';
-import { getAvatarBuildForAvatar, getAvatarSpriteUrl, getNewlyUnlockedRewardMilestones } from './data/AvatarRewards';
+import { getAvatarBuildForAvatar, getAvatarLayerImageUrls, getAvatarSpriteUrl, getNewlyUnlockedRewardMilestones } from './data/AvatarRewards';
+import { getArtworkBrief } from './data/ArtworkLibrary';
+import { getVisualLanguageGuideForWing } from './data/VisualLanguageGuide';
 import { SIDE_QUEST_CASES_BY_ID, createInitialSideQuestState, normalizeSideQuestState } from './data/SideQuests';
+import { PreloadAsset, preloadAssets, waitForMinimum, warmAssets } from './utils/assetPreloader';
 
 const TEACHER_UNLOCK_CODE = '0554';
 const TEACHER_AVATAR_IMAGE_URL = './public/images/Teacher.png';
 type GuideReturnTarget = 'splash' | 'map' | 'returnMenu';
 type ReturnMenuTarget = 'map' | 'game';
+type PanelScreen = Extract<GameScreen, 'guide' | 'journal' | 'inventory' | 'assessment'>;
+
+interface LoadTransitionState {
+  title: string;
+  message: string;
+  detail?: string;
+  tone: GalleryLoadingTone;
+  compact?: boolean;
+  minimumMs?: number;
+}
+
+const MAP_BACKGROUND_IMAGES = {
+  foyer: './public/images/backgrounds/foyer.png',
+  galleries: [
+    './public/images/backgrounds/gallery-1.png',
+    './public/images/backgrounds/gallery-2.png',
+    './public/images/backgrounds/gallery-3.png',
+    './public/images/backgrounds/gallery-4.png',
+  ],
+};
+
+const MAP_CHARACTER_IMAGE_ASSETS = [
+  './public/images/npcs/gallery-guide.png',
+  './public/images/npcs/gallery-guard.png',
+  './public/images/npcs/pip.png',
+];
+
+const CORE_AUDIO_ASSETS = [
+  './public/audio/main-game-exploration.mp3',
+  './public/audio/door-opening.m4a',
+  './public/audio/page-turn.mp3',
+];
+
+const PANEL_IMAGE_ASSETS: Record<PanelScreen, string[]> = {
+  guide: [
+    './public/images/screens/guide/guidebook-preview.png',
+    './public/images/screens/guide/quick-start.png',
+    './public/images/screens/guide/map-basics.png',
+  ],
+  journal: [
+    './public/images/screens/journal-blank-plate.png',
+    './public/images/screens/journal-page-turns/book-rest.png',
+    './public/images/screens/journal-page-turns/frame-01.png',
+  ],
+  inventory: [
+    './public/images/screens/build-avatar-screen-v2.png',
+  ],
+  assessment: [],
+};
+
+const imageAsset = (src: string | null | undefined): PreloadAsset => ({ type: 'image', src });
+const audioAsset = (src: string | null | undefined): PreloadAsset => ({ type: 'audio', src });
+
+const getGallerySceneName = (scene: GalleryScene): string => {
+  if (scene === 'foyer') return 'Foyer';
+  return `Gallery ${scene + 1}`;
+};
+
+const getWingDisplayName = (wingId: string): string => {
+  const wing = WING_DEFINITIONS.find((item) => item.id === wingId);
+  return wing?.name.replace(/^[^\p{L}\p{N}]+/u, '').trim() || 'Analysis Room';
+};
+
+const getAvatarPreloadAssets = (avatar?: PlayerAvatar | null): PreloadAsset[] => {
+  if (!avatar) return [];
+
+  const avatarBuild = avatar.avatarBuild || getAvatarBuildForAvatar(avatar);
+  const avatarSprite = getAvatarSpriteUrl({ ...avatar, avatarBuild }) || avatar.imageUrl;
+  const layerImages = avatar.id === 'custom' && avatarBuild
+    ? getAvatarLayerImageUrls(avatarBuild)
+    : [];
+
+  return [
+    imageAsset(avatarSprite),
+    ...layerImages.map(imageAsset),
+  ];
+};
+
+const getMapSceneBackground = (scene: GalleryScene): string => (
+  scene === 'foyer'
+    ? MAP_BACKGROUND_IMAGES.foyer
+    : MAP_BACKGROUND_IMAGES.galleries[scene] || MAP_BACKGROUND_IMAGES.galleries[0]
+);
+
+const getGalleryWingIds = (scene: GalleryScene): string[] => {
+  if (scene === 'foyer') return WING_DEFINITIONS.slice(0, 3).map((wing) => wing.id);
+  const startIndex = scene * 3;
+  return WING_DEFINITIONS.slice(startIndex, startIndex + 3).map((wing) => wing.id);
+};
+
+const getMapScenePreloadAssets = (scene: GalleryScene, avatar?: PlayerAvatar | null): PreloadAsset[] => [
+  imageAsset(getMapSceneBackground(scene)),
+  ...MAP_CHARACTER_IMAGE_ASSETS.map(imageAsset),
+  ...getAvatarPreloadAssets(avatar),
+];
+
+const getAdjacentMapScenePreloadAssets = (scene: GalleryScene, avatar?: PlayerAvatar | null): PreloadAsset[] => {
+  const adjacentScenes: GalleryScene[] = scene === 'foyer'
+    ? [0]
+    : [
+        scene > 0 ? scene - 1 : 'foyer',
+        ...(scene < MAP_BACKGROUND_IMAGES.galleries.length - 1 ? [(scene + 1) as GalleryScene] : []),
+      ];
+
+  return adjacentScenes.flatMap((adjacentScene) => getMapScenePreloadAssets(adjacentScene, avatar));
+};
+
+const getAnalysisRoomPreloadAssets = (wingId: string, avatar?: PlayerAvatar | null): PreloadAsset[] => {
+  const yearLevel = avatar?.selectedYearLevel || 9;
+  const artworkBrief = getArtworkBrief(wingId, yearLevel);
+  const visualGuide = getVisualLanguageGuideForWing(
+    wingId,
+    yearLevel,
+    avatar?.selectedCoursePathway,
+  );
+
+  return [
+    imageAsset(artworkBrief.assetPath),
+    imageAsset(visualGuide.help.practiceImageSrc),
+    imageAsset('./public/images/npcs/gallery-guide.png'),
+    ...getAvatarPreloadAssets(avatar),
+  ];
+};
+
+const getCurrentGalleryAnalysisPreloadAssets = (
+  scene: GalleryScene,
+  avatar?: PlayerAvatar | null,
+): PreloadAsset[] => (
+  getGalleryWingIds(scene).flatMap((wingId) => getAnalysisRoomPreloadAssets(wingId, avatar))
+);
+
+const getPanelPreloadAssets = (screen: PanelScreen, avatar?: PlayerAvatar | null): PreloadAsset[] => [
+  ...PANEL_IMAGE_ASSETS[screen].map(imageAsset),
+  ...getAvatarPreloadAssets(avatar),
+];
+
+const getPanelTransition = (screen: PanelScreen): LoadTransitionState => {
+  const labels: Record<PanelScreen, string> = {
+    guide: 'Opening the Guide',
+    journal: 'Opening the Journal',
+    inventory: 'Opening the Inventory',
+    assessment: 'Opening Assessment',
+  };
+
+  const messages: Record<PanelScreen, string> = {
+    guide: 'Dusting off the guidebook pages.',
+    journal: 'Finding your latest gallery notes.',
+    inventory: 'Arranging your earned artist gear.',
+    assessment: 'Lining up your evidence and reflections.',
+  };
+
+  return {
+    title: labels[screen],
+    message: messages[screen],
+    detail: 'This is a quick panel load, not a full room change.',
+    tone: 'panel',
+    compact: true,
+    minimumMs: 280,
+  };
+};
+
+const getSceneTransition = (nextScene: GalleryScene, fromScene: GalleryScene): LoadTransitionState => ({
+  title: `Entering ${getGallerySceneName(nextScene)}`,
+  message: nextScene === 'foyer'
+    ? 'Rolling the gallery map back to the foyer.'
+    : 'Lighting the next hall and checking the door glyphs.',
+  detail: `${getGallerySceneName(fromScene)} -> ${getGallerySceneName(nextScene)}`,
+  tone: nextScene === 'foyer' ? 'foyer' : 'gallery',
+  minimumMs: 520,
+});
+
+const getAnalysisTransition = (wingId: string): LoadTransitionState => ({
+  title: `Entering ${getWingDisplayName(wingId)}`,
+  message: 'Framing the artwork and waking the Curator.',
+  detail: 'Artwork, guide terms, and avatar assets are being prepared.',
+  tone: 'analysis',
+  minimumMs: 650,
+});
+
+const getReturnTransition = (scene: GalleryScene): LoadTransitionState => ({
+  title: `Returning to ${getGallerySceneName(scene)}`,
+  message: 'Packing the analysis notes and reopening the gallery floor.',
+  detail: 'Your progress stays cached for the next room.',
+  tone: 'return',
+  minimumMs: 480,
+});
 
 const initialWingsState = (): Record<string, WingState> => {
   const wings: Record<string, WingState> = {};
@@ -61,13 +251,15 @@ const normalizeUnlockedWings = (wings: Record<string, WingState>): Record<string
   const normalized: Record<string, WingState> = {};
 
   WING_DEFINITIONS.forEach((wing) => {
+    const savedWing = wings[wing.id];
+
     normalized[wing.id] = {
-      isSolved: false,
-      isUnlocked: wing.id === INITIAL_WING_ID,
-      currentQuestionLevel: 1,
-      phaseResponses: {},
-      entryChallengeCompleted: false,
-      ...wings[wing.id],
+      ...savedWing,
+      isSolved: savedWing?.isSolved ?? false,
+      isUnlocked: savedWing?.isUnlocked ?? wing.id === INITIAL_WING_ID,
+      currentQuestionLevel: savedWing?.currentQuestionLevel ?? 1,
+      phaseResponses: savedWing?.phaseResponses ?? {},
+      entryChallengeCompleted: savedWing?.entryChallengeCompleted ?? false,
     };
 
     if (normalized[wing.id].isSolved) {
@@ -85,16 +277,6 @@ const normalizeUnlockedWings = (wings: Record<string, WingState>): Record<string
   });
 
   return normalized;
-};
-
-const defaultAvatarForRetry: PlayerAvatar = {
-  id:'default',
-  name:'Artist',
-  title:'The Curious',
-  description:'',
-  iconInitial:'A',
-  colorClass:'bg-gray-500',
-  selectedYearLevel: 9 as YearLevel
 };
 
 const teacherAvatar: PlayerAvatar = {
@@ -265,8 +447,69 @@ export const App: React.FC = () => {
   const [guideReturnTarget, setGuideReturnTarget] = useState<GuideReturnTarget>('map');
   const [returnMenuTarget, setReturnMenuTarget] = useState<ReturnMenuTarget>('map');
   const [pendingReturnMenuTarget, setPendingReturnMenuTarget] = useState<ReturnMenuTarget | null>(null);
+  const [loadTransition, setLoadTransition] = useState<LoadTransitionState | null>(null);
+  const loadTransitionIdRef = useRef<number>(0);
   const hasSaveableGame = !!appGameState.selectedAvatar && !!appGameState.playerStats;
 
+  const runLoadTransition = useCallback(async (
+    transition: LoadTransitionState,
+    work: () => Promise<void> | void,
+  ) => {
+    const transitionId = loadTransitionIdRef.current + 1;
+    loadTransitionIdRef.current = transitionId;
+    setLoadTransition(transition);
+    const startedAt = Date.now();
+
+    try {
+      await waitForMinimum(50);
+      await work();
+      const remainingMinimumMs = (transition.minimumMs ?? 420) - (Date.now() - startedAt);
+      if (remainingMinimumMs > 0) {
+        await waitForMinimum(remainingMinimumMs);
+      }
+    } finally {
+      if (loadTransitionIdRef.current === transitionId) {
+        setLoadTransition(null);
+      }
+    }
+  }, []);
+
+  const runPanelTransition = useCallback(async (screen: PanelScreen, commit: () => void) => {
+    await runLoadTransition(getPanelTransition(screen), async () => {
+      await preloadAssets(getPanelPreloadAssets(screen, appGameState.selectedAvatar), {
+        timeoutMs: 1800,
+      });
+      commit();
+    });
+  }, [appGameState.selectedAvatar, runLoadTransition]);
+
+  const runSceneTransition = useCallback(async (
+    nextScene: GalleryScene,
+    fromScene: GalleryScene,
+    commitSceneChange: () => void,
+  ) => {
+    await runLoadTransition(getSceneTransition(nextScene, fromScene), async () => {
+      await preloadAssets(
+        [
+          ...getMapScenePreloadAssets(nextScene, appGameState.selectedAvatar),
+          ...getAdjacentMapScenePreloadAssets(nextScene, appGameState.selectedAvatar),
+        ],
+        { timeoutMs: 2400 },
+      );
+      commitSceneChange();
+    });
+  }, [appGameState.selectedAvatar, runLoadTransition]);
+
+  useEffect(() => {
+    if (currentScreen !== 'map') return;
+
+    warmAssets([
+      ...getMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
+      ...getAdjacentMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
+      ...getCurrentGalleryAnalysisPreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
+      ...CORE_AUDIO_ASSETS.map(audioAsset),
+    ]);
+  }, [appGameState.selectedAvatar, currentGalleryScene, currentScreen]);
 
   const handleNewGameSetupComplete = useCallback(async (avatar: PlayerAvatar) => {
     setCurrentGalleryScene('foyer');
@@ -281,14 +524,29 @@ export const App: React.FC = () => {
         playerStats: createInitialPlayerStats(),
         sideQuestState: createInitialSideQuestState(),
     }));
+
     try {
-      const chat = initializeAiChat();
-      setAppGameState(prev => ({
-        ...prev,
-        geminiChat: chat,
-        isLoading: false,
-      }));
-      setCurrentScreen('map');
+      await runLoadTransition({
+        title: 'Opening the Foyer',
+        message: `${avatar.name || 'Your artist'} is collecting a sketchbook and gallery key.`,
+        detail: 'Foyer, first gallery, avatar, and exploration audio are being prepared.',
+        tone: 'foyer',
+        minimumMs: 720,
+      }, async () => {
+        const chat = initializeAiChat();
+        await preloadAssets([
+          ...getMapScenePreloadAssets('foyer', avatar),
+          ...getAdjacentMapScenePreloadAssets('foyer', avatar),
+          ...CORE_AUDIO_ASSETS.map(audioAsset),
+        ], { timeoutMs: 3200 });
+
+        setAppGameState(prev => ({
+          ...prev,
+          geminiChat: chat,
+          isLoading: false,
+        }));
+        setCurrentScreen('map');
+      });
     } catch (err) {
       console.error("Failed to initialize AI Chat for new game:", err);
       const errorMessage = (err instanceof Error) ? err.message : "An unknown error occurred";
@@ -299,7 +557,7 @@ export const App: React.FC = () => {
       }));
        // Stay on newGameSetup or splash, but show error. User might need to refresh.
     }
-  }, []);
+  }, [runLoadTransition]);
 
   const handleNavigateToNewGameSetup = useCallback(() => {
     // Optionally confirm if a game is in progress and will be lost
@@ -320,22 +578,36 @@ export const App: React.FC = () => {
     }
 
     setCurrentGalleryScene('foyer');
-    const chat = initializeAiChat();
-    setAppGameState(() => ({
-      ...initialAppGameState,
-      selectedAvatar: teacherAvatar,
-      wings: teacherUnlockedWingsState(),
-      geminiChat: chat,
-      playerStats: createInitialPlayerStats(),
-      sideQuestState: createInitialSideQuestState(),
-      teacherMode: true,
-      avatarImageUrl: teacherAvatar.imageUrl || null,
-      isLoading: false,
-      error: null,
-    }));
-    setCurrentScreen('map');
+    await runLoadTransition({
+      title: 'Opening Teacher Preview',
+      message: 'Unlocking every gallery room for a quick walkthrough.',
+      detail: 'Foyer, gallery backgrounds, and preview avatar are being prepared.',
+      tone: 'foyer',
+      minimumMs: 620,
+    }, async () => {
+      const chat = initializeAiChat();
+      await preloadAssets([
+        ...getMapScenePreloadAssets('foyer', teacherAvatar),
+        ...getAdjacentMapScenePreloadAssets('foyer', teacherAvatar),
+        ...CORE_AUDIO_ASSETS.map(audioAsset),
+      ], { timeoutMs: 2800 });
+
+      setAppGameState(() => ({
+        ...initialAppGameState,
+        selectedAvatar: teacherAvatar,
+        wings: teacherUnlockedWingsState(),
+        geminiChat: chat,
+        playerStats: createInitialPlayerStats(),
+        sideQuestState: createInitialSideQuestState(),
+        teacherMode: true,
+        avatarImageUrl: teacherAvatar.imageUrl || null,
+        isLoading: false,
+        error: null,
+      }));
+      setCurrentScreen('map');
+    });
     return true;
-  }, []);
+  }, [runLoadTransition]);
 
   const handleSaveGame = useCallback(() => {
     if (!appGameState.selectedAvatar || !appGameState.playerStats) {
@@ -398,29 +670,44 @@ export const App: React.FC = () => {
       }
 
       // Re-initialize AI chat
-      const chat = initializeAiChat();
+      const selectedAvatar = normalizeSelectedAvatar(parsedData.gameState.selectedAvatar);
 
-      setAppGameState(prev => ({
-        ...prev, // Keep some transient states like error handling
-        ...parsedData.gameState, // Load core game state
-        selectedAvatar: normalizeSelectedAvatar(parsedData.gameState.selectedAvatar),
-        wings: normalizeUnlockedWings(parsedData.gameState.wings || {}),
-        playerStats: normalizePlayerStats(parsedData.gameState.playerStats),
-        sideQuestState: normalizeSideQuestState(parsedData.gameState.sideQuestState),
-        teacherMode: !!parsedData.gameState.teacherMode,
-        geminiChat: chat, // Set the new chat instance
-        isLoading: false,
-        currentWingIdForGame: null, // Always start on map after load
-        narrativeLog: [], // Clear previous narrative log
-        avatarImageError: null, // Clear any previous avatar image errors
-        isGeneratingAvatarPortrait: false,
-      }));
-      setCurrentGalleryScene('foyer');
-      setCurrentScreen('map');
+      await runLoadTransition({
+        title: 'Restoring the Foyer',
+        message: `${selectedAvatar.name || 'Your artist'} is reopening the saved sketchbook.`,
+        detail: 'Save data, foyer assets, and avatar layers are being prepared.',
+        tone: 'foyer',
+        minimumMs: 620,
+      }, async () => {
+        const chat = initializeAiChat();
+        await preloadAssets([
+          ...getMapScenePreloadAssets('foyer', selectedAvatar),
+          ...getAdjacentMapScenePreloadAssets('foyer', selectedAvatar),
+          ...CORE_AUDIO_ASSETS.map(audioAsset),
+        ], { timeoutMs: 3000 });
+
+        setAppGameState(prev => ({
+          ...prev, // Keep some transient states like error handling
+          ...parsedData.gameState, // Load core game state
+          selectedAvatar,
+          wings: normalizeUnlockedWings(parsedData.gameState.wings || {}),
+          playerStats: normalizePlayerStats(parsedData.gameState.playerStats),
+          sideQuestState: normalizeSideQuestState(parsedData.gameState.sideQuestState),
+          teacherMode: !!parsedData.gameState.teacherMode,
+          geminiChat: chat, // Set the new chat instance
+          isLoading: false,
+          currentWingIdForGame: null, // Always start on map after load
+          narrativeLog: [], // Clear previous narrative log
+          avatarImageError: null, // Clear any previous avatar image errors
+          isGeneratingAvatarPortrait: false,
+        }));
+        setCurrentGalleryScene('foyer');
+        setCurrentScreen('map');
+      });
     } catch (err) {
       console.error("Failed to load game:", err);
       const errorMessage = (err instanceof Error) ? err.message : "An unknown error occurred during load.";
-      setAppGameState(prev => ({
+      setAppGameState(() => ({
         ...initialAppGameState, // Reset to a clean state on load failure
         isLoading: false,
         error: `Load failed: ${errorMessage}. Please try a valid save file or start a new game.`
@@ -428,35 +715,54 @@ export const App: React.FC = () => {
       setCurrentGalleryScene('foyer');
       setCurrentScreen('splash'); // Return to splash on error
     }
-  }, []);
+  }, [runLoadTransition]);
 
 
-  const handleSelectWing = useCallback((wingId: string) => {
+  const handleSelectWing = useCallback(async (wingId: string) => {
     const currentWings = normalizeUnlockedWings(appGameState.wings);
     if (!isWingEffectivelyUnlocked(currentWings, wingId)) return;
 
-    setAppGameState(prev => {
-      const newWingsState = normalizeUnlockedWings(prev.wings);
-      newWingsState[wingId] = {
-        ...newWingsState[wingId],
-        currentQuestionLevel: newWingsState[wingId]?.isSolved ? 4 : (newWingsState[wingId]?.currentQuestionLevel || 1),
-        phaseResponses: newWingsState[wingId]?.phaseResponses || {},
-        isSolved: newWingsState[wingId]?.isSolved || false, // Preserve solved state
-      };
-      return {
-        ...prev,
-        currentWingIdForGame: wingId,
-        wings: newWingsState,
-        narrativeLog: [],
-      };
+    await runLoadTransition(getAnalysisTransition(wingId), async () => {
+      await preloadAssets([
+        ...getAnalysisRoomPreloadAssets(wingId, appGameState.selectedAvatar),
+        ...CORE_AUDIO_ASSETS.map(audioAsset),
+      ], { timeoutMs: 3200 });
+
+      setAppGameState(prev => {
+        const newWingsState = normalizeUnlockedWings(prev.wings);
+        newWingsState[wingId] = {
+          ...newWingsState[wingId],
+          currentQuestionLevel: newWingsState[wingId]?.isSolved ? 4 : (newWingsState[wingId]?.currentQuestionLevel || 1),
+          phaseResponses: newWingsState[wingId]?.phaseResponses || {},
+          isSolved: newWingsState[wingId]?.isSolved || false, // Preserve solved state
+        };
+        return {
+          ...prev,
+          currentWingIdForGame: wingId,
+          wings: newWingsState,
+          narrativeLog: [],
+        };
+      });
+      setCurrentScreen('game');
     });
-    setCurrentScreen('game');
-  }, [appGameState.wings]);
+  }, [appGameState.selectedAvatar, appGameState.wings, runLoadTransition]);
 
   const handleReturnToMap = useCallback(() => {
     setAppGameState(prev => ({ ...prev, currentWingIdForGame: null, focusedWingIdForJournal: null }));
     setCurrentScreen('map');
   }, []);
+
+  const handleReturnFromGameToMap = useCallback(async () => {
+    await runLoadTransition(getReturnTransition(currentGalleryScene), async () => {
+      await preloadAssets([
+        ...getMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
+        ...getAdjacentMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
+      ], { timeoutMs: 2400 });
+
+      setAppGameState(prev => ({ ...prev, currentWingIdForGame: null, focusedWingIdForJournal: null }));
+      setCurrentScreen('map');
+    });
+  }, [appGameState.selectedAvatar, currentGalleryScene, runLoadTransition]);
 
   const openReturnMenu = useCallback((target: ReturnMenuTarget) => {
     setReturnMenuTarget(target);
@@ -752,39 +1058,51 @@ export const App: React.FC = () => {
     }));
   }, []);
 
-  const handleNavigateToJournal = useCallback(() => {
-    setAppGameState(prev => ({ ...prev, focusedWingIdForJournal: null }));
-    setCurrentScreen('journal');
-  }, []);
+  const handleNavigateToJournal = useCallback(async () => {
+    await runPanelTransition('journal', () => {
+      setAppGameState(prev => ({ ...prev, focusedWingIdForJournal: null }));
+      setCurrentScreen('journal');
+    });
+  }, [runPanelTransition]);
 
-  const handleNavigateToInventory = useCallback(() => {
-    setAppGameState(prev => ({ ...prev, focusedWingIdForJournal: null }));
-    setCurrentScreen('inventory');
-  }, []);
+  const handleNavigateToInventory = useCallback(async () => {
+    await runPanelTransition('inventory', () => {
+      setAppGameState(prev => ({ ...prev, focusedWingIdForJournal: null }));
+      setCurrentScreen('inventory');
+    });
+  }, [runPanelTransition]);
 
-  const handleNavigateToJournalEntry = useCallback((wingId: string) => {
-    setAppGameState(prev => ({ ...prev, focusedWingIdForJournal: wingId }));
-    setCurrentScreen('journal');
-  }, []);
+  const handleNavigateToJournalEntry = useCallback(async (wingId: string) => {
+    await runPanelTransition('journal', () => {
+      setAppGameState(prev => ({ ...prev, focusedWingIdForJournal: wingId }));
+      setCurrentScreen('journal');
+    });
+  }, [runPanelTransition]);
 
   const handleClearFocusedWingId = useCallback(() => {
     setAppGameState(prev => ({ ...prev, focusedWingIdForJournal: null }));
   }, []);
 
-  const handleNavigateToGuide = useCallback(() => {
-    setGuideReturnTarget('map');
-    setCurrentScreen('guide');
-  }, []);
+  const handleNavigateToGuide = useCallback(async () => {
+    await runPanelTransition('guide', () => {
+      setGuideReturnTarget('map');
+      setCurrentScreen('guide');
+    });
+  }, [runPanelTransition]);
 
-  const handleNavigateToGuideFromStart = useCallback(() => {
-    setGuideReturnTarget('splash');
-    setCurrentScreen('guide');
-  }, []);
+  const handleNavigateToGuideFromStart = useCallback(async () => {
+    await runPanelTransition('guide', () => {
+      setGuideReturnTarget('splash');
+      setCurrentScreen('guide');
+    });
+  }, [runPanelTransition]);
 
-  const handleNavigateToGuideFromReturnMenu = useCallback(() => {
-    setGuideReturnTarget('returnMenu');
-    setCurrentScreen('guide');
-  }, []);
+  const handleNavigateToGuideFromReturnMenu = useCallback(async () => {
+    await runPanelTransition('guide', () => {
+      setGuideReturnTarget('returnMenu');
+      setCurrentScreen('guide');
+    });
+  }, [runPanelTransition]);
 
   const handleReturnFromGuide = useCallback(() => {
     if (guideReturnTarget === 'splash') {
@@ -800,9 +1118,11 @@ export const App: React.FC = () => {
     handleReturnToMap();
   }, [guideReturnTarget, handleReturnToMap]);
 
-  const handleNavigateToAssessment = useCallback(() => {
-    setCurrentScreen('assessment');
-  }, []);
+  const handleNavigateToAssessment = useCallback(async () => {
+    await runPanelTransition('assessment', () => {
+      setCurrentScreen('assessment');
+    });
+  }, [runPanelTransition]);
 
   const handleUpdateAvatar = useCallback((avatar: PlayerAvatar) => {
     setAppGameState(prev => ({
@@ -930,6 +1250,7 @@ export const App: React.FC = () => {
           wingsState={appGameState.wings}
           currentGalleryScene={currentGalleryScene}
           onGallerySceneChange={setCurrentGalleryScene}
+          onSceneTransition={runSceneTransition}
           onSelectWing={handleSelectWing}
           wingDefinitions={WING_DEFINITIONS}
           learningJournal={appGameState.learningJournal}
@@ -966,7 +1287,7 @@ export const App: React.FC = () => {
             onAppendNarrative={appendNarrativeEntry}
             onUpdateWingState={updateWingState}
             onUnlockNextWing={unlockNextWing}
-            onReturnToMap={handleReturnToMap}
+            onReturnToMap={handleReturnFromGameToMap}
             onOpenGameMenu={handleRequestReturnMenuFromGame}
             onGameWon={handleGameWon}
             onError={handleError}
@@ -1003,6 +1324,7 @@ export const App: React.FC = () => {
                 wingsState={appGameState.wings}
                 currentGalleryScene={currentGalleryScene}
                 onGallerySceneChange={setCurrentGalleryScene}
+                onSceneTransition={runSceneTransition}
                 onSelectWing={handleSelectWing}
                 wingDefinitions={WING_DEFINITIONS}
                 learningJournal={appGameState.learningJournal}
@@ -1099,6 +1421,15 @@ export const App: React.FC = () => {
   return (
     <>
       {screenComponent}
+      {loadTransition && (
+        <GalleryLoadingScreen
+          title={loadTransition.title}
+          message={loadTransition.message}
+          detail={loadTransition.detail}
+          tone={loadTransition.tone}
+          compact={loadTransition.compact}
+        />
+      )}
       <Modal
         isOpen={pendingReturnMenuTarget !== null}
         title="Save Progress?"

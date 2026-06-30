@@ -657,7 +657,7 @@ const renderHeldObjectPixels = (heldObject: HeldObjectOption): string => {
   }
 };
 
-const buildAvatarSvg = (config: AvatarBuilderConfig): string => {
+export const buildAvatarSvg = (config: AvatarBuilderConfig): string => {
   const skin = getOptionById(SKIN_TONES, config.skinToneId);
   const hair = getOptionById(HAIR_STYLES, config.hairStyleId);
   const outfit = getOptionById(OUTFITS, config.outfitId);
