@@ -169,6 +169,10 @@ const getFrontHairLayerUrl = (hairUrl: string | undefined): string | undefined =
   hairUrl?.replace('/Asset.Hair/', '/Asset.Hair.front/')
 );
 
+const getOutfitObjectLayerUrl = (objectUrl: string | undefined, outfitId: string): string | undefined => (
+  objectUrl?.replace('/asset.object/', `/asset.object/by_outfit/${outfitId}/`)
+);
+
 const OBJECTS_WITH_RAISED_HAND_OVERLAY = new Set([
   'brush',
   'crystal_staff',
@@ -197,7 +201,10 @@ export const getAvatarLayerImageUrls = (config: AvatarBuilderConfig): string[] =
   const hairUrl = getLayerUrlForSlot(assetSet, 'hairStyleId', normalizedConfig);
   const frontHairUrl = getFrontHairLayerUrl(hairUrl);
   const outfitUrl = getLayerUrlForSlot(assetSet, 'outfitId', normalizedConfig);
-  const heldObjectUrl = getLayerUrlForSlot(assetSet, 'heldObjectId', normalizedConfig);
+  const heldObjectUrl = getOutfitObjectLayerUrl(
+    getLayerUrlForSlot(assetSet, 'heldObjectId', normalizedConfig),
+    normalizedConfig.outfitId,
+  );
   const accessoryUrl = getLayerUrlForSlot(assetSet, 'accessoryId', normalizedConfig);
   const shouldRaiseHandOverlayObject = OBJECTS_WITH_RAISED_HAND_OVERLAY.has(normalizedConfig.heldObjectId);
   const layerUrls = [
@@ -243,6 +250,11 @@ export const getAvatarAssetPreviewImageUrls = (
   }
 
   const layerUrl = getLayerUrlForSlot(assetSet, tabId, normalizedConfig);
+  if (tabId === 'heldObjectId') {
+    const outfitObjectUrl = getOutfitObjectLayerUrl(layerUrl, normalizedConfig.outfitId);
+    return outfitObjectUrl ? [outfitObjectUrl] : [];
+  }
+
   return layerUrl ? [layerUrl] : [];
 };
 

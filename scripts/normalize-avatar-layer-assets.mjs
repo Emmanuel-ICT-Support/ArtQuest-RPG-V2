@@ -59,6 +59,8 @@ const MANUAL_OUTFIT_HAND_COMPONENTS = {
   },
 };
 
+const DEFAULT_RAISED_HAND_ANCHOR = { x: 862, y: 619 };
+
 const pngModuleCandidates = [
   'pngjs',
   '/Users/andrew.middleton/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pngjs/lib/png.js',
@@ -198,7 +200,7 @@ const getHairRig = (relativePath) => {
   const styleName = getHairStyleName(relativePath);
 
   if (styleName === 'ponytail') {
-    return { maxWidth: 420, top: 104, centerX: 548 };
+    return { maxWidth: 470, top: 90, centerX: 548 };
   }
   if (styleName === 'spikeslong') {
     return { maxWidth: 350, top: 64, centerX: 548 };
@@ -651,6 +653,45 @@ const drawScaledNearest = (source, transform) => {
   return output;
 };
 
+const translateLayer = (source, deltaX, deltaY) => {
+  const output = new PNG({ width: TARGET_WIDTH, height: TARGET_HEIGHT });
+  const offsetX = Math.round(deltaX);
+  const offsetY = Math.round(deltaY);
+
+  for (let y = 0; y < TARGET_HEIGHT; y += 1) {
+    const targetY = y + offsetY;
+    if (targetY < 0 || targetY >= TARGET_HEIGHT) continue;
+
+    for (let x = 0; x < TARGET_WIDTH; x += 1) {
+      const targetX = x + offsetX;
+      if (targetX < 0 || targetX >= TARGET_WIDTH) continue;
+
+      const sourceIndex = (TARGET_WIDTH * y + x) * 4;
+      const alpha = source.data[sourceIndex + 3];
+      if (alpha <= ALPHA_THRESHOLD) continue;
+
+      const targetIndex = (TARGET_WIDTH * targetY + targetX) * 4;
+      output.data[targetIndex] = source.data[sourceIndex];
+      output.data[targetIndex + 1] = source.data[sourceIndex + 1];
+      output.data[targetIndex + 2] = source.data[sourceIndex + 2];
+      output.data[targetIndex + 3] = alpha;
+    }
+  }
+
+  return output;
+};
+
+const getBoundsCenter = (png, fallback = DEFAULT_RAISED_HAND_ANCHOR) => {
+  const bounds = getAlphaBounds(png);
+
+  if (!bounds) return fallback;
+
+  return {
+    x: bounds.centerX,
+    y: bounds.centerY,
+  };
+};
+
 const createFrontHairLayer = (hairLayer, relativePath) => {
   const frontLayer = new PNG({ width: TARGET_WIDTH, height: TARGET_HEIGHT });
   const faceCenterX = 548;
@@ -672,23 +713,24 @@ const createFrontHairLayer = (hairLayer, relativePath) => {
       const protectedEyeBand = (
         isPonytail
         && insideFaceWindow
-        && y >= fringeBottom
-        && y <= 335
-        && x >= 390
-        && x <= 700
+        && y >= 260
+        && y <= 342
+        && x >= 430
+        && x <= 664
       );
       const ponytailLeftSideLock = (
         isPonytail
-        && x <= 470
-        && y >= 248
+        && x <= 514
+        && y >= 166
         && y <= 445
         && !protectedEyeBand
       );
       const ponytailRightSideLock = (
         isPonytail
-        && x >= 625
-        && y >= 286
-        && y <= 480
+        && (
+          (x >= 560 && y >= 166 && y < 260)
+          || (x >= 664 && y >= 260 && y <= 480)
+        )
         && !protectedEyeBand
       );
       const keepAsFront = !insideFaceWindow
@@ -803,6 +845,43 @@ const writeOutfitHandLayers = async () => {
   }
 };
 
+const writeOutfitObjectLayers = async () => {
+  const objectDir = path.join(outputRoot, 'asset.object');
+  const objectPaths = (await collectPngs(objectDir)).filter((objectPath) => {
+    const relativeParts = path.relative(objectDir, objectPath).split(path.sep);
+    return !relativeParts.includes('by_outfit');
+  });
+  const handRoot = path.join(outputRoot, 'Asset.skin/by_outfit');
+  const handEntries = await readDirSafe(handRoot);
+  const baseHandPath = path.join(outputRoot, 'Asset.skin/raised_hand/golden.png');
+  const baseAnchor = existsSync(baseHandPath)
+    ? getBoundsCenter(PNG.sync.read(await readFile(baseHandPath)))
+    : DEFAULT_RAISED_HAND_ANCHOR;
+
+  for (const entry of handEntries) {
+    if (!entry.isDirectory()) continue;
+
+    const outfitId = entry.name;
+    const outfitRaisedHandPath = path.join(handRoot, outfitId, 'raised_hand/golden.png');
+    if (!existsSync(outfitRaisedHandPath)) continue;
+
+    const outfitAnchor = getBoundsCenter(PNG.sync.read(await readFile(outfitRaisedHandPath)), baseAnchor);
+    const offsetX = outfitAnchor.x - baseAnchor.x;
+    const offsetY = outfitAnchor.y - baseAnchor.y;
+    const outfitObjectDir = path.join(objectDir, 'by_outfit', outfitId);
+    await mkdir(outfitObjectDir, { recursive: true });
+
+    for (const objectPath of objectPaths) {
+      const objectLayer = PNG.sync.read(await readFile(objectPath));
+      const translatedObjectLayer = translateLayer(objectLayer, offsetX, offsetY);
+      await writeFile(
+        path.join(outfitObjectDir, path.basename(objectPath)),
+        PNG.sync.write(translatedObjectLayer),
+      );
+    }
+  }
+};
+
 const main = async () => {
   if (!existsSync(sourceRoot)) {
     throw new Error(`Avatar layer source folder does not exist: ${sourceRoot}`);
@@ -818,6 +897,7 @@ const main = async () => {
   await writeBlankBase();
   await writeSkinLayers();
   await writeOutfitHandLayers();
+  await writeOutfitObjectLayers();
 
   const byCategory = results.reduce((counts, result) => ({
     ...counts,

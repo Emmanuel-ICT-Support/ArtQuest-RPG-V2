@@ -229,12 +229,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/Auburn/ponytail.Auburn.png": {
-    "height": 410,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/Auburn/spikeslong.Auburn.png": {
     "height": 509,
@@ -285,12 +285,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/black/ponytail.black.png": {
-    "height": 410,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/black/spikeslong.black.png": {
     "height": 513,
@@ -341,12 +341,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/blonde/ponytail.blonde.png": {
-    "height": 410,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/blonde/spikeslong.blonde.png": {
     "height": 511,
@@ -397,12 +397,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/brown/ponytail.brown.png": {
-    "height": 410,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/brown/spikeslong.brown.png": {
     "height": 510,
@@ -453,12 +453,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/pink/ponytail.pink.png": {
-    "height": 410,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/pink/spikeslong.pink.png": {
     "height": 512,
@@ -509,12 +509,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/red/ponytail.red.png": {
-    "height": 410,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/red/spikeslong.red.png": {
     "height": 511,
@@ -565,12 +565,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/teal/ponytail.teal.png": {
-    "height": 410,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair.front/teal/spikeslong.teal.png": {
     "height": 510,
@@ -621,12 +621,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/Auburn/ponytail.Auburn.png": {
-    "height": 411,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/Auburn/spikeslong.Auburn.png": {
     "height": 509,
@@ -677,12 +677,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/black/ponytail.black.png": {
-    "height": 411,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/black/spikeslong.black.png": {
     "height": 513,
@@ -733,12 +733,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/blonde/ponytail.blonde.png": {
-    "height": 411,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/blonde/spikeslong.blonde.png": {
     "height": 511,
@@ -789,12 +789,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/brown/ponytail.brown.png": {
-    "height": 411,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/brown/spikeslong.brown.png": {
     "height": 510,
@@ -845,12 +845,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/pink/ponytail.pink.png": {
-    "height": 411,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/pink/spikeslong.pink.png": {
     "height": 512,
@@ -901,12 +901,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/red/ponytail.red.png": {
-    "height": 411,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/red/spikeslong.red.png": {
     "height": 511,
@@ -957,12 +957,12 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "width": 360
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/teal/ponytail.teal.png": {
-    "height": 411,
-    "left": 338,
+    "height": 459,
+    "left": 314,
     "naturalHeight": 1536,
     "naturalWidth": 1024,
-    "top": 104,
-    "width": 420
+    "top": 90,
+    "width": 470
   },
   "./public/images/avatar-layers/generated/normalized/Asset.Hair/teal/spikeslong.teal.png": {
     "height": 510,
@@ -3139,6 +3139,2606 @@ export const AVATAR_ASSET_BOUNDS_BY_URL: Record<string, AvatarAssetBoundsManifes
     "naturalWidth": 1024,
     "top": 430,
     "width": 740
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.brush.png": {
+    "height": 430,
+    "left": 705,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 373,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.camera.png": {
+    "height": 208,
+    "left": 661,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 469,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.coinpouch.png": {
+    "height": 379,
+    "left": 671,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 399,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.compass.png": {
+    "height": 352,
+    "left": 671,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 411,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.crystal.png": {
+    "height": 430,
+    "left": 707,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 373,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.crystalstaff.png": {
+    "height": 700,
+    "left": 759,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 333,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.flower.png": {
+    "height": 560,
+    "left": 721,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 343,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.herb.png": {
+    "height": 430,
+    "left": 712,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 373,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.hourglass.png": {
+    "height": 430,
+    "left": 687,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 372,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.key.png": {
+    "height": 400,
+    "left": 671,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 388,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.magnifying glass.png": {
+    "height": 430,
+    "left": 697,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 373,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.mallet.png": {
+    "height": 425,
+    "left": 670,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 376,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.map.png": {
+    "height": 208,
+    "left": 660,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 469,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.palette.png": {
+    "height": 250,
+    "left": 665,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 448,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.pencil.png": {
+    "height": 430,
+    "left": 672,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 373,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.potion.png": {
+    "height": 430,
+    "left": 672,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 372,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.quill.png": {
+    "height": 430,
+    "left": 706,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 373,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.scroll.png": {
+    "height": 560,
+    "left": 730,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 343,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.shield.png": {
+    "height": 327,
+    "left": 671,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 424,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.spellbook.png": {
+    "height": 400,
+    "left": 670,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 388,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.starstaff.png": {
+    "height": 700,
+    "left": 757,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 333,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.telescope.png": {
+    "height": 249,
+    "left": 661,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 448,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.torch.png": {
+    "height": 700,
+    "left": 745,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 333,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.wand.png": {
+    "height": 430,
+    "left": 696,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 373,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/archivist_vest/object.wrench.png": {
+    "height": 695,
+    "left": 720,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 336,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.brush.png": {
+    "height": 430,
+    "left": 755,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 414,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.camera.png": {
+    "height": 208,
+    "left": 711,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 510,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.coinpouch.png": {
+    "height": 379,
+    "left": 721,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 440,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.compass.png": {
+    "height": 352,
+    "left": 721,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 452,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.crystal.png": {
+    "height": 430,
+    "left": 757,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 414,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.crystalstaff.png": {
+    "height": 700,
+    "left": 809,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 374,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.flower.png": {
+    "height": 560,
+    "left": 771,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 384,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.herb.png": {
+    "height": 430,
+    "left": 762,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 414,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.hourglass.png": {
+    "height": 430,
+    "left": 737,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 413,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.key.png": {
+    "height": 400,
+    "left": 721,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 429,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.magnifying glass.png": {
+    "height": 430,
+    "left": 747,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 414,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.mallet.png": {
+    "height": 425,
+    "left": 720,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 417,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.map.png": {
+    "height": 208,
+    "left": 710,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 510,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.palette.png": {
+    "height": 250,
+    "left": 715,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 489,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.pencil.png": {
+    "height": 430,
+    "left": 722,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 414,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.potion.png": {
+    "height": 430,
+    "left": 722,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 413,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.quill.png": {
+    "height": 430,
+    "left": 756,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 414,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.scroll.png": {
+    "height": 560,
+    "left": 780,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 384,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.shield.png": {
+    "height": 327,
+    "left": 721,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 465,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.spellbook.png": {
+    "height": 400,
+    "left": 720,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 429,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.starstaff.png": {
+    "height": 700,
+    "left": 807,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 374,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.telescope.png": {
+    "height": 249,
+    "left": 711,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 489,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.torch.png": {
+    "height": 700,
+    "left": 795,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 374,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.wand.png": {
+    "height": 430,
+    "left": 746,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 414,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/artist_apron/object.wrench.png": {
+    "height": 695,
+    "left": 770,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 377,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.brush.png": {
+    "height": 430,
+    "left": 753,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 408,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.camera.png": {
+    "height": 208,
+    "left": 709,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 504,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.coinpouch.png": {
+    "height": 379,
+    "left": 719,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 434,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.compass.png": {
+    "height": 352,
+    "left": 719,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 446,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.crystal.png": {
+    "height": 430,
+    "left": 755,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 408,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.crystalstaff.png": {
+    "height": 700,
+    "left": 807,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 368,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.flower.png": {
+    "height": 560,
+    "left": 769,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 378,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.herb.png": {
+    "height": 430,
+    "left": 760,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 408,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.hourglass.png": {
+    "height": 430,
+    "left": 735,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 407,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.key.png": {
+    "height": 400,
+    "left": 719,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 423,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.magnifying glass.png": {
+    "height": 430,
+    "left": 745,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 408,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.mallet.png": {
+    "height": 425,
+    "left": 718,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 411,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.map.png": {
+    "height": 208,
+    "left": 708,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 504,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.palette.png": {
+    "height": 250,
+    "left": 713,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 483,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.pencil.png": {
+    "height": 430,
+    "left": 720,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 408,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.potion.png": {
+    "height": 430,
+    "left": 720,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 407,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.quill.png": {
+    "height": 430,
+    "left": 754,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 408,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.scroll.png": {
+    "height": 560,
+    "left": 778,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 378,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.shield.png": {
+    "height": 327,
+    "left": 719,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 459,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.spellbook.png": {
+    "height": 400,
+    "left": 718,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 423,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.starstaff.png": {
+    "height": 700,
+    "left": 805,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 368,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.telescope.png": {
+    "height": 249,
+    "left": 709,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 483,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.torch.png": {
+    "height": 700,
+    "left": 793,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 368,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.wand.png": {
+    "height": 430,
+    "left": 744,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 408,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/dream_painter/object.wrench.png": {
+    "height": 695,
+    "left": 768,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 371,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.brush.png": {
+    "height": 430,
+    "left": 750,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 478,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.camera.png": {
+    "height": 208,
+    "left": 706,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 574,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.coinpouch.png": {
+    "height": 379,
+    "left": 716,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 504,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.compass.png": {
+    "height": 352,
+    "left": 716,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 516,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.crystal.png": {
+    "height": 430,
+    "left": 752,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 478,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.crystalstaff.png": {
+    "height": 700,
+    "left": 804,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 438,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.flower.png": {
+    "height": 560,
+    "left": 766,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 448,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.herb.png": {
+    "height": 430,
+    "left": 757,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 478,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.hourglass.png": {
+    "height": 430,
+    "left": 732,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 477,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.key.png": {
+    "height": 400,
+    "left": 716,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 493,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.magnifying glass.png": {
+    "height": 430,
+    "left": 742,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 478,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.mallet.png": {
+    "height": 425,
+    "left": 715,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 481,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.map.png": {
+    "height": 208,
+    "left": 705,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 574,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.palette.png": {
+    "height": 250,
+    "left": 710,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 553,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.pencil.png": {
+    "height": 430,
+    "left": 717,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 478,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.potion.png": {
+    "height": 430,
+    "left": 717,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 477,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.quill.png": {
+    "height": 430,
+    "left": 751,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 478,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.scroll.png": {
+    "height": 560,
+    "left": 775,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 448,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.shield.png": {
+    "height": 327,
+    "left": 716,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 529,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.spellbook.png": {
+    "height": 400,
+    "left": 715,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 493,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.starstaff.png": {
+    "height": 700,
+    "left": 802,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 438,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.telescope.png": {
+    "height": 249,
+    "left": 706,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 553,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.torch.png": {
+    "height": 700,
+    "left": 790,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 438,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.wand.png": {
+    "height": 430,
+    "left": 741,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 478,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorer/object.wrench.png": {
+    "height": 695,
+    "left": 765,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 441,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.brush.png": {
+    "height": 430,
+    "left": 743,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 412,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.camera.png": {
+    "height": 208,
+    "left": 699,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 508,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.coinpouch.png": {
+    "height": 379,
+    "left": 709,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 438,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.compass.png": {
+    "height": 352,
+    "left": 709,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 450,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.crystal.png": {
+    "height": 430,
+    "left": 745,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 412,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.crystalstaff.png": {
+    "height": 700,
+    "left": 797,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 372,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.flower.png": {
+    "height": 560,
+    "left": 759,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 382,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.herb.png": {
+    "height": 430,
+    "left": 750,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 412,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.hourglass.png": {
+    "height": 430,
+    "left": 725,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 411,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.key.png": {
+    "height": 400,
+    "left": 709,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 427,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.magnifying glass.png": {
+    "height": 430,
+    "left": 735,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 412,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.mallet.png": {
+    "height": 425,
+    "left": 708,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 415,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.map.png": {
+    "height": 208,
+    "left": 698,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 508,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.palette.png": {
+    "height": 250,
+    "left": 703,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 487,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.pencil.png": {
+    "height": 430,
+    "left": 710,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 412,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.potion.png": {
+    "height": 430,
+    "left": 710,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 411,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.quill.png": {
+    "height": 430,
+    "left": 744,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 412,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.scroll.png": {
+    "height": 560,
+    "left": 768,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 382,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.shield.png": {
+    "height": 327,
+    "left": 709,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 463,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.spellbook.png": {
+    "height": 400,
+    "left": 708,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 427,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.starstaff.png": {
+    "height": 700,
+    "left": 795,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 372,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.telescope.png": {
+    "height": 249,
+    "left": 699,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 487,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.torch.png": {
+    "height": 700,
+    "left": 783,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 372,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.wand.png": {
+    "height": 430,
+    "left": 734,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 412,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/explorers_jacket/object.wrench.png": {
+    "height": 695,
+    "left": 758,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 375,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.brush.png": {
+    "height": 430,
+    "left": 751,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.camera.png": {
+    "height": 208,
+    "left": 707,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 458,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.coinpouch.png": {
+    "height": 379,
+    "left": 717,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 388,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.compass.png": {
+    "height": 352,
+    "left": 717,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 400,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.crystal.png": {
+    "height": 430,
+    "left": 753,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.crystalstaff.png": {
+    "height": 700,
+    "left": 805,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 322,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.flower.png": {
+    "height": 560,
+    "left": 767,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 332,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.herb.png": {
+    "height": 430,
+    "left": 758,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.hourglass.png": {
+    "height": 430,
+    "left": 733,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 361,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.key.png": {
+    "height": 400,
+    "left": 717,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 377,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.magnifying glass.png": {
+    "height": 430,
+    "left": 743,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.mallet.png": {
+    "height": 425,
+    "left": 716,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 365,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.map.png": {
+    "height": 208,
+    "left": 706,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 458,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.palette.png": {
+    "height": 250,
+    "left": 711,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 437,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.pencil.png": {
+    "height": 430,
+    "left": 718,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.potion.png": {
+    "height": 430,
+    "left": 718,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 361,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.quill.png": {
+    "height": 430,
+    "left": 752,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.scroll.png": {
+    "height": 560,
+    "left": 776,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 332,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.shield.png": {
+    "height": 327,
+    "left": 717,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 413,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.spellbook.png": {
+    "height": 400,
+    "left": 716,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 377,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.starstaff.png": {
+    "height": 700,
+    "left": 803,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 322,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.telescope.png": {
+    "height": 249,
+    "left": 707,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 437,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.torch.png": {
+    "height": 700,
+    "left": 791,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 322,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.wand.png": {
+    "height": 430,
+    "left": 742,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/gallery_guard/object.wrench.png": {
+    "height": 695,
+    "left": 766,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 325,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.brush.png": {
+    "height": 430,
+    "left": 715,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 375,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.camera.png": {
+    "height": 208,
+    "left": 671,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 471,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.coinpouch.png": {
+    "height": 379,
+    "left": 681,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 401,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.compass.png": {
+    "height": 352,
+    "left": 681,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 413,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.crystal.png": {
+    "height": 430,
+    "left": 717,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 375,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.crystalstaff.png": {
+    "height": 700,
+    "left": 769,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 335,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.flower.png": {
+    "height": 560,
+    "left": 731,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 345,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.herb.png": {
+    "height": 430,
+    "left": 722,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 375,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.hourglass.png": {
+    "height": 430,
+    "left": 697,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 374,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.key.png": {
+    "height": 400,
+    "left": 681,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 390,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.magnifying glass.png": {
+    "height": 430,
+    "left": 707,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 375,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.mallet.png": {
+    "height": 425,
+    "left": 680,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 378,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.map.png": {
+    "height": 208,
+    "left": 670,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 471,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.palette.png": {
+    "height": 250,
+    "left": 675,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 450,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.pencil.png": {
+    "height": 430,
+    "left": 682,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 375,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.potion.png": {
+    "height": 430,
+    "left": 682,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 374,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.quill.png": {
+    "height": 430,
+    "left": 716,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 375,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.scroll.png": {
+    "height": 560,
+    "left": 740,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 345,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.shield.png": {
+    "height": 327,
+    "left": 681,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 426,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.spellbook.png": {
+    "height": 400,
+    "left": 680,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 390,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.starstaff.png": {
+    "height": 700,
+    "left": 767,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 335,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.telescope.png": {
+    "height": 249,
+    "left": 671,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 450,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.torch.png": {
+    "height": 700,
+    "left": 755,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 335,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.wand.png": {
+    "height": 430,
+    "left": 706,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 375,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/herbologist/object.wrench.png": {
+    "height": 695,
+    "left": 730,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 338,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.brush.png": {
+    "height": 430,
+    "left": 752,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 347,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.camera.png": {
+    "height": 208,
+    "left": 708,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 443,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.coinpouch.png": {
+    "height": 379,
+    "left": 718,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 373,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.compass.png": {
+    "height": 352,
+    "left": 718,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 385,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.crystal.png": {
+    "height": 430,
+    "left": 754,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 347,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.crystalstaff.png": {
+    "height": 700,
+    "left": 806,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 307,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.flower.png": {
+    "height": 560,
+    "left": 768,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 317,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.herb.png": {
+    "height": 430,
+    "left": 759,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 347,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.hourglass.png": {
+    "height": 430,
+    "left": 734,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 346,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.key.png": {
+    "height": 400,
+    "left": 718,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.magnifying glass.png": {
+    "height": 430,
+    "left": 744,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 347,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.mallet.png": {
+    "height": 425,
+    "left": 717,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 350,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.map.png": {
+    "height": 208,
+    "left": 707,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 443,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.palette.png": {
+    "height": 250,
+    "left": 712,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 422,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.pencil.png": {
+    "height": 430,
+    "left": 719,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 347,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.potion.png": {
+    "height": 430,
+    "left": 719,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 346,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.quill.png": {
+    "height": 430,
+    "left": 753,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 347,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.scroll.png": {
+    "height": 560,
+    "left": 777,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 317,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.shield.png": {
+    "height": 327,
+    "left": 718,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 398,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.spellbook.png": {
+    "height": 400,
+    "left": 717,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.starstaff.png": {
+    "height": 700,
+    "left": 804,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 307,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.telescope.png": {
+    "height": 249,
+    "left": 708,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 422,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.torch.png": {
+    "height": 700,
+    "left": 792,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 307,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.wand.png": {
+    "height": 430,
+    "left": 743,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 347,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/inventors_apron/object.wrench.png": {
+    "height": 695,
+    "left": 767,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 310,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.brush.png": {
+    "height": 430,
+    "left": 734,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 389,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.camera.png": {
+    "height": 208,
+    "left": 690,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 485,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.coinpouch.png": {
+    "height": 379,
+    "left": 700,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 415,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.compass.png": {
+    "height": 352,
+    "left": 700,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 427,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.crystal.png": {
+    "height": 430,
+    "left": 736,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 389,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.crystalstaff.png": {
+    "height": 700,
+    "left": 788,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 349,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.flower.png": {
+    "height": 560,
+    "left": 750,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 359,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.herb.png": {
+    "height": 430,
+    "left": 741,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 389,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.hourglass.png": {
+    "height": 430,
+    "left": 716,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 388,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.key.png": {
+    "height": 400,
+    "left": 700,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 404,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.magnifying glass.png": {
+    "height": 430,
+    "left": 726,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 389,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.mallet.png": {
+    "height": 425,
+    "left": 699,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 392,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.map.png": {
+    "height": 208,
+    "left": 689,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 485,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.palette.png": {
+    "height": 250,
+    "left": 694,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 464,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.pencil.png": {
+    "height": 430,
+    "left": 701,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 389,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.potion.png": {
+    "height": 430,
+    "left": 701,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 388,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.quill.png": {
+    "height": 430,
+    "left": 735,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 389,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.scroll.png": {
+    "height": 560,
+    "left": 759,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 359,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.shield.png": {
+    "height": 327,
+    "left": 700,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 440,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.spellbook.png": {
+    "height": 400,
+    "left": 699,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 404,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.starstaff.png": {
+    "height": 700,
+    "left": 786,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 349,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.telescope.png": {
+    "height": 249,
+    "left": 690,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 464,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.torch.png": {
+    "height": 700,
+    "left": 774,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 349,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.wand.png": {
+    "height": 430,
+    "left": 725,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 389,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/magic_explorer/object.wrench.png": {
+    "height": 695,
+    "left": 749,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 352,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.brush.png": {
+    "height": 430,
+    "left": 729,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 402,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.camera.png": {
+    "height": 208,
+    "left": 685,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 498,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.coinpouch.png": {
+    "height": 379,
+    "left": 695,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 428,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.compass.png": {
+    "height": 352,
+    "left": 695,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 440,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.crystal.png": {
+    "height": 430,
+    "left": 731,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 402,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.crystalstaff.png": {
+    "height": 700,
+    "left": 783,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.flower.png": {
+    "height": 560,
+    "left": 745,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 372,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.herb.png": {
+    "height": 430,
+    "left": 736,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 402,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.hourglass.png": {
+    "height": 430,
+    "left": 711,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 401,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.key.png": {
+    "height": 400,
+    "left": 695,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 417,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.magnifying glass.png": {
+    "height": 430,
+    "left": 721,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 402,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.mallet.png": {
+    "height": 425,
+    "left": 694,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 405,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.map.png": {
+    "height": 208,
+    "left": 684,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 498,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.palette.png": {
+    "height": 250,
+    "left": 689,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 477,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.pencil.png": {
+    "height": 430,
+    "left": 696,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 402,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.potion.png": {
+    "height": 430,
+    "left": 696,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 401,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.quill.png": {
+    "height": 430,
+    "left": 730,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 402,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.scroll.png": {
+    "height": 560,
+    "left": 754,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 372,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.shield.png": {
+    "height": 327,
+    "left": 695,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 453,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.spellbook.png": {
+    "height": 400,
+    "left": 694,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 417,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.starstaff.png": {
+    "height": 700,
+    "left": 781,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.telescope.png": {
+    "height": 249,
+    "left": 685,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 477,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.torch.png": {
+    "height": 700,
+    "left": 769,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 362,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.wand.png": {
+    "height": 430,
+    "left": 720,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 402,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/masonry_overalls/object.wrench.png": {
+    "height": 695,
+    "left": 744,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 365,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.brush.png": {
+    "height": 430,
+    "left": 760,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 416,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.camera.png": {
+    "height": 208,
+    "left": 716,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 512,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.coinpouch.png": {
+    "height": 379,
+    "left": 726,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 442,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.compass.png": {
+    "height": 352,
+    "left": 726,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 454,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.crystal.png": {
+    "height": 430,
+    "left": 762,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 416,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.crystalstaff.png": {
+    "height": 700,
+    "left": 814,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 376,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.flower.png": {
+    "height": 560,
+    "left": 776,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 386,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.herb.png": {
+    "height": 430,
+    "left": 767,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 416,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.hourglass.png": {
+    "height": 430,
+    "left": 742,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 415,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.key.png": {
+    "height": 400,
+    "left": 726,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 431,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.magnifying glass.png": {
+    "height": 430,
+    "left": 752,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 416,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.mallet.png": {
+    "height": 425,
+    "left": 725,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 419,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.map.png": {
+    "height": 208,
+    "left": 715,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 512,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.palette.png": {
+    "height": 250,
+    "left": 720,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 491,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.pencil.png": {
+    "height": 430,
+    "left": 727,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 416,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.potion.png": {
+    "height": 430,
+    "left": 727,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 415,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.quill.png": {
+    "height": 430,
+    "left": 761,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 416,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.scroll.png": {
+    "height": 560,
+    "left": 785,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 386,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.shield.png": {
+    "height": 327,
+    "left": 726,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 467,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.spellbook.png": {
+    "height": 400,
+    "left": 725,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 431,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.starstaff.png": {
+    "height": 700,
+    "left": 812,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 376,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.telescope.png": {
+    "height": 249,
+    "left": 716,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 491,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.torch.png": {
+    "height": 700,
+    "left": 800,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 376,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.wand.png": {
+    "height": 430,
+    "left": 751,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 416,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/mystic_robe/object.wrench.png": {
+    "height": 695,
+    "left": 775,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 379,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.brush.png": {
+    "height": 430,
+    "left": 726,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 481,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.camera.png": {
+    "height": 208,
+    "left": 682,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 577,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.coinpouch.png": {
+    "height": 379,
+    "left": 692,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 507,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.compass.png": {
+    "height": 352,
+    "left": 692,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 519,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.crystal.png": {
+    "height": 430,
+    "left": 728,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 481,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.crystalstaff.png": {
+    "height": 700,
+    "left": 780,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 441,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.flower.png": {
+    "height": 560,
+    "left": 742,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 451,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.herb.png": {
+    "height": 430,
+    "left": 733,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 481,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.hourglass.png": {
+    "height": 430,
+    "left": 708,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 480,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.key.png": {
+    "height": 400,
+    "left": 692,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 496,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.magnifying glass.png": {
+    "height": 430,
+    "left": 718,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 481,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.mallet.png": {
+    "height": 425,
+    "left": 691,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 484,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.map.png": {
+    "height": 208,
+    "left": 681,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 577,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.palette.png": {
+    "height": 250,
+    "left": 686,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 556,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.pencil.png": {
+    "height": 430,
+    "left": 693,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 481,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.potion.png": {
+    "height": 430,
+    "left": 693,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 480,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.quill.png": {
+    "height": 430,
+    "left": 727,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 481,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.scroll.png": {
+    "height": 560,
+    "left": 751,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 451,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.shield.png": {
+    "height": 327,
+    "left": 692,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 532,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.spellbook.png": {
+    "height": 400,
+    "left": 691,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 496,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.starstaff.png": {
+    "height": 700,
+    "left": 778,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 441,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.telescope.png": {
+    "height": 249,
+    "left": 682,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 556,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.torch.png": {
+    "height": 700,
+    "left": 766,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 441,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.wand.png": {
+    "height": 430,
+    "left": 717,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 481,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painted_hoodie/object.wrench.png": {
+    "height": 695,
+    "left": 741,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 444,
+    "width": 170
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.brush.png": {
+    "height": 430,
+    "left": 719,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 378,
+    "width": 211
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.camera.png": {
+    "height": 208,
+    "left": 675,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 474,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.coinpouch.png": {
+    "height": 379,
+    "left": 685,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 404,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.compass.png": {
+    "height": 352,
+    "left": 685,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 416,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.crystal.png": {
+    "height": 430,
+    "left": 721,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 378,
+    "width": 209
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.crystalstaff.png": {
+    "height": 700,
+    "left": 773,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 338,
+    "width": 93
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.flower.png": {
+    "height": 560,
+    "left": 735,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 348,
+    "width": 180
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.herb.png": {
+    "height": 430,
+    "left": 726,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 378,
+    "width": 197
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.hourglass.png": {
+    "height": 430,
+    "left": 701,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 377,
+    "width": 247
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.key.png": {
+    "height": 400,
+    "left": 685,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 393,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.magnifying glass.png": {
+    "height": 430,
+    "left": 711,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 378,
+    "width": 227
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.mallet.png": {
+    "height": 425,
+    "left": 684,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 381,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.map.png": {
+    "height": 208,
+    "left": 674,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 474,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.palette.png": {
+    "height": 250,
+    "left": 679,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 453,
+    "width": 272
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.pencil.png": {
+    "height": 430,
+    "left": 686,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 378,
+    "width": 277
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.potion.png": {
+    "height": 430,
+    "left": 686,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 377,
+    "width": 276
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.quill.png": {
+    "height": 430,
+    "left": 720,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 378,
+    "width": 210
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.scroll.png": {
+    "height": 560,
+    "left": 744,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 348,
+    "width": 163
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.shield.png": {
+    "height": 327,
+    "left": 685,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 429,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.spellbook.png": {
+    "height": 400,
+    "left": 684,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 393,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.starstaff.png": {
+    "height": 700,
+    "left": 771,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 338,
+    "width": 97
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.telescope.png": {
+    "height": 249,
+    "left": 675,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 453,
+    "width": 280
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.torch.png": {
+    "height": 700,
+    "left": 759,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 338,
+    "width": 121
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.wand.png": {
+    "height": 430,
+    "left": 710,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 378,
+    "width": 230
+  },
+  "./public/images/avatar-layers/generated/normalized/asset.object/by_outfit/painters_smock/object.wrench.png": {
+    "height": 695,
+    "left": 734,
+    "naturalHeight": 1536,
+    "naturalWidth": 1024,
+    "top": 341,
+    "width": 170
   },
   "./public/images/avatar-layers/generated/normalized/asset.object/object.brush.png": {
     "height": 430,
