@@ -677,6 +677,18 @@ const doorEntryRectFromPosition = (position: DoorPosition): Rect => {
   };
 };
 
+const lockedDoorThresholdRectFromPosition = (position: DoorPosition): Rect => {
+  const entryRect = doorEntryRectFromPosition(position);
+  const thresholdDepth = 0.35;
+
+  return {
+    x: entryRect.x,
+    y: entryRect.y - PLAYER_HALF_DEPTH - thresholdDepth,
+    width: entryRect.width,
+    height: thresholdDepth,
+  };
+};
+
 const rectsOverlap = (first: Rect, second: Rect): boolean => (
   first.x < second.x + second.width
   && first.x + first.width > second.x
@@ -1857,7 +1869,17 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       return FOYER_FIXED_BLOCKING_RECTS;
     }
 
-    return getGalleryFixedBlockingRects(activeGallery?.index || 0);
+    const lockedDoorThresholds = activeGallery
+      ? activeGallery.wingIds.flatMap((wingId, doorIndex) => {
+        if (isWingAccessible(wingId)) return [];
+        return [lockedDoorThresholdRectFromPosition(getLevelDoorPosition(activeGallery.index, doorIndex))];
+      })
+      : [];
+
+    return [
+      ...getGalleryFixedBlockingRects(activeGallery?.index || 0),
+      ...lockedDoorThresholds,
+    ];
   };
 
   const isPositionBlocked = (position: Point): boolean => {
