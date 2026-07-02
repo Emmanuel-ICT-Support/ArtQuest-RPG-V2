@@ -196,11 +196,7 @@ const FOYER_FIXED_BLOCKING_RECTS: Rect[] = [
   { x: 85.4, y: 91.7, width: 5.6, height: 4.7 },
 ];
 
-const GALLERY_BOUNDARY_BLOCKING_RECTS: Rect[] = [
-  { x: 0, y: 0, width: 100, height: 32 },
-  { x: 0, y: 0, width: 6, height: 100 },
-  { x: 94, y: 0, width: 6, height: 100 },
-];
+const GALLERY_BOUNDARY_BLOCKING_RECTS: Rect[] = [];
 
 // Collision uses the avatar's feet, so these boxes track floor footprints rather than full prop artwork.
 const GALLERY_FIXED_BLOCKING_RECTS_BY_INDEX: Rect[][] = [
@@ -1859,8 +1855,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
 
   const getSceneBounds = (): Rect => (
     scene === 'foyer'
-      ? { x: 10, y: 32, width: 80, height: 55 }
-      : { x: 6, y: 34, width: 88, height: 55 }
+      ? { x: 8.4, y: 25.3, width: 84.3, height: 70.9 }
+      : { x: 6.8, y: 25, width: 86.5, height: 73.6 }
   );
 
   const getBlockingRects = (): Rect[] => {

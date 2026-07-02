@@ -17502,11 +17502,30 @@ interface NavigationPromptTarget {
   distance: number;
 }
 
-const LEVEL_DOOR_POSITIONS: DoorPosition[] = [
-  { left: '12%', top: '14%', width: '18%', height: '22%' },
-  { left: '41%', top: '12%', width: '18%', height: '25%' },
-  { left: '72%', top: '14%', width: '18%', height: '22%' },
+const LEVEL_DOOR_POSITIONS_BY_GALLERY: DoorPosition[][] = [
+  [
+    { left: '17.5%', top: '8%', width: '13.5%', height: '27.5%' },
+    { left: '43%', top: '6%', width: '14%', height: '29%' },
+    { left: '70%', top: '8%', width: '13.5%', height: '27.5%' },
+  ],
+  [
+    { left: '20%', top: '4%', width: '10.5%', height: '28%' },
+    { left: '45%', top: '2%', width: '10.5%', height: '30%' },
+    { left: '70.5%', top: '4%', width: '11%', height: '28%' },
+  ],
+  [
+    { left: '18.5%', top: '5.4%', width: '10%', height: '28.7%' },
+    { left: '44%', top: '6.9%', width: '10.2%', height: '28%' },
+    { left: '70%', top: '8%', width: '10%', height: '26%' },
+  ],
+  [
+    { left: '17%', top: '6%', width: '14.5%', height: '28.5%' },
+    { left: '43%', top: '4%', width: '15%', height: '30%' },
+    { left: '68.5%', top: '7%', width: '14%', height: '27%' },
+  ],
 ];
+
+const LEVEL_DOOR_COUNT = LEVEL_DOOR_POSITIONS_BY_GALLERY[0].length;
 
 const DOOR_GUARD_POSITION_OFFSETS_BY_GALLERY: Point[][] = [
   [{ x: -4, y: 0 }, { x: -4, y: 3.5 }, { x: 0, y: 0 }],
@@ -17547,7 +17566,7 @@ const NPC_SPRITE_SRC = './public/images/npcs/gallery-guide.png';
 const DOOR_GUARD_SPRITE_SRC = './public/images/npcs/gallery-guard.png';
 const PIP_SPRITE_SRC = './public/images/npcs/pip.png';
 const FOYER_SPAWN: Point = { x: 50, y: 68 };
-const GALLERY_SPAWN: Point = { x: 50, y: 62 };
+const GALLERY_SPAWN: Point = { x: 50, y: 58 };
 
 const PIP_POSITIONS: Record<NPCScene, Point> = {
   foyer: { x: 54, y: 59 },
@@ -17558,76 +17577,104 @@ const PIP_POSITIONS: Record<NPCScene, Point> = {
 };
 
 const FOYER_FIXED_BLOCKING_RECTS: Rect[] = [
-  { x: 0, y: 0, width: 100, height: 31 },
-  { x: 0, y: 0, width: 10, height: 100 },
-  { x: 90, y: 0, width: 10, height: 100 },
-  { x: 30.6, y: 31.6, width: 5.8, height: 10.5 },
-  { x: 68.1, y: 31.6, width: 5.8, height: 10.5 },
-  { x: 30.2, y: 49.5, width: 1.8, height: 5.6 },
-  { x: 70.3, y: 49.5, width: 1.8, height: 5.6 },
-  { x: 17, y: 83, width: 25, height: 14 },
-  { x: 61, y: 83, width: 25, height: 14 },
+  { x: 8.5, y: 2.1, width: 83.5, height: 23.2 },
+  { x: 8.4, y: 25.7, width: 2.4, height: 70.5 },
+  { x: 90.6, y: 25.3, width: 2.1, height: 70.4 },
+  { x: 11.2, y: 20.5, width: 4.4, height: 9.4 },
+  { x: 86.1, y: 20.1, width: 3.4, height: 10.9 },
+  { x: 30.6, y: 21.6, width: 4.6, height: 20.4 },
+  { x: 67.4, y: 21.7, width: 4.7, height: 20.7 },
+  { x: 30.1, y: 47.4, width: 2.7, height: 10.3 },
+  { x: 69.5, y: 48, width: 2.8, height: 9.6 },
+  { x: 16.3, y: 79.5, width: 26.9, height: 15.6 },
+  { x: 60.6, y: 79.7, width: 25, height: 16.3 },
+  { x: 10.9, y: 92.2, width: 5.4, height: 3.8 },
+  { x: 85.4, y: 91.7, width: 5.6, height: 4.7 },
 ];
 
-const GALLERY_BOUNDARY_BLOCKING_RECTS: Rect[] = [
-  { x: 0, y: 0, width: 100, height: 32 },
-  { x: 0, y: 0, width: 6, height: 100 },
-  { x: 94, y: 0, width: 6, height: 100 },
-];
+const GALLERY_BOUNDARY_BLOCKING_RECTS: Rect[] = [];
 
 // Collision uses the avatar's feet, so these boxes track floor footprints rather than full prop artwork.
 const GALLERY_FIXED_BLOCKING_RECTS_BY_INDEX: Rect[][] = [
   [
-    { x: 34.2, y: 34.8, width: 3.8, height: 10.2 },
-    { x: 61.7, y: 34.8, width: 3.8, height: 10.2 },
-    { x: 32.3, y: 48, width: 1.7, height: 4.8 },
-    { x: 66.2, y: 48, width: 1.7, height: 4.8 },
-    { x: 44.3, y: 81, width: 11.5, height: 7.5 },
+    { x: 11.2, y: 1.9, width: 77.3, height: 26.2 },
+    { x: 10.8, y: 28.6, width: 2, height: 67.8 },
+    { x: 13, y: 93.9, width: 76.6, height: 2.6 },
+    { x: 34.5, y: 26.8, width: 3.8, height: 18.4 },
+    { x: 61.7, y: 26.8, width: 3.8, height: 18.8 },
+    { x: 31.4, y: 40.5, width: 2.5, height: 10 },
+    { x: 65.7, y: 41.6, width: 2.7, height: 9.4 },
+    { x: 43.4, y: 78.2, width: 13.2, height: 19.1 },
+    { x: 79.8, y: 41, width: 9.4, height: 5.7 },
+    { x: 76, y: 47, width: 13.3, height: 16.5 },
+    { x: 75.8, y: 72.9, width: 13.9, height: 5 },
+    { x: 87.6, y: 78.2, width: 1.9, height: 15.2 },
   ],
   [
-    { x: 34.5, y: 32.4, width: 4, height: 12.6 },
-    { x: 63.7, y: 32.4, width: 4, height: 12.6 },
-    { x: 31.1, y: 41.1, width: 2.1, height: 4.5 },
-    { x: 67.7, y: 41.1, width: 2.1, height: 4.5 },
-    { x: 43.7, y: 78.8, width: 12.6, height: 9.2 },
+    { x: 7.4, y: 1.4, width: 12.9, height: 25.2 },
+    { x: 20.2, y: 3.8, width: 25, height: 22.4 },
+    { x: 45, y: 2, width: 47.2, height: 23 },
+    { x: 7.5, y: 27, width: 2.4, height: 70.9 },
+    { x: 90.4, y: 25.7, width: 1.9, height: 73 },
+    { x: 33.3, y: 22.6, width: 6.2, height: 23.6 },
+    { x: 61.5, y: 25.2, width: 5.4, height: 20.6 },
+    { x: 30.2, y: 34.5, width: 2.9, height: 8.6 },
+    { x: 67.2, y: 34.8, width: 2.8, height: 8.4 },
+    { x: 82.2, y: 38.3, width: 8.3, height: 7.1 },
+    { x: 79.9, y: 45.6, width: 11.4, height: 20.2 },
+    { x: 80.3, y: 77.3, width: 10.1, height: 5.5 },
+    { x: 44.3, y: 76.7, width: 11.3, height: 19.8 },
+    { x: 38.9, y: 86, width: 5.1, height: 11.2 },
+    { x: 56.2, y: 86.4, width: 5.1, height: 9.7 },
+    { x: 7.5, y: 95.2, width: 82.6, height: 3.7 },
   ],
   [
-    { x: 34, y: 34.5, width: 3.5, height: 8.5 },
-    { x: 62.4, y: 34.5, width: 3.5, height: 8.5 },
-    { x: 31.2, y: 38.6, width: 2.1, height: 4.4 },
-    { x: 41.2, y: 38.3, width: 1.8, height: 4.3 },
-    { x: 57.8, y: 38.3, width: 1.8, height: 4.3 },
-    { x: 67.1, y: 38.6, width: 2.1, height: 4.4 },
-    { x: 43.4, y: 79.6, width: 13.2, height: 8.8 },
+    { x: 9.4, y: 2.4, width: 8.8, height: 31.6 },
+    { x: 9, y: 34.1, width: 2, height: 64.8 },
+    { x: 18.5, y: 5.4, width: 9.9, height: 20 },
+    { x: 44, y: 6.9, width: 10.2, height: 19.2 },
+    { x: 70, y: 8, width: 9.8, height: 18.1 },
+    { x: 79.7, y: 2, width: 9.6, height: 31 },
+    { x: 28.3, y: 12.1, width: 15.3, height: 33.7 },
+    { x: 54, y: 9.5, width: 15.8, height: 36.5 },
+    { x: 77.6, y: 42, width: 8.7, height: 19.6 },
+    { x: 86.8, y: 40.4, width: 3.6, height: 31.8 },
+    { x: 87.4, y: 33.5, width: 2.3, height: 6.7 },
+    { x: 11.4, y: 71.9, width: 5.6, height: 21.6 },
+    { x: 82.7, y: 71.9, width: 5.9, height: 21.6 },
+    { x: 43.7, y: 77.6, width: 10.9, height: 16.4 },
+    { x: 37.1, y: 80.9, width: 6.3, height: 13 },
+    { x: 54.7, y: 81.1, width: 6.3, height: 13.2 },
+    { x: 11.6, y: 96.8, width: 78.5, height: 2.6 },
   ],
   [
-    { x: 35.7, y: 35.3, width: 3.6, height: 7.8 },
-    { x: 61.6, y: 35.3, width: 3.6, height: 7.8 },
-    { x: 34.3, y: 38.7, width: 2.2, height: 4.6 },
-    { x: 64.8, y: 38.7, width: 2.2, height: 4.6 },
-    { x: 42.6, y: 77.2, width: 14.8, height: 10.8 },
+    { x: 7.2, y: 1.2, width: 85.3, height: 24.3 },
+    { x: 6.9, y: 25.3, width: 1.7, height: 73 },
+    { x: 91.5, y: 25.3, width: 1.8, height: 72.8 },
+    { x: 15, y: 24.9, width: 7.9, height: 9.7 },
+    { x: 26.3, y: 25.3, width: 22, height: 9.5 },
+    { x: 51.5, y: 25.6, width: 22, height: 8.6 },
+    { x: 76.7, y: 24.9, width: 8.1, height: 9.9 },
+    { x: 31.6, y: 34.6, width: 8.7, height: 7.2 },
+    { x: 59.8, y: 34.5, width: 8.7, height: 7.7 },
+    { x: 57, y: 43.6, width: 5.2, height: 5.5 },
+    { x: 31.8, y: 47.9, width: 5.9, height: 6.1 },
+    { x: 62.4, y: 50.4, width: 6, height: 5.9 },
+    { x: 36.3, y: 55.4, width: 5.9, height: 6.3 },
+    { x: 68.2, y: 57.7, width: 6.1, height: 7.1 },
+    { x: 42.4, y: 74.1, width: 15.2, height: 23.5 },
+    { x: 37.7, y: 79.7, width: 4.1, height: 14.2 },
+    { x: 57.5, y: 80, width: 4.6, height: 13.8 },
+    { x: 8.6, y: 95.2, width: 84.3, height: 3.2 },
   ],
 ];
 
-// The right-side gallery doorway is an interaction target, but its wall/frame should stay solid.
-// These blockers start to the right of the nearby torches so the main walking lane remains open.
+// Right-side gallery doorway blockers are folded into the per-gallery rectangles above.
 const GALLERY_SIDE_DOOR_BLOCKING_RECTS_BY_INDEX: Rect[][] = [
-  [
-    { x: 76.8, y: 40.5, width: 17.2, height: 7 },
-    { x: 78.8, y: 47, width: 15.2, height: 30.5 },
-  ],
-  [
-    { x: 78, y: 39.2, width: 16, height: 7.5 },
-    { x: 78.8, y: 46.7, width: 15.2, height: 31.5 },
-  ],
-  [
-    { x: 76.5, y: 40.8, width: 17.5, height: 7.2 },
-    { x: 78.8, y: 48, width: 15.2, height: 30 },
-  ],
-  [
-    { x: 77.4, y: 40.8, width: 16.6, height: 7.2 },
-    { x: 78.8, y: 48, width: 15.2, height: 30 },
-  ],
+  [],
+  [],
+  [],
+  [],
 ];
 
 const getGalleryFixedBlockingRects = (galleryIndex: number): Rect[] => [
@@ -18213,9 +18260,15 @@ const getOptionsInOrder = (
   return orderedOptions.length === options.length ? orderedOptions : options;
 };
 
+const getLevelDoorPosition = (galleryIndex: number, doorIndex: number): DoorPosition => (
+  LEVEL_DOOR_POSITIONS_BY_GALLERY[galleryIndex]?.[doorIndex]
+  || LEVEL_DOOR_POSITIONS_BY_GALLERY[0][doorIndex]
+  || LEVEL_DOOR_POSITIONS_BY_GALLERY[0][0]
+);
+
 const getDoorGuardPoint = (doorIndex: number, galleryIndex = 0): Point => {
-  const doorRect = doorRectFromPosition(LEVEL_DOOR_POSITIONS[doorIndex]);
-  const isRightmostDoor = doorIndex === LEVEL_DOOR_POSITIONS.length - 1;
+  const doorRect = doorRectFromPosition(getLevelDoorPosition(galleryIndex, doorIndex));
+  const isRightmostDoor = doorIndex === LEVEL_DOOR_COUNT - 1;
   const offset = DOOR_GUARD_POSITION_OFFSETS_BY_GALLERY[galleryIndex]?.[doorIndex] || { x: 0, y: 0 };
 
   return {
@@ -18224,8 +18277,8 @@ const getDoorGuardPoint = (doorIndex: number, galleryIndex = 0): Point => {
   };
 };
 
-const getDoorInteractionPoint = (doorIndex: number): Point => {
-  const doorEntryRect = doorEntryRectFromPosition(LEVEL_DOOR_POSITIONS[doorIndex]);
+const getDoorInteractionPoint = (doorIndex: number, galleryIndex = 0): Point => {
+  const doorEntryRect = doorEntryRectFromPosition(getLevelDoorPosition(galleryIndex, doorIndex));
 
   return {
     x: doorEntryRect.x + doorEntryRect.width / 2,
@@ -18615,7 +18668,9 @@ const MapScreen: React.FC<MapScreenProps> = ({
         if (!wing) return;
 
         const isGuardedDoor = currentDoorGuardTarget?.wingId === wingId;
-        const promptPoint = isGuardedDoor ? getDoorGuardPoint(doorIndex, activeGallery.index) : getDoorInteractionPoint(doorIndex);
+        const promptPoint = isGuardedDoor
+          ? getDoorGuardPoint(doorIndex, activeGallery.index)
+          : getDoorInteractionPoint(doorIndex, activeGallery.index);
         const point = isGuardedDoor
           ? { x: promptPoint.x, y: promptPoint.y + 10 }
           : promptPoint;
@@ -18633,7 +18688,7 @@ const MapScreen: React.FC<MapScreenProps> = ({
           prompt,
           point,
           promptPosition: promptPoint,
-          placement: doorIndex === LEVEL_DOOR_POSITIONS.length - 1 ? 'left' : 'right',
+          placement: doorIndex === LEVEL_DOOR_COUNT - 1 ? 'left' : 'right',
           action: canEnter ? { type: 'wing', wingId } : null,
         });
       });
@@ -18713,7 +18768,7 @@ const MapScreen: React.FC<MapScreenProps> = ({
     const playerFeet = getPlayerFeet(playerPosition);
     const closestDoor = activeGallery.wingIds
       .map((wingId, doorIndex) => {
-        const doorRect = doorRectFromPosition(LEVEL_DOOR_POSITIONS[doorIndex]);
+        const doorRect = doorRectFromPosition(getLevelDoorPosition(activeGallery.index, doorIndex));
         const talkPoint = {
           x: doorRect.x + doorRect.width / 2,
           y: doorRect.y + doorRect.height + 13,
@@ -19196,8 +19251,8 @@ const MapScreen: React.FC<MapScreenProps> = ({
 
   const getSceneBounds = (): Rect => (
     scene === 'foyer'
-      ? { x: 10, y: 32, width: 80, height: 55 }
-      : { x: 6, y: 34, width: 88, height: 55 }
+      ? { x: 8.4, y: 25.3, width: 84.3, height: 70.9 }
+      : { x: 6.8, y: 25, width: 86.5, height: 73.6 }
   );
 
   const getBlockingRects = (): Rect[] => {
@@ -19210,7 +19265,7 @@ const MapScreen: React.FC<MapScreenProps> = ({
           .flatMap((wingId, doorIndex) => {
             const isEnterable = isWingAccessible(wingId);
             if (isEnterable) return [];
-            const doorPosition = LEVEL_DOOR_POSITIONS[doorIndex];
+            const doorPosition = getLevelDoorPosition(activeGallery.index, doorIndex);
             return [
               expandedRect(doorRectFromPosition(doorPosition), 1.5),
               expandedRect(doorEntryRectFromPosition(doorPosition), 1.5),
@@ -21199,7 +21254,7 @@ const MapScreen: React.FC<MapScreenProps> = ({
     );
   };
 
-  const renderLevelDoor = (wingId: string, doorIndex: number) => {
+  const renderLevelDoor = (wingId: string, doorIndex: number, galleryIndex: number) => {
     const wing = getWingById(wingId);
     if (!wing) return null;
 
@@ -21207,7 +21262,7 @@ const MapScreen: React.FC<MapScreenProps> = ({
     const isUnlocked = isWingAccessible(wing.id);
     const isSolved = !!state?.isSolved;
     const canEnter = isUnlocked;
-    const position = LEVEL_DOOR_POSITIONS[doorIndex];
+    const position = getLevelDoorPosition(galleryIndex, doorIndex);
     const statusText = isSolved ? 'Complete' : canEnter ? 'Open' : 'Locked';
     const levelNumber = wingDefinitions.findIndex((item) => item.id === wing.id) + 1;
 
@@ -21264,7 +21319,7 @@ const MapScreen: React.FC<MapScreenProps> = ({
           ) : (
             <div className="absolute left-[80%] top-[46%] z-30 h-[31%] w-[14%]" aria-hidden="true" />
           )}
-          {activeGallery.wingIds.map((wingId, doorIndex) => renderLevelDoor(wingId, doorIndex))}
+          {activeGallery.wingIds.map((wingId, doorIndex) => renderLevelDoor(wingId, doorIndex, galleryIndex))}
           {renderSideQuestClues()}
           {renderDoorGuards()}
           {renderSceneNpcs()}
