@@ -677,13 +677,6 @@ const doorEntryRectFromPosition = (position: DoorPosition): Rect => {
   };
 };
 
-const expandedRect = (rect: Rect, amount: number): Rect => ({
-  x: rect.x - amount,
-  y: rect.y - amount,
-  width: rect.width + amount * 2,
-  height: rect.height + amount * 2,
-});
-
 const rectsOverlap = (first: Rect, second: Rect): boolean => (
   first.x < second.x + second.width
   && first.x + first.width > second.x
@@ -1864,23 +1857,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({
       return FOYER_FIXED_BLOCKING_RECTS;
     }
 
-    const blockedDoors = activeGallery
-      ? activeGallery.wingIds
-          .flatMap((wingId, doorIndex) => {
-            const isEnterable = isWingAccessible(wingId);
-            if (isEnterable) return [];
-            const doorPosition = getLevelDoorPosition(activeGallery.index, doorIndex);
-            return [
-              expandedRect(doorRectFromPosition(doorPosition), 1.5),
-              expandedRect(doorEntryRectFromPosition(doorPosition), 1.5),
-            ];
-          })
-      : [];
-
-    return [
-      ...getGalleryFixedBlockingRects(activeGallery?.index || 0),
-      ...blockedDoors,
-    ];
+    return getGalleryFixedBlockingRects(activeGallery?.index || 0);
   };
 
   const isPositionBlocked = (position: Point): boolean => {
