@@ -5,6 +5,7 @@ import { WING_DEFINITIONS, MSG_TAG_PUZZLE_SOLVED, MSG_TAG_GAME_WON, MSG_TAG_GENE
 import { sendMessageToChat, generateImagePromptFromDescription, generateImage } from './services/aiService';
 import { getArtworkBrief } from './data/ArtworkLibrary';
 import { SCSA_ASSESSMENT_YEAR_OPTIONS, getAssessmentDisplayLabel, getAssessmentYearOptionId } from './data/SCSACurriculum';
+import { getResponseExpectation } from './data/ResponseExpectations';
 import { getAvatarBuildForAvatar, getAvatarLayerImageUrls, getAvatarSpriteUrl } from './data/AvatarRewards';
 import { VisualLanguageGuideContent, flattenVisualLanguageGuide, getVisualLanguageGuideForWing } from './data/VisualLanguageGuide';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -12,12 +13,6 @@ import Modal from './components/Modal';
 import PostLevelSummaryModal from './components/PostLevelSummaryModal'; 
 import PlayerStatsDisplay from './components/PlayerStatsDisplay'; 
 import AvatarLayeredPreview from './components/AvatarLayeredPreview';
-
-const RESPONSE_DEPTH_TARGETS: Record<'junior' | 'middle' | 'senior', Record<QuestionPhase, number>> = {
-  junior: { 1: 12, 2: 16, 3: 18, 4: 24 },
-  middle: { 1: 20, 2: 28, 3: 34, 4: 45 },
-  senior: { 1: 30, 2: 42, 3: 52, 4: 70 },
-};
 
 interface StatsRewardResult {
   updatedStats: PlayerStats;
@@ -33,11 +28,7 @@ const getResponseDepthTarget = (
   phase: QuestionPhase,
   yearLevel: YearLevel,
   coursePathway?: SeniorCoursePathway
-): number => {
-  const band = yearLevel >= 11 ? 'senior' : yearLevel >= 9 ? 'middle' : 'junior';
-  const baseTarget = RESPONSE_DEPTH_TARGETS[band][phase];
-  return yearLevel >= 11 && coursePathway === 'atar' ? baseTarget + 8 : baseTarget;
-};
+): number => getResponseExpectation(yearLevel, phase, coursePathway).minWords;
 
 const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 

@@ -8,6 +8,8 @@ import {
   getAssessmentFeedbackNudge,
   getAssessmentRubricForContext,
 } from '../data/SCSACurriculum';
+import { getResponseExpectation } from '../data/ResponseExpectations';
+import { getVisualLanguageGuideForWing } from '../data/VisualLanguageGuide';
 import LoadingSpinner from './LoadingSpinner';
 import {
   ArtQuestPlayerPanel,
@@ -116,9 +118,16 @@ const normalizeForAssessment = (text: string): string => text
   .replace(/\s+/g, ' ')
   .trim();
 
+const escapeAssessmentRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 const containsAssessmentTerm = (text: string, terms: string[]): boolean => {
   const normalized = normalizeForAssessment(text);
-  return terms.some(term => normalized.includes(normalizeForAssessment(term)));
+  return terms.some((term) => {
+    const normalizedTerm = normalizeForAssessment(term);
+    if (!normalizedTerm) return false;
+    const termPattern = escapeAssessmentRegExp(normalizedTerm).replace(/\s+/g, '\\s+');
+    return new RegExp(`(^|\\s)${termPattern}(\\s|$)`, 'u').test(normalized);
+  });
 };
 
 const countAssessmentSentenceLikeUnits = (text: string): number => {
@@ -138,6 +147,39 @@ const ASSESSMENT_ANALYSIS_TERMS = ['creates', 'guides', 'leads', 'draws', 'empha
 const ASSESSMENT_INTERPRETATION_TERMS = ['mood', 'feeling', 'idea', 'message', 'meaning', 'story', 'symbolises', 'symbolizes', 'suggests', 'communicates', 'represents', 'reminds', 'could mean', 'might mean'];
 const ASSESSMENT_JUDGEMENT_TERMS = ['successful', 'effective', 'powerful', 'works', 'strong', 'weak', 'partly successful', 'not successful', 'overall', 'i think', 'my judgement'];
 const ASSESSMENT_REASONING_TERMS = ['because', 'evidence', 'shows', 'suggests', 'from the artwork', 'this makes', 'this creates', 'therefore', 'however', 'although'];
+
+const getAssessmentWordScore = (wordCount: number, targetWordCount: number): number => {
+  if (wordCount <= 0) return 0;
+  if (wordCount >= Math.ceil(targetWordCount * 1.5)) return 95;
+  if (wordCount >= Math.ceil(targetWordCount * 1.25)) return 85;
+  if (wordCount >= targetWordCount) return 65;
+  if (wordCount >= Math.ceil(targetWordCount * 0.7)) return 50;
+  if (wordCount >= Math.ceil(targetWordCount * 0.4)) return 35;
+  return 20;
+};
+
+const getAssessmentVisualLanguageTargets = (context: AssessmentContext): { competent: number; excellent: number } => {
+  if (context.assessmentStage === 'lowerSecondary') return { competent: 2, excellent: 4 };
+  if (context.assessmentStage === 'middleSecondary') return { competent: 3, excellent: 5 };
+  if (context.assessmentStage === 'seniorAtar') return { competent: 5, excellent: 7 };
+  return { competent: 4, excellent: 6 };
+};
+
+const getAssessmentVisualTermsUsed = (
+  entry: JournalEntry,
+  responseText: string,
+  context: AssessmentContext,
+): string[] => {
+  const guide = getVisualLanguageGuideForWing(entry.wingId, context.yearLevel, context.coursePathway);
+  const candidateTerms = [
+    ...(entry.visualLanguageLog || []),
+    guide.focus,
+    ...guide.assessmentVocabulary,
+  ];
+
+  return Array.from(new Set(candidateTerms.map(term => term.trim()).filter(Boolean)))
+    .filter(term => containsAssessmentTerm(responseText, [term]));
+};
 
 // Helper function to generate constructive feedback
 const getConstructiveFeedbackForCriterion = (
@@ -320,12 +362,12 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
   const getRawScoreForEntryCriterion = (entry: JournalEntry, criterionId: RubricCriterion['id']): number => {
     const phaseResponses = getPhaseResponsesForAssessment(entry);
     const personalReflection = entry.playerPersonalReflection?.trim() || "";
-    const visualTermsCount = entry.visualLanguageLog?.length || 0; 
 
     const seeThinkText = `${phaseResponses[1]} ${phaseResponses[2]}`.trim();
     const interpretReflectText = `${phaseResponses[3]} ${phaseResponses[4]}`.trim();
     const allResponseText = `${phaseResponses[1]} ${phaseResponses[2]} ${phaseResponses[3]} ${phaseResponses[4]}`.trim();
     const reflection = phaseResponses[4].trim();
+    const visualTermsCount = getAssessmentVisualTermsUsed(entry, allResponseText, assessmentContext).length;
 
     const seeThinkWordCount = countWords(seeThinkText);
     const interpretReflectWordCount = countWords(interpretReflectText);
@@ -343,68 +385,57 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
     const hasJudgementLanguage = containsAssessmentTerm(reflection, ASSESSMENT_JUDGEMENT_TERMS);
     const hasReasoning = containsAssessmentTerm(allResponseText, ASSESSMENT_REASONING_TERMS);
     const hasReflectionReasoning = containsAssessmentTerm(reflection, ASSESSMENT_REASONING_TERMS);
+    const hasNuancedJudgement = containsAssessmentTerm(reflection, ['partly successful', 'not successful', 'however', 'although', 'overall']);
+    const phaseWordTarget = (phase: 1 | 2 | 3 | 4): number => (
+      getResponseExpectation(assessmentContext.yearLevel, phase, assessmentContext.coursePathway).minWords
+    );
+    const artUnderstandingTarget = phaseWordTarget(1) + phaseWordTarget(2);
+    const personalInsightTarget = phaseWordTarget(3) + phaseWordTarget(4);
+    const engagementTarget = artUnderstandingTarget + personalInsightTarget;
 
     switch (criterionId) {
       case 'artUnderstanding':
-        let auScore = 0;
-        if (seeThinkWordCount > 95 && seeThinkSentenceCount >= 4) auScore = 90;
-        else if (seeThinkWordCount > 70 && seeThinkSentenceCount >= 3) auScore = 75;
-        else if (seeThinkWordCount > 45 && seeThinkSentenceCount >= 2) auScore = 60;
-        else if (seeThinkWordCount > 25 && seeThinkSentenceCount >= 1) auScore = 40;
-        else if (seeThinkWordCount > 0) auScore = 20;
-        if (visualTermsCount >= 3 && seeThinkWordCount > 25) auScore += 10;
-        if (hasLocationEvidence) auScore += 5;
+        let auScore = getAssessmentWordScore(seeThinkWordCount, artUnderstandingTarget);
+        if (visualTermsCount >= getAssessmentVisualLanguageTargets(assessmentContext).competent) auScore += 4;
+        if (hasLocationEvidence) auScore += 4;
         if (hasAnalysisLanguage) auScore += 5;
-        if (completedPhaseCount === 4 && auScore > 0) auScore += 5;
+        if (seeThinkSentenceCount >= 2) auScore += 3;
         return clampScore(auScore);
       
       case 'visualLanguage': 
         {
+          const visualTargets = getAssessmentVisualLanguageTargets(assessmentContext);
           let vlScore = 0;
-          if (visualTermsCount >= 8) vlScore = 95;
-          else if (visualTermsCount >= 6) vlScore = 80;
-          else if (visualTermsCount >= 4) vlScore = 65;
-          else if (visualTermsCount >= 2) vlScore = 45;
-          else if (visualTermsCount >= 1) vlScore = 25;
-          if (allSentenceCount >= completedPhaseCount && visualTermsCount >= 2) vlScore += 5;
+          if (visualTermsCount >= visualTargets.excellent) vlScore = 95;
+          else if (visualTermsCount >= visualTargets.competent) vlScore = 72;
+          else if (visualTermsCount >= Math.max(1, visualTargets.competent - 1)) vlScore = 52;
+          else if (visualTermsCount >= 1) vlScore = 35;
+          if (allSentenceCount >= completedPhaseCount && visualTermsCount >= visualTargets.competent) vlScore += 3;
           return clampScore(vlScore);
         }
 
       case 'personalInsight':
-        let piScore = 0;
-        const combinedReflectionWordCount = interpretReflectWordCount + personalReflectionWordCount;
-        if (personalReflectionWordCount > 45 && hasInterpretationLanguage) piScore = 95;
-        else if (combinedReflectionWordCount > 100 && interpretReflectSentenceCount >= 4) piScore = 90;
-        else if (combinedReflectionWordCount > 75 && interpretReflectSentenceCount >= 3) piScore = 75;
-        else if (combinedReflectionWordCount > 50 && interpretReflectSentenceCount >= 2) piScore = 60;
-        else if (combinedReflectionWordCount > 25) piScore = 35;
-        else if (combinedReflectionWordCount > 0) piScore = 20;
-        if (hasInterpretationLanguage) piScore += 10;
+        let piScore = getAssessmentWordScore(interpretReflectWordCount, personalInsightTarget);
+        if (hasInterpretationLanguage) piScore += 7;
         if (hasReasoning) piScore += 5;
+        if (personalReflectionWordCount >= 8) piScore += 4;
+        if (interpretReflectSentenceCount >= 2) piScore += 3;
         return clampScore(piScore);
 
       case 'judgementReflection': 
-        let jrScore = 0;
-        if (reflectionWordCount > 90 && reflectionSentenceCount >= 4) jrScore = 90;
-        else if (reflectionWordCount > 65 && reflectionSentenceCount >= 3) jrScore = 75;
-        else if (reflectionWordCount > 40 && reflectionSentenceCount >= 2) jrScore = 60;
-        else if (reflectionWordCount > 20 && reflectionSentenceCount >= 1) jrScore = 40;
-        else if (reflectionWordCount > 0) jrScore = 20;
-
-        if (hasJudgementLanguage) jrScore += 10;
-        if (hasReflectionReasoning) jrScore += 10;
-        if (containsAssessmentTerm(reflection, ['partly successful', 'not successful', 'however', 'although', 'overall'])) jrScore += 5;
+        let jrScore = getAssessmentWordScore(reflectionWordCount, phaseWordTarget(4));
+        if (hasJudgementLanguage) jrScore += 8;
+        if (hasReflectionReasoning) jrScore += 8;
+        if (hasNuancedJudgement) jrScore += 4;
+        if (reflectionSentenceCount >= getResponseExpectation(assessmentContext.yearLevel, 4, assessmentContext.coursePathway).minSentences) jrScore += 3;
         return clampScore(jrScore);
 
       case 'engagementEffort':
-        let eeScore = 0;
-        if (completedPhaseCount === 4 && allResponseWordCount > 180 && allSentenceCount >= 8) eeScore = 100;
-        else if (completedPhaseCount === 4 && allResponseWordCount > 130 && allSentenceCount >= 6) eeScore = 85;
-        else if (completedPhaseCount >= 3 && allResponseWordCount > 90 && allSentenceCount >= 4) eeScore = 65;
-        else if (completedPhaseCount >= 2 && allResponseWordCount > 50 && allSentenceCount >= 2) eeScore = 45;
-        else if (allResponseWordCount > 0) eeScore = 25;
-        if (personalReflectionWordCount > 0) eeScore += 10;
-        if (completedPhaseCount === 4 && visualTermsCount >= 3) eeScore += 5;
+        let eeScore = getAssessmentWordScore(allResponseWordCount, engagementTarget);
+        if (completedPhaseCount < 4) eeScore = Math.min(eeScore, completedPhaseCount >= 3 ? 60 : completedPhaseCount >= 2 ? 45 : 30);
+        if (completedPhaseCount === 4) eeScore += 4;
+        if (allSentenceCount >= completedPhaseCount && completedPhaseCount >= 2) eeScore += 3;
+        if (completedPhaseCount === 4 && visualTermsCount >= getAssessmentVisualLanguageTargets(assessmentContext).competent) eeScore += 3;
         return clampScore(eeScore);
       default:
         return 0;
@@ -597,7 +628,7 @@ const AssessmentScreen: React.FC<AssessmentScreenProps> = ({
             </div>
             <p className="assessment-v3-rubric-note mx-auto mb-1 w-full max-w-4xl shrink-0 rounded-md border border-[#9a6328]/65 bg-[#030817]/80 px-3 py-0.5 text-center font-serif text-[10px] font-black uppercase text-[#ffd45f] max-[700px]:py-0 max-[700px]:text-[8px]">
               {hasJournalEntries
-                ? `This rubric provides an estimated summary based on journal entries and the selected ${assessmentContext.label} expectations.`
+                ? `This formative estimate uses the selected ${assessmentContext.label} expectations, relevant visual evidence, visual language, and complete phase responses — not word count alone.`
                 : 'Complete wings to unlock estimated scores. For now, review the assessment standards below.'}
             </p>
 

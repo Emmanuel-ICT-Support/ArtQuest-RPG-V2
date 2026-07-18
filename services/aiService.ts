@@ -1,5 +1,6 @@
 import { WING_DEFINITIONS, MSG_TAG_GENERATE_PLAYER_IMAGE, MSG_TAG_GENERATE_PREDEFINED_IMAGE, MSG_TAG_GAME_WON, MSG_TAG_PUZZLE_SOLVED } from '../constants';
 import { OFFLINE_WING_CONTENT, getOfflinePhaseTask, getOfflineWingImagePrompt } from '../data/OfflineCurator';
+import { getResponseExpectation, getResponseQualityRatio } from '../data/ResponseExpectations';
 import { getArtworkAssetPath, parseArtworkPrompt, YEAR_ARTWORK_PROFILES } from '../data/ArtworkLibrary';
 import {
   CAUSE_EFFECT_MARKERS,
@@ -39,8 +40,6 @@ const normalizeText = (value: string): string => value
 
 const wordCount = (value: string): number => value.trim().split(/\s+/).filter(Boolean).length;
 
-type OfflineResponseYearBand = 'junior' | 'middle' | 'senior';
-
 type PhaseExpectation = {
   minWords: number;
   minSentences: number;
@@ -53,33 +52,6 @@ type AnswerQuality = PhaseExpectation & {
   score: number;
   maxScore: number;
   passed: boolean;
-};
-
-const RESPONSE_EXPECTATIONS: Record<OfflineResponseYearBand, Record<number, PhaseExpectation>> = {
-  junior: {
-    1: { minWords: 12, minSentences: 1 },
-    2: { minWords: 16, minSentences: 1 },
-    3: { minWords: 18, minSentences: 2 },
-    4: { minWords: 24, minSentences: 2 },
-  },
-  middle: {
-    1: { minWords: 20, minSentences: 2 },
-    2: { minWords: 28, minSentences: 2 },
-    3: { minWords: 34, minSentences: 2 },
-    4: { minWords: 45, minSentences: 3 },
-  },
-  senior: {
-    1: { minWords: 30, minSentences: 2 },
-    2: { minWords: 42, minSentences: 3 },
-    3: { minWords: 52, minSentences: 3 },
-    4: { minWords: 70, minSentences: 4 },
-  },
-};
-
-const getOfflineResponseYearBand = (yearLevel: YearLevel): OfflineResponseYearBand => {
-  if (yearLevel >= 11) return 'senior';
-  if (yearLevel >= 9) return 'middle';
-  return 'junior';
 };
 
 const escapeOfflineRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -178,16 +150,6 @@ type ResponseCategoryCheck = {
   label: string;
   matched: boolean;
   weight: number;
-};
-
-const getScoreRatio = (
-  yearLevel: YearLevel,
-  coursePathway?: SeniorCoursePathway
-): number => {
-  if (yearLevel >= 11 && coursePathway === 'atar') return 0.86;
-  if (yearLevel >= 11) return 0.78;
-  if (yearLevel >= 9) return 0.68;
-  return 0.58;
 };
 
 const hasFirstPersonReflection = (normalized: string): boolean =>
@@ -292,10 +254,7 @@ const analyzeAnswerQuality = (
   coursePathway?: SeniorCoursePathway
 ): AnswerQuality => {
   const normalized = normalizeText(input);
-  const baseExpectation = RESPONSE_EXPECTATIONS[getOfflineResponseYearBand(yearLevel)][phase] || RESPONSE_EXPECTATIONS.middle[1];
-  const expectation = yearLevel >= 11 && coursePathway === 'atar'
-    ? { minWords: baseExpectation.minWords + 8, minSentences: baseExpectation.minSentences + (phase >= 2 ? 1 : 0) }
-    : baseExpectation;
+  const expectation = getResponseExpectation(yearLevel, phase, coursePathway) as PhaseExpectation;
   const count = wordCount(input);
   const sentenceCount = countSentenceLikeUnits(input);
   const missing: string[] = [];
@@ -315,9 +274,9 @@ const analyzeAnswerQuality = (
   const checks = getPhaseCategoryChecks(normalized, wingId, phase, yearLevel, coursePathway, sentenceCount);
   const score = checks.reduce((total, check) => total + (check.matched ? check.weight : 0), 0);
   const maxScore = checks.reduce((total, check) => total + check.weight, 0);
-  const requiredScore = maxScore * getScoreRatio(yearLevel, coursePathway);
+  const requiredScore = maxScore * getResponseQualityRatio(yearLevel, coursePathway);
   const hasCategoryDepth = score >= requiredScore;
-  const compactAnswerFloor = phase <= 2 ? 5 : Math.ceil(expectation.minWords * 0.45);
+  const compactAnswerFloor = Math.max(5, Math.ceil(expectation.minWords * 0.6));
   const hasEnoughLength = count >= expectation.minWords || (hasCategoryDepth && count >= compactAnswerFloor);
   const hasEnoughSentenceShape = sentenceCount >= expectation.minSentences || (hasCategoryDepth && sentenceCount >= 1);
   const passed = hasCategoryDepth && hasEnoughLength && hasEnoughSentenceShape;
