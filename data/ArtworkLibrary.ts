@@ -189,6 +189,11 @@ export const getArtworkAssetPath = (wingId: string, yearLevel: YearLevel): strin
   return `./public/${relativePath.replace(/^\/+/, '')}`;
 };
 
+const getArtworkCollectionName = (selection?: ArtworkSelection): string =>
+  selection?.sourceProvider === 'met'
+    ? 'the Metropolitan Museum of Art'
+    : 'the Art Institute of Chicago';
+
 const escapeAttribute = (value: string): string => value.replace(/"/g, "'");
 
 const buildMarker = (brief: Omit<ArtworkBrief, 'prompt'>): string =>
@@ -202,7 +207,7 @@ export const getArtworkBrief = (wingId: string, yearLevel: YearLevel): ArtworkBr
   const title = selection ? `${selection.title} - ${selection.artistDisplay || 'Unknown artist'}` : `${concept.title} - Year ${yearLevel}`;
   const medium = selection?.mediumDisplay || profile.medium;
   const subject = selection
-    ? `public-domain artwork from the Art Institute of Chicago: ${selection.title}, ${selection.dateDisplay}, ${selection.mediumDisplay}`
+    ? `public-domain artwork from ${getArtworkCollectionName(selection)}: ${selection.title}, ${selection.dateDisplay}, ${selection.mediumDisplay}`
     : concept.subject;
 
   const briefWithoutPrompt = {

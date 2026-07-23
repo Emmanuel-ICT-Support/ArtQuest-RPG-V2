@@ -80,6 +80,7 @@
   {
     "wingId": "hall_of_line",
     "yearLevel": 10,
+    "sourceProvider": "met",
     "id": 437980,
     "title": "Cypresses",
     "artistDisplay": "Vincent van Gogh (Dutch, 1853–1890)",

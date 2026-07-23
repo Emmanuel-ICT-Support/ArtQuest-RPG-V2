@@ -10633,9 +10633,12 @@ const ASSESSMENT_RUBRIC_DATA: RubricCriterion[] = getAssessmentRubricForContext(
 
 
 // --- data/ArtworkSelections.ts ---
+type ArtworkSourceProvider = 'artic' | 'met';
+
 interface ArtworkSelection {
   wingId: string;
   yearLevel: number;
+  sourceProvider?: ArtworkSourceProvider;
   id: number;
   title: string;
   artistDisplay: string;
@@ -10743,6 +10746,7 @@ const ARTWORK_SELECTIONS: Record<string, Record<number, ArtworkSelection>> = {
     "10": {
       "wingId": "hall_of_line",
       "yearLevel": 10,
+      "sourceProvider": "met",
       "id": 437980,
       "title": "Cypresses",
       "artistDisplay": "Vincent van Gogh (Dutch, 1853–1890)",
@@ -12747,6 +12751,11 @@ const getArtworkAssetPath = (wingId: string, yearLevel: YearLevel): string => {
   return `./public/${relativePath.replace(/^\/+/, '')}`;
 };
 
+const getArtworkCollectionName = (selection?: ArtworkSelection): string =>
+  selection?.sourceProvider === 'met'
+    ? 'the Metropolitan Museum of Art'
+    : 'the Art Institute of Chicago';
+
 const escapeAttribute = (value: string): string => value.replace(/"/g, "'");
 
 const buildMarker = (brief: Omit<ArtworkBrief, 'prompt'>): string =>
@@ -12760,7 +12769,7 @@ const getArtworkBrief = (wingId: string, yearLevel: YearLevel): ArtworkBrief => 
   const title = selection ? `${selection.title} - ${selection.artistDisplay || 'Unknown artist'}` : `${concept.title} - Year ${yearLevel}`;
   const medium = selection?.mediumDisplay || profile.medium;
   const subject = selection
-    ? `public-domain artwork from the Art Institute of Chicago: ${selection.title}, ${selection.dateDisplay}, ${selection.mediumDisplay}`
+    ? `public-domain artwork from ${getArtworkCollectionName(selection)}: ${selection.title}, ${selection.dateDisplay}, ${selection.mediumDisplay}`
     : concept.subject;
 
   const briefWithoutPrompt = {

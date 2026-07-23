@@ -1,6 +1,9 @@
+export type ArtworkSourceProvider = 'artic' | 'met';
+
 export interface ArtworkSelection {
   wingId: string;
   yearLevel: number;
+  sourceProvider?: ArtworkSourceProvider;
   id: number;
   title: string;
   artistDisplay: string;
@@ -108,6 +111,7 @@ export const ARTWORK_SELECTIONS: Record<string, Record<number, ArtworkSelection>
     "10": {
       "wingId": "hall_of_line",
       "yearLevel": 10,
+      "sourceProvider": "met",
       "id": 437980,
       "title": "Cypresses",
       "artistDisplay": "Vincent van Gogh (Dutch, 1853–1890)",

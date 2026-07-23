@@ -7,6 +7,7 @@
     "avatar:normalize": "node scripts/normalize-avatar-layer-assets.mjs",
     "avatar:manifest": "node scripts/generate-avatar-layer-manifest.mjs",
     "avatar:bounds": "python3 scripts/generate-avatar-asset-bounds.py",
+    "artwork:refresh": "node scripts/fetch-artic-artwork-assets.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"

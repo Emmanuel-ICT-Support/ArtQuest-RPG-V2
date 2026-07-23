@@ -4,7 +4,10 @@ import { resolve } from 'node:path';
 const outputDir = resolve('public/images/artworks');
 const selectionsFile = resolve('data/ArtworkSelections.ts');
 const manifestFile = resolve(outputDir, 'manifest.json');
-const searchUrl = 'https://api.artic.edu/api/v1/artworks/search';
+const ARTIC_API_BASE_URL = 'https://api.artic.edu/api/v1';
+const MET_API_BASE_URL = 'https://collectionapi.metmuseum.org/public/collection/v1';
+const ARTIC_SOURCE = 'artic';
+const MET_SOURCE = 'met';
 const hotlinkOnly = process.argv.includes('--hotlink-only') || process.argv.includes('--remote-only');
 const dryRun = process.argv.includes('--dry-run');
 const verifyImages = process.argv.includes('--verify-images');
@@ -35,12 +38,14 @@ const fields = [
 const years = [7, 8, 9, 10, 11, 12];
 
 const slot = (query, focusReason, options = {}) => ({
+  sourceProvider: ARTIC_SOURCE,
   query,
   focusReason,
   minYear: 1850,
   minPreferredYear: 1900,
   allowNonPublicDomain: false,
   allowSculpture: false,
+  allowHistoricSculpture: false,
   ...options,
 });
 
@@ -65,7 +70,7 @@ const searchPlan = {
     slot('geometric shape painting modern', 'Obvious geometric and organic shapes support identification and description.'),
     slot('vessel form design 20th century', 'Designed objects and vessels show three-dimensional form through structure and contour.'),
     slot('modern still life shape form painting', 'Still-life forms support analysis of volume, edges, and spatial relationships.'),
-    slot('Eve after the Fall Rodin', 'Rodin’s carved marble figure gives students a powerful three-dimensional form to analyse through pose, volume, surface, and negative space.', { allowSculpture: true }),
+    slot('Eve after the Fall Rodin', 'Rodin’s carved marble figure gives students a powerful three-dimensional form to analyse through pose, volume, surface, and negative space.', { allowSculpture: true, allowHistoricSculpture: true }),
     slot('modern design chair form 1980', 'Late-20th-century design provides engaging non-sculptural form, silhouette, and material evidence.', { minPreferredYear: 1980, allowNonPublicDomain: true }),
     slot('contemporary design chair form 2000', 'A contemporary design object supports senior discussion of function, form, material, and audience.', { minPreferredYear: 2000, allowNonPublicDomain: true }),
   ],
@@ -148,6 +153,11 @@ const manualSelections = {
     7: [20684, 'Street edges, umbrella curves, lamp posts, and perspective lines give Year 7 students both line evidence and a story to interpret.'],
     8: [210484, 'A preparatory drawing makes sketch line, perspective, and compositional planning visible.'],
     9: [50091, 'Printmaking line and train-window geometry support contour, hatching, and directional analysis.'],
+    10: {
+      sourceProvider: MET_SOURCE,
+      id: 437980,
+      focusReason: 'Towering cypresses, rolling hills, and animated brushstrokes create expressive vertical, diagonal, and swirling lines for sophisticated analysis.',
+    },
     11: [258252, 'A late-20th-century city photograph gives senior students layered edge, grid, and perspective evidence.'],
     12: [180574, 'A 21st-century architectural rendering supports complex line, viewpoint, and design-intent analysis.'],
   },
@@ -241,36 +251,6 @@ const manualSelections = {
   },
 };
 
-// Cypresses is not held by the Art Institute of Chicago, so retain its
-// Metropolitan Museum of Art collection record when refreshing local assets.
-const externalSelections = {
-  hall_of_line: {
-    10: {
-      id: 437980,
-      title: 'Cypresses',
-      artistDisplay: 'Vincent van Gogh (Dutch, 1853–1890)',
-      dateDisplay: '1889',
-      dateStart: 1889,
-      dateEnd: 1889,
-      isPublicDomain: true,
-      imageId: 'DP130999',
-      mediumDisplay: 'Oil on canvas',
-      classificationTitle: 'Paintings',
-      artworkTypeTitle: 'Painting',
-      placeOfOrigin: 'Saint-Rémy-de-Provence, France',
-      creditLine: 'Rogers Fund, 1949',
-      departmentTitle: 'European Paintings',
-      artistTitle: 'Vincent van Gogh',
-      styleTitle: 'Post-Impressionism',
-      copyrightNotice: '',
-      apiLink: 'https://collectionapi.metmuseum.org/public/collection/v1/objects/437980',
-      sourceUrl: 'https://www.metmuseum.org/art/collection/search/437980',
-      iiifUrl: 'https://images.metmuseum.org/CRDImages/ep/original/DP130999.jpg',
-      focusReason: 'Towering cypresses, rolling hills, and animated brushstrokes create expressive vertical, diagonal, and swirling lines for sophisticated analysis.',
-    },
-  },
-};
-
 const suppressedArtworkIds = new Set([
   135,
   936,
@@ -312,8 +292,8 @@ const fetchJson = async (url) => {
   return response.json();
 };
 
-const searchArtworks = async (slotConfig) => {
-  const url = new URL(searchUrl);
+const searchArticArtworks = async (slotConfig) => {
+  const url = new URL(`${ARTIC_API_BASE_URL}/artworks/search`);
   url.searchParams.set('q', slotConfig.query);
   if (publicDomainOnly || !slotConfig.allowNonPublicDomain) {
     url.searchParams.set('query[term][is_public_domain]', 'true');
@@ -324,13 +304,95 @@ const searchArtworks = async (slotConfig) => {
   return Array.isArray(json.data) ? json.data : [];
 };
 
-const getArtworkById = async (id) => {
-  const url = new URL(`https://api.artic.edu/api/v1/artworks/${id}`);
+const getArticArtworkById = async (id) => {
+  const url = new URL(`${ARTIC_API_BASE_URL}/artworks/${id}`);
   url.searchParams.set('fields', fields);
   const json = await fetchJson(url);
-  if (!json.data) throw new Error(`No artwork found for manual selection: ${id}`);
+  if (!json.data) throw new Error(`No Art Institute artwork found for manual selection: ${id}`);
   return json.data;
 };
+
+const getMetArtworkById = async (id) => {
+  const rawArtwork = await fetchJson(`${MET_API_BASE_URL}/objects/${id}`);
+  if (!rawArtwork?.objectID) throw new Error(`No Metropolitan Museum artwork found for manual selection: ${id}`);
+
+  const imageUrl = safeText(rawArtwork.primaryImage) || safeText(rawArtwork.primaryImageSmall);
+  const artistName = safeText(rawArtwork.artistDisplayName);
+  const artistBio = safeText(rawArtwork.artistDisplayBio);
+  const artistDisplay = artistName && artistBio
+    ? `${artistName} (${artistBio})`
+    : artistName || artistBio;
+  const placeOfOrigin = [rawArtwork.city, rawArtwork.state, rawArtwork.country]
+    .map(safeText)
+    .filter(Boolean)
+    .join(', ');
+  const tags = Array.isArray(rawArtwork.tags)
+    ? rawArtwork.tags.map((tag) => safeText(tag?.term)).filter(Boolean)
+    : [];
+
+  return {
+    id: rawArtwork.objectID,
+    source_provider: MET_SOURCE,
+    title: safeText(rawArtwork.title),
+    artist_display: artistDisplay,
+    date_display: safeText(rawArtwork.objectDate),
+    date_start: Number.isFinite(rawArtwork.objectBeginDate) ? rawArtwork.objectBeginDate : null,
+    date_end: Number.isFinite(rawArtwork.objectEndDate) ? rawArtwork.objectEndDate : null,
+    image_id: imageUrl.split('/').pop()?.replace(/\.[^.]+$/, '') || String(rawArtwork.objectID),
+    image_url: imageUrl,
+    is_public_domain: Boolean(rawArtwork.isPublicDomain),
+    medium_display: safeText(rawArtwork.medium),
+    classification_title: safeText(rawArtwork.classification),
+    artwork_type_title: safeText(rawArtwork.objectName),
+    place_of_origin: placeOfOrigin,
+    credit_line: safeText(rawArtwork.creditLine),
+    department_title: safeText(rawArtwork.department),
+    artist_title: artistName,
+    style_title: safeText(rawArtwork.period),
+    subject_titles: tags,
+    term_titles: tags,
+    copyright_notice: safeText(rawArtwork.rightsAndReproduction),
+    thumbnail: { alt_text: safeText(rawArtwork.title) },
+    api_link: `${MET_API_BASE_URL}/objects/${rawArtwork.objectID}`,
+    source_url: safeText(rawArtwork.objectURL) || `https://www.metmuseum.org/art/collection/search/${rawArtwork.objectID}`,
+  };
+};
+
+const searchMetArtworks = async (slotConfig) => {
+  const url = new URL(`${MET_API_BASE_URL}/search`);
+  url.searchParams.set('q', slotConfig.query);
+  url.searchParams.set('hasImages', 'true');
+  if (Number.isFinite(slotConfig.minYear)) {
+    url.searchParams.set('dateBegin', String(slotConfig.minYear));
+    url.searchParams.set('dateEnd', String(new Date().getFullYear()));
+  }
+  if (slotConfig.metTitleOnly) url.searchParams.set('title', 'true');
+
+  const json = await fetchJson(url);
+  const objectIds = Array.isArray(json.objectIDs) ? json.objectIDs.slice(0, 40) : [];
+  const results = await Promise.allSettled(objectIds.map((id) => getMetArtworkById(id)));
+  return results.flatMap((result) => result.status === 'fulfilled' ? [result.value] : []);
+};
+
+const searchArtworks = async (slotConfig) => (
+  slotConfig.sourceProvider === MET_SOURCE
+    ? searchMetArtworks(slotConfig)
+    : searchArticArtworks(slotConfig)
+);
+
+const getArtworkBySource = async (sourceProvider, id) => (
+  sourceProvider === MET_SOURCE
+    ? getMetArtworkById(id)
+    : getArticArtworkById(id)
+);
+
+const getArtworkImageUrl = (artwork) => artwork.image_url
+  || `https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`;
+
+const getArtworkSourceUrl = (artwork) => artwork.source_url
+  || `https://www.artic.edu/artworks/${artwork.id}`;
+
+const getArtworkKey = (artwork) => `${artwork.source_provider || ARTIC_SOURCE}:${artwork.id}`;
 
 const getArtworkStartYear = (artwork) => {
   if (Number.isFinite(artwork?.date_start)) return artwork.date_start;
@@ -369,7 +431,7 @@ const getSculptureText = (artwork) => [
 const isSculptureCandidate = (artwork) => sculpturePattern.test(getSculptureText(artwork));
 
 const isSafeCandidate = (artwork, slotConfig) => {
-  if (!artwork?.image_id) return false;
+  if (!artwork?.image_id || (artwork.source_provider === MET_SOURCE && !artwork.image_url)) return false;
   if ((publicDomainOnly || !slotConfig.allowNonPublicDomain) && !artwork.is_public_domain) return false;
   const startYear = getArtworkStartYear(artwork);
   if (!Number.isFinite(startYear) || startYear < slotConfig.minYear) return false;
@@ -385,7 +447,7 @@ const isSafeCandidate = (artwork, slotConfig) => {
 
   if (!isSculptureCandidate(artwork)) return true;
   return slotConfig.allowSculpture
-    && startYear >= 1980
+    && (startYear >= 1980 || slotConfig.allowHistoricSculpture)
     && !abstractSculpturePattern.test(combined);
 };
 
@@ -449,7 +511,7 @@ const scoreCandidate = (artwork, slotConfig) => {
 const chooseArtwork = async (slotConfig, usedIds) => {
   const candidates = (await searchArtworks(slotConfig))
     .filter((artwork) => isSafeCandidate(artwork, slotConfig))
-    .filter((artwork) => !usedIds.has(artwork.id))
+    .filter((artwork) => !usedIds.has(getArtworkKey(artwork)))
     .sort((a, b) => scoreCandidate(b, slotConfig) - scoreCandidate(a, slotConfig));
 
   if (candidates.length > 0) return candidates[0];
@@ -460,12 +522,12 @@ const chooseArtwork = async (slotConfig, usedIds) => {
   };
   const fallbackCandidates = (await searchArtworks(fallbackSlot))
     .filter((artwork) => isSafeCandidate(artwork, fallbackSlot))
-    .filter((artwork) => !usedIds.has(artwork.id))
+    .filter((artwork) => !usedIds.has(getArtworkKey(artwork)))
     .sort((a, b) => scoreCandidate(b, fallbackSlot) - scoreCandidate(a, fallbackSlot));
 
   if (fallbackCandidates.length > 0) return fallbackCandidates[0];
 
-  throw new Error(`No safe ArtIC image candidate found for query: ${slotConfig.query}`);
+  throw new Error(`No safe ${slotConfig.sourceProvider === MET_SOURCE ? 'Metropolitan Museum' : 'Art Institute'} image candidate found for query: ${slotConfig.query}`);
 };
 
 const fetchImageBuffer = async (url, referer) => {
@@ -487,9 +549,12 @@ const downloadImage = async (url, outputPath, referer) => {
 };
 
 const writeSelectionsTs = (selectionMap) => {
-const source = `export interface ArtworkSelection {
+const source = `export type ArtworkSourceProvider = 'artic' | 'met';
+
+export interface ArtworkSelection {
   wingId: string;
   yearLevel: number;
+  sourceProvider: ArtworkSourceProvider;
   id: number;
   title: string;
   artistDisplay: string;
@@ -521,7 +586,19 @@ export const ARTWORK_SELECTIONS: Record<string, Record<number, ArtworkSelection>
 
 mkdirSync(outputDir, { recursive: true });
 
-const usedIds = new Set(suppressedArtworkIds);
+const getManualSelectionConfig = (selection) => {
+  if (!selection) return null;
+  if (Array.isArray(selection)) {
+    return {
+      sourceProvider: ARTIC_SOURCE,
+      id: selection[0],
+      focusReason: selection[1],
+    };
+  }
+  return selection;
+};
+
+const usedIds = new Set([...suppressedArtworkIds].map((id) => `${ARTIC_SOURCE}:${id}`));
 const selectionMap = {};
 const manifest = [];
 
@@ -530,37 +607,30 @@ for (const [wingId, slots] of Object.entries(searchPlan)) {
 
   for (const [index, slotConfig] of slots.entries()) {
     const yearLevel = years[index];
-    const externalSelection = externalSelections[wingId]?.[yearLevel];
-    const manualSelection = manualSelections[wingId]?.[yearLevel];
-    const manualArtwork = !externalSelection && manualSelection ? await getArtworkById(manualSelection[0]) : null;
+    const manualSelection = getManualSelectionConfig(manualSelections[wingId]?.[yearLevel]);
+    const manualArtwork = manualSelection
+      ? await getArtworkBySource(manualSelection.sourceProvider, manualSelection.id)
+      : null;
     const manualSlotConfig = {
       ...slotConfig,
       allowNonPublicDomain: publicDomainOnly ? false : true,
     };
     const useManualSelection = manualArtwork
-      && !usedIds.has(manualArtwork.id)
+      && !usedIds.has(getArtworkKey(manualArtwork))
       && isSafeCandidate(manualArtwork, manualSlotConfig);
-    const useExternalSelection = Boolean(externalSelection);
-    const artwork = useExternalSelection
-      ? externalSelection
-      : (useManualSelection ? manualArtwork : await chooseArtwork(slotConfig, usedIds));
-    const finalFocusReason = useExternalSelection
-      ? externalSelection.focusReason
-      : (useManualSelection ? manualSelection[1] : slotConfig.focusReason);
-    if (usedIds.has(artwork.id)) {
-      throw new Error(`Duplicate artwork selected for ${wingId} Year ${yearLevel}: ${artwork.id}`);
+    const artwork = useManualSelection ? manualArtwork : await chooseArtwork(slotConfig, usedIds);
+    const finalFocusReason = useManualSelection ? manualSelection.focusReason : slotConfig.focusReason;
+    const artworkKey = getArtworkKey(artwork);
+    if (usedIds.has(artworkKey)) {
+      throw new Error(`Duplicate artwork selected for ${wingId} Year ${yearLevel}: ${artworkKey}`);
     }
-    usedIds.add(artwork.id);
+    usedIds.add(artworkKey);
 
     const filename = `${wingId}-year-${yearLevel}.jpg`;
     const localAssetPath = `images/artworks/${filename}`;
     const outputPath = resolve('public', localAssetPath);
-    const iiifUrl = useExternalSelection
-      ? externalSelection.iiifUrl
-      : `https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`;
-    const sourceUrl = useExternalSelection
-      ? externalSelection.sourceUrl
-      : `https://www.artic.edu/artworks/${artwork.id}`;
+    const iiifUrl = getArtworkImageUrl(artwork);
+    const sourceUrl = getArtworkSourceUrl(artwork);
     const assetPath = hotlinkOnly ? iiifUrl : localAssetPath;
 
     console.log(`${wingId} Year ${yearLevel}: ${artwork.title} (${artwork.id})`);
@@ -572,39 +642,33 @@ for (const [wingId, slots] of Object.entries(searchPlan)) {
       await delay(1100);
     }
 
-    const selection = useExternalSelection
-      ? {
-        wingId,
-        yearLevel,
-        ...externalSelection,
-        assetPath,
-      }
-      : {
-        wingId,
-        yearLevel,
-        id: artwork.id,
-        title: titleOverrides[artwork.id] || safeText(artwork.title),
-        artistDisplay: safeText(artwork.artist_display),
-        dateDisplay: safeText(artwork.date_display),
-        dateStart: getArtworkStartYear(artwork),
-        dateEnd: getArtworkEndYear(artwork),
-        isPublicDomain: Boolean(artwork.is_public_domain),
-        imageId: artwork.image_id,
-        mediumDisplay: safeText(artwork.medium_display),
-        classificationTitle: safeText(artwork.classification_title),
-        artworkTypeTitle: safeText(artwork.artwork_type_title),
-        placeOfOrigin: safeText(artwork.place_of_origin),
-        creditLine: safeText(artwork.credit_line),
-        departmentTitle: safeText(artwork.department_title),
-        artistTitle: safeText(artwork.artist_title),
-        styleTitle: safeText(artwork.style_title),
-        copyrightNotice: safeText(artwork.copyright_notice),
-        apiLink: safeText(artwork.api_link),
-        sourceUrl,
-        iiifUrl,
-        assetPath,
-        focusReason: finalFocusReason,
-      };
+    const selection = {
+      wingId,
+      yearLevel,
+      sourceProvider: artwork.source_provider || ARTIC_SOURCE,
+      id: artwork.id,
+      title: titleOverrides[artwork.id] || safeText(artwork.title),
+      artistDisplay: safeText(artwork.artist_display),
+      dateDisplay: safeText(artwork.date_display),
+      dateStart: getArtworkStartYear(artwork),
+      dateEnd: getArtworkEndYear(artwork),
+      isPublicDomain: Boolean(artwork.is_public_domain),
+      imageId: artwork.image_id,
+      mediumDisplay: safeText(artwork.medium_display),
+      classificationTitle: safeText(artwork.classification_title),
+      artworkTypeTitle: safeText(artwork.artwork_type_title),
+      placeOfOrigin: safeText(artwork.place_of_origin),
+      creditLine: safeText(artwork.credit_line),
+      departmentTitle: safeText(artwork.department_title),
+      artistTitle: safeText(artwork.artist_title),
+      styleTitle: safeText(artwork.style_title),
+      copyrightNotice: safeText(artwork.copyright_notice),
+      apiLink: safeText(artwork.api_link),
+      sourceUrl,
+      iiifUrl,
+      assetPath,
+      focusReason: finalFocusReason,
+    };
 
     selectionMap[wingId][yearLevel] = selection;
     manifest.push(selection);
@@ -620,4 +684,9 @@ if (!dryRun) {
   writeSelectionsTs(selectionMap);
   writeFileSync(manifestFile, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 }
-console.log(`${dryRun ? 'Selected' : 'Fetched'} ${manifest.length} Art Institute of Chicago artworks.`);
+const sourceCounts = manifest.reduce((counts, artwork) => {
+  const source = artwork.sourceProvider || ARTIC_SOURCE;
+  counts[source] = (counts[source] || 0) + 1;
+  return counts;
+}, {});
+console.log(`${dryRun ? 'Selected' : 'Fetched'} ${manifest.length} museum artworks (${Object.entries(sourceCounts).map(([source, count]) => `${source}: ${count}`).join(', ')}).`);
