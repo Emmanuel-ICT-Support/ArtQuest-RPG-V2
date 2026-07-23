@@ -2,6 +2,7 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import SplashScreen from './components/SplashScreen';
 import ReturnToGameScreen from './components/ReturnToGameScreen';
+import TeacherModeScreen from './components/TeacherModeScreen';
 import NewGameSetupScreen from './components/StartScreen'; // Renamed from StartScreen, actual file is StartScreen.tsx
 import { MapScreen } from './components/MapScreen';
 import MainGame from './MainGame';
@@ -82,6 +83,10 @@ const NEW_GAME_SETUP_IMAGE_ASSETS = [
   './public/images/Nova.png',
   './public/images/Leo.png',
   './public/images/Zia.png',
+];
+
+const TEACHER_MODE_IMAGE_ASSETS = [
+  './public/images/screens/teacher-mode-start-screen.png',
 ];
 
 const imageAsset = (src: string | null | undefined): PreloadAsset => ({ type: 'image', src });
@@ -604,6 +609,14 @@ export const App: React.FC = () => {
       return false;
     }
 
+    await preloadAssets(TEACHER_MODE_IMAGE_ASSETS.map(imageAsset), {
+      timeoutMs: 1800,
+    });
+    setCurrentScreen('teacherMode');
+    return true;
+  }, []);
+
+  const handleExploreArtQuest = useCallback(async () => {
     setCurrentGalleryScene('foyer');
     await runLoadTransition({
       title: 'Opening Teacher Preview',
@@ -633,7 +646,6 @@ export const App: React.FC = () => {
       }));
       setCurrentScreen('map');
     });
-    return true;
   }, [runLoadTransition]);
 
   const handleSaveGame = useCallback(() => {
@@ -1200,7 +1212,7 @@ export const App: React.FC = () => {
   }, []);
 
   const activeMusicTrack = useMemo<GameMusicTrack>(() => {
-    if (currentScreen === 'splash' || currentScreen === 'newGameSetup' || currentScreen === 'returnMenu') {
+    if (currentScreen === 'splash' || currentScreen === 'newGameSetup' || currentScreen === 'returnMenu' || currentScreen === 'teacherMode') {
       return 'start';
     }
 
@@ -1286,6 +1298,9 @@ export const App: React.FC = () => {
           onNavigateToGuide={handleNavigateToGuideFromReturnMenu}
         />
       );
+      break;
+    case 'teacherMode':
+      screenComponent = <TeacherModeScreen onExploreArtQuest={handleExploreArtQuest} />;
       break;
     case 'newGameSetup':
       screenComponent = (

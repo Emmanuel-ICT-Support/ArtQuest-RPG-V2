@@ -465,4 +465,4 @@ export interface AssessmentScreenProps {
 }
 
 // Union type for different game screens
-export type GameScreen = 'splash' | 'newGameSetup' | 'returnMenu' | 'map' | 'game' | 'journal' | 'inventory' | 'guide' | 'assessment';
+export type GameScreen = 'splash' | 'newGameSetup' | 'returnMenu' | 'teacherMode' | 'map' | 'game' | 'journal' | 'inventory' | 'guide' | 'assessment';

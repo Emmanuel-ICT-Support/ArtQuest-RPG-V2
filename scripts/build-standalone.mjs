@@ -49,6 +49,7 @@ const sourceFiles = [
   'components/DoorUnlockAnimation.tsx',
   'components/SplashScreen.tsx',
   'components/ReturnToGameScreen.tsx',
+  'components/TeacherModeScreen.tsx',
   'components/StartScreen.tsx',
   'components/MapScreen.tsx',
   'components/JournalScreen.tsx',
