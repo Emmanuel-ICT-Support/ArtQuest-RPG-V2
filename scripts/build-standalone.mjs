@@ -33,6 +33,7 @@ const sourceFiles = [
   'data/ArtworkSelections.ts',
   'data/ArtworkLibrary.ts',
   'data/VisualLanguageGuide.ts',
+  'data/ResponseExpectations.ts',
   'data/OfflineCurator.ts',
   'utils/assetPreloader.ts',
   'components/LoadingSpinner.tsx',
