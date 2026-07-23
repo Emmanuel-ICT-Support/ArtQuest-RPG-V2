@@ -49,7 +49,7 @@ const searchPlan = {
     slot('Paris Street Rainy Day line perspective', 'Street edges, umbrella curves, lamp posts, and perspective lines give Year 7 students both line evidence and a story to interpret.', { minPreferredYear: 1850 }),
     slot('modern ink drawing landscape line', 'Drawing media make contour, edge, direction, and line quality visible without mature subject matter.'),
     slot('lithograph line figure movement 20th century', 'Graphic line work supports discussion of hatching, contour, repeated marks, and expressive gesture.'),
-    slot('architectural drawing modern line', 'Modern architectural lines support analysis of structure, viewpoint, and visual pathways.'),
+    slot('Cypresses Vincent van Gogh', 'Towering cypresses, rolling hills, and animated brushstrokes create expressive vertical, diagonal, and swirling lines for sophisticated analysis.'),
     slot('urban photograph lines perspective contemporary', 'A contemporary urban image gives senior students layered linear evidence in a familiar environment.', { minPreferredYear: 1980, allowNonPublicDomain: true }),
     slot('contemporary city photograph line 2000', 'A 21st-century city image supports complex line analysis through grids, edges, scale, and movement.', { minPreferredYear: 2000, allowNonPublicDomain: true }),
   ],
@@ -65,7 +65,7 @@ const searchPlan = {
     slot('geometric shape painting modern', 'Obvious geometric and organic shapes support identification and description.'),
     slot('vessel form design 20th century', 'Designed objects and vessels show three-dimensional form through structure and contour.'),
     slot('modern still life shape form painting', 'Still-life forms support analysis of volume, edges, and spatial relationships.'),
-    slot('Marsden Hartley shape form painting', 'Modernist forms support interpretation of shape, structure, and expressive organisation.'),
+    slot('Eve after the Fall Rodin', 'Rodin’s carved marble figure gives students a powerful three-dimensional form to analyse through pose, volume, surface, and negative space.', { allowSculpture: true }),
     slot('modern design chair form 1980', 'Late-20th-century design provides engaging non-sculptural form, silhouette, and material evidence.', { minPreferredYear: 1980, allowNonPublicDomain: true }),
     slot('contemporary design chair form 2000', 'A contemporary design object supports senior discussion of function, form, material, and audience.', { minPreferredYear: 2000, allowNonPublicDomain: true }),
   ],
@@ -81,7 +81,7 @@ const searchPlan = {
     slot('city street perspective modern painting', 'Foreground, middle ground, background, and scale are clear in an accessible street scene.', { minPreferredYear: 1850 }),
     slot('interior perspective modern painting', 'Interior depth supports spatial description through furniture, walls, and viewpoint.'),
     slot('architecture perspective modern photograph', 'Architecture and photography make linear perspective and scale relationships visible.'),
-    slot('Edward Hopper interior space', 'Modern interiors support analysis of isolation, viewpoint, and spatial arrangement.', { allowNonPublicDomain: true }),
+    slot('The Bedroom Vincent van Gogh', 'The tilted furniture, sharply receding floor and wall lines, and compact interior make perspective and spatial tension especially clear.'),
     slot('Thomas Struth museum space photograph 1990', 'A late-20th-century museum photograph supports discussion of audience, scale, and institutional space.', { minPreferredYear: 1980, allowNonPublicDomain: true }),
     slot('Andreas Gursky Shanghai space photograph 2000', 'A 21st-century photograph offers complex depth, grid, scale, and contemporary visual space.', { minPreferredYear: 2000, allowNonPublicDomain: true }),
   ],
@@ -97,7 +97,7 @@ const searchPlan = {
     slot('balanced park scene painting', 'Large and small figures, empty space, and repeated shapes support visual weight discussion.', { minPreferredYear: 1850 }),
     slot('balanced still life modern painting', 'Object arrangement supports discussion of stable and asymmetrical composition.'),
     slot('modern composition balance painting', 'Distributed visual weight supports interpretation of structure and harmony.'),
-    slot('Mondrian balance composition', 'Modernist balance makes visual weight, proportion, and placement explicit.'),
+    slot('At the Moulin Rouge Toulouse-Lautrec', 'The off-centre figures, cropped edges, mirrors, and vivid accents create a rich example of asymmetrical balance and visual weight.'),
     slot('architecture balance photograph 1990', 'Late-20th-century architecture supports complex balance, symmetry, and scale analysis.', { minPreferredYear: 1980, allowNonPublicDomain: true }),
     slot('contemporary design balance 2000', 'Contemporary design supports senior evaluation of balance between function, form, and visual weight.', { minPreferredYear: 2000, allowNonPublicDomain: true }),
   ],
@@ -148,7 +148,6 @@ const manualSelections = {
     7: [20684, 'Street edges, umbrella curves, lamp posts, and perspective lines give Year 7 students both line evidence and a story to interpret.'],
     8: [210484, 'A preparatory drawing makes sketch line, perspective, and compositional planning visible.'],
     9: [50091, 'Printmaking line and train-window geometry support contour, hatching, and directional analysis.'],
-    10: [158987, 'A 21st-century architectural sketch gives strong linear perspective and design thinking.'],
     11: [258252, 'A late-20th-century city photograph gives senior students layered edge, grid, and perspective evidence.'],
     12: [180574, 'A 21st-century architectural rendering supports complex line, viewpoint, and design-intent analysis.'],
   },
@@ -164,7 +163,7 @@ const manualSelections = {
     7: [65930, 'A modern still life gives clear shapes, edges, and volumetric forms to identify.'],
     8: [65940, 'A modern still life supports discussion of object form, overlap, and spatial arrangement.'],
     9: [109819, 'Geometric modernism makes shape, proportion, and composition explicit.'],
-    10: [193864, 'Late-20th-century design provides engaging non-sculptural form, silhouette, and material evidence.'],
+    10: [16963, 'Rodin’s carved marble figure gives students a powerful three-dimensional form to analyse through pose, volume, surface, and negative space.'],
     11: [191220, 'A 21st-century chair design supports analysis of organic form, function, and material.'],
     12: [205051, 'A contemporary chair supports senior discussion of function, form, material, and audience.'],
   },
@@ -180,7 +179,7 @@ const manualSelections = {
     7: [16584, 'Atmospheric depth and landmark scale make foreground, background, and space accessible.'],
     8: [14752, 'A modern interior drawing supports spatial description through walls, furniture, and viewpoint.'],
     9: [14749, 'Architecture and drawing make scale, viewpoint, and built space visible.'],
-    10: [100858, 'A late-modern sky painting expands spatial thinking through depth, scale, and viewpoint.'],
+    10: [28560, 'The tilted furniture, sharply receding floor and wall lines, and compact interior make perspective and spatial tension especially clear.'],
     11: [117271, 'A late-20th-century museum photograph supports discussion of audience, scale, and institutional space.'],
     12: [157154, 'A 21st-century photograph offers complex depth, grid, scale, and contemporary visual space.'],
   },
@@ -196,7 +195,7 @@ const manualSelections = {
     7: [27992, 'A crowded park scene lets students compare visual weight, empty space, and stable composition.'],
     8: [65908, 'A modern landscape supports balance through mass, horizon, and dark-light placement.'],
     9: [65920, 'Modern shapes and repeated forms support discussion of asymmetrical balance.'],
-    10: [142570, 'A modern compositional study makes proportion, placement, and visual weight explicit.'],
+    10: [61128, 'The off-centre figures, cropped edges, mirrors, and vivid accents create a rich example of asymmetrical balance and visual weight.'],
     11: [189810, 'A contemporary design object supports balance between function, form, and visual weight.'],
     12: [191197, 'A 21st-century design work supports senior analysis of balance, structure, and material logic.'],
   },
@@ -239,6 +238,36 @@ const manualSelections = {
     10: [147629, 'Figurative modern work combines colour, shape, emphasis, rhythm, and social meaning.'],
     11: [64383, 'A modern interior combines value, space, colour, balance, and human context for broad analysis.'],
     12: [188919, 'A 21st-century work supports multi-principle judgement through colour, space, mood, and ambiguity.'],
+  },
+};
+
+// Cypresses is not held by the Art Institute of Chicago, so retain its
+// Metropolitan Museum of Art collection record when refreshing local assets.
+const externalSelections = {
+  hall_of_line: {
+    10: {
+      id: 437980,
+      title: 'Cypresses',
+      artistDisplay: 'Vincent van Gogh (Dutch, 1853–1890)',
+      dateDisplay: '1889',
+      dateStart: 1889,
+      dateEnd: 1889,
+      isPublicDomain: true,
+      imageId: 'DP130999',
+      mediumDisplay: 'Oil on canvas',
+      classificationTitle: 'Paintings',
+      artworkTypeTitle: 'Painting',
+      placeOfOrigin: 'Saint-Rémy-de-Provence, France',
+      creditLine: 'Rogers Fund, 1949',
+      departmentTitle: 'European Paintings',
+      artistTitle: 'Vincent van Gogh',
+      styleTitle: 'Post-Impressionism',
+      copyrightNotice: '',
+      apiLink: 'https://collectionapi.metmuseum.org/public/collection/v1/objects/437980',
+      sourceUrl: 'https://www.metmuseum.org/art/collection/search/437980',
+      iiifUrl: 'https://images.metmuseum.org/CRDImages/ep/original/DP130999.jpg',
+      focusReason: 'Towering cypresses, rolling hills, and animated brushstrokes create expressive vertical, diagonal, and swirling lines for sophisticated analysis.',
+    },
   },
 };
 
@@ -501,8 +530,9 @@ for (const [wingId, slots] of Object.entries(searchPlan)) {
 
   for (const [index, slotConfig] of slots.entries()) {
     const yearLevel = years[index];
+    const externalSelection = externalSelections[wingId]?.[yearLevel];
     const manualSelection = manualSelections[wingId]?.[yearLevel];
-    const manualArtwork = manualSelection ? await getArtworkById(manualSelection[0]) : null;
+    const manualArtwork = !externalSelection && manualSelection ? await getArtworkById(manualSelection[0]) : null;
     const manualSlotConfig = {
       ...slotConfig,
       allowNonPublicDomain: publicDomainOnly ? false : true,
@@ -510,8 +540,13 @@ for (const [wingId, slots] of Object.entries(searchPlan)) {
     const useManualSelection = manualArtwork
       && !usedIds.has(manualArtwork.id)
       && isSafeCandidate(manualArtwork, manualSlotConfig);
-    const artwork = useManualSelection ? manualArtwork : await chooseArtwork(slotConfig, usedIds);
-    const finalFocusReason = useManualSelection ? manualSelection[1] : slotConfig.focusReason;
+    const useExternalSelection = Boolean(externalSelection);
+    const artwork = useExternalSelection
+      ? externalSelection
+      : (useManualSelection ? manualArtwork : await chooseArtwork(slotConfig, usedIds));
+    const finalFocusReason = useExternalSelection
+      ? externalSelection.focusReason
+      : (useManualSelection ? manualSelection[1] : slotConfig.focusReason);
     if (usedIds.has(artwork.id)) {
       throw new Error(`Duplicate artwork selected for ${wingId} Year ${yearLevel}: ${artwork.id}`);
     }
@@ -520,8 +555,12 @@ for (const [wingId, slots] of Object.entries(searchPlan)) {
     const filename = `${wingId}-year-${yearLevel}.jpg`;
     const localAssetPath = `images/artworks/${filename}`;
     const outputPath = resolve('public', localAssetPath);
-    const iiifUrl = `https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`;
-    const sourceUrl = `https://www.artic.edu/artworks/${artwork.id}`;
+    const iiifUrl = useExternalSelection
+      ? externalSelection.iiifUrl
+      : `https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`;
+    const sourceUrl = useExternalSelection
+      ? externalSelection.sourceUrl
+      : `https://www.artic.edu/artworks/${artwork.id}`;
     const assetPath = hotlinkOnly ? iiifUrl : localAssetPath;
 
     console.log(`${wingId} Year ${yearLevel}: ${artwork.title} (${artwork.id})`);
@@ -533,32 +572,39 @@ for (const [wingId, slots] of Object.entries(searchPlan)) {
       await delay(1100);
     }
 
-    const selection = {
-      wingId,
-      yearLevel,
-      id: artwork.id,
-      title: titleOverrides[artwork.id] || safeText(artwork.title),
-      artistDisplay: safeText(artwork.artist_display),
-      dateDisplay: safeText(artwork.date_display),
-      dateStart: getArtworkStartYear(artwork),
-      dateEnd: getArtworkEndYear(artwork),
-      isPublicDomain: Boolean(artwork.is_public_domain),
-      imageId: artwork.image_id,
-      mediumDisplay: safeText(artwork.medium_display),
-      classificationTitle: safeText(artwork.classification_title),
-      artworkTypeTitle: safeText(artwork.artwork_type_title),
-      placeOfOrigin: safeText(artwork.place_of_origin),
-      creditLine: safeText(artwork.credit_line),
-      departmentTitle: safeText(artwork.department_title),
-      artistTitle: safeText(artwork.artist_title),
-      styleTitle: safeText(artwork.style_title),
-      copyrightNotice: safeText(artwork.copyright_notice),
-      apiLink: safeText(artwork.api_link),
-      sourceUrl,
-      iiifUrl,
-      assetPath,
-      focusReason: finalFocusReason,
-    };
+    const selection = useExternalSelection
+      ? {
+        wingId,
+        yearLevel,
+        ...externalSelection,
+        assetPath,
+      }
+      : {
+        wingId,
+        yearLevel,
+        id: artwork.id,
+        title: titleOverrides[artwork.id] || safeText(artwork.title),
+        artistDisplay: safeText(artwork.artist_display),
+        dateDisplay: safeText(artwork.date_display),
+        dateStart: getArtworkStartYear(artwork),
+        dateEnd: getArtworkEndYear(artwork),
+        isPublicDomain: Boolean(artwork.is_public_domain),
+        imageId: artwork.image_id,
+        mediumDisplay: safeText(artwork.medium_display),
+        classificationTitle: safeText(artwork.classification_title),
+        artworkTypeTitle: safeText(artwork.artwork_type_title),
+        placeOfOrigin: safeText(artwork.place_of_origin),
+        creditLine: safeText(artwork.credit_line),
+        departmentTitle: safeText(artwork.department_title),
+        artistTitle: safeText(artwork.artist_title),
+        styleTitle: safeText(artwork.style_title),
+        copyrightNotice: safeText(artwork.copyright_notice),
+        apiLink: safeText(artwork.api_link),
+        sourceUrl,
+        iiifUrl,
+        assetPath,
+        focusReason: finalFocusReason,
+      };
 
     selectionMap[wingId][yearLevel] = selection;
     manifest.push(selection);
