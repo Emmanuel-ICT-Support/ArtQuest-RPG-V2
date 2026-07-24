@@ -9,7 +9,8 @@ import {
   MUSEUM_SEARCH_SCOPE_OPTIONS,
 } from '../data/MuseumArtworkFilters';
 import { searchMuseumArtworks } from '../data/MuseumArtworkSearch';
-import type { ClassPackArtwork, ClassPackExport } from '../data/ClassPack';
+import { CLASS_PACK_IMAGE_MAX_BYTES, prepareClassPackImage } from '../data/ClassPack';
+import type { ClassPackArtwork, ClassPackExport, PreparedClassPackImage } from '../data/ClassPack';
 import { getOfflinePhaseTask } from '../data/OfflineCurator';
 import type { ArtworkBrief } from '../data/ArtworkLibrary';
 import type { MuseumArtworkFilterSelection } from '../data/MuseumArtworkFilters';
@@ -31,6 +32,14 @@ const CLASS_PACK_PHASES: ReadonlyArray<{ phase: QuestionPhase; label: string }> 
   { phase: 4, label: 'Reflect' },
 ];
 
+const EMPTY_UPLOAD_ARTWORK_FORM = {
+  title: '',
+  artistName: '',
+  medium: '',
+  year: '',
+  sourceUrl: '',
+};
+
 interface ClassPackBuilderScreenProps {
   yearLevel: YearLevel;
   initialClassPack?: ClassPackExport | null;
@@ -38,6 +47,14 @@ interface ClassPackBuilderScreenProps {
 }
 
 type ClassPackQuestions = Record<QuestionPhase, string>;
+
+interface UploadArtworkForm {
+  title: string;
+  artistName: string;
+  medium: string;
+  year: string;
+  sourceUrl: string;
+}
 
 interface MuseumSearchSession {
   query: string;
@@ -121,6 +138,8 @@ const getClassPackArtworkSourceName = (artwork: ClassPackArtwork): string => (
       ? 'Wikimedia Commons via Openverse'
       : artwork.sourceProvider === 'rijksmuseum'
         ? 'Rijksmuseum'
+        : artwork.sourceProvider === 'teacher_upload'
+          ? 'Teacher upload'
     : 'Art Institute of Chicago'
 );
 
@@ -146,6 +165,11 @@ const describeMatchMix = (bestMatchCount: number, broaderMatchCount: number): st
 };
 
 const artworkKey = (artwork: ClassPackArtwork): string => `${artwork.sourceProvider}-${artwork.id}`;
+
+const getUploadYear = (year: string): number | null => {
+  const match = year.match(/-?\d{1,4}/);
+  return match ? Number(match[0]) : null;
+};
 
 const toMuseumResultPages = (artworks: ClassPackArtwork[]): MuseumResultPage[] => (
   Array.from({ length: Math.ceil(artworks.length / CLASS_PACK_ARTWORKS_PER_PAGE) }, (_, index) => ({
@@ -189,6 +213,12 @@ const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
   const [searchMessage, setSearchMessage] = useState('Search museum collections and Wikimedia public-domain works to add artwork to this pack.');
   const [editingPhase, setEditingPhase] = useState<QuestionPhase | null>(null);
   const [viewedArtwork, setViewedArtwork] = useState<ClassPackArtwork | null>(null);
+  const [isUploadArtworkOpen, setIsUploadArtworkOpen] = useState(false);
+  const [uploadArtworkForm, setUploadArtworkForm] = useState<UploadArtworkForm>(EMPTY_UPLOAD_ARTWORK_FORM);
+  const [preparedUploadImage, setPreparedUploadImage] = useState<PreparedClassPackImage | null>(null);
+  const [isPreparingUploadImage, setIsPreparingUploadImage] = useState(false);
+  const [uploadArtworkError, setUploadArtworkError] = useState<string | null>(null);
+  const uploadArtworkFileInputRef = useRef<HTMLInputElement>(null);
   const [selectedArtworks, setSelectedArtworks] = useState<Record<string, ClassPackArtwork>>(() => (
     Object.fromEntries(
       WING_DEFINITIONS.map((wing) => [
@@ -388,6 +418,94 @@ const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
 
   const selectArtworkForActiveRoom = (artwork: ClassPackArtwork) => {
     setSelectedArtworks((previous) => ({ ...previous, [activeWingId]: artwork }));
+  };
+
+  const closeUploadArtwork = () => {
+    setIsUploadArtworkOpen(false);
+    setUploadArtworkForm(EMPTY_UPLOAD_ARTWORK_FORM);
+    setPreparedUploadImage(null);
+    setIsPreparingUploadImage(false);
+    setUploadArtworkError(null);
+  };
+
+  const openUploadArtwork = () => {
+    setUploadArtworkForm(EMPTY_UPLOAD_ARTWORK_FORM);
+    setPreparedUploadImage(null);
+    setUploadArtworkError(null);
+    setIsUploadArtworkOpen(true);
+  };
+
+  const handleUploadArtworkImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const imageFile = event.target.files?.[0];
+    event.target.value = '';
+    if (!imageFile) return;
+
+    setIsPreparingUploadImage(true);
+    setPreparedUploadImage(null);
+    setUploadArtworkError(null);
+    try {
+      setPreparedUploadImage(await prepareClassPackImage(imageFile));
+    } catch (error) {
+      setUploadArtworkError(error instanceof Error ? error.message : 'The image could not be prepared for this Class Pack.');
+    } finally {
+      setIsPreparingUploadImage(false);
+    }
+  };
+
+  const addUploadedArtworkToActiveRoom = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!preparedUploadImage) {
+      setUploadArtworkError('Choose an image before adding this artwork.');
+      return;
+    }
+
+    const title = uploadArtworkForm.title.trim();
+    const artistName = uploadArtworkForm.artistName.trim();
+    const medium = uploadArtworkForm.medium.trim();
+    const year = uploadArtworkForm.year.trim();
+    if (!title || !artistName || !medium || !year) {
+      setUploadArtworkError('Complete the title, artist name, medium, and year fields.');
+      return;
+    }
+
+    let sourceUrl: string;
+    try {
+      const source = new URL(uploadArtworkForm.sourceUrl.trim());
+      if (!['http:', 'https:'].includes(source.protocol)) throw new Error();
+      sourceUrl = source.toString();
+    } catch {
+      setUploadArtworkError('Enter a valid http or https source website URL for acknowledgement.');
+      return;
+    }
+
+    const yearValue = getUploadYear(year);
+    const uploadedArtwork: ClassPackArtwork = {
+      id: Date.now(),
+      sourceProvider: 'teacher_upload',
+      title,
+      artistName,
+      artistDisplay: artistName,
+      dateDisplay: year,
+      dateStart: yearValue,
+      dateEnd: yearValue,
+      isPublicDomain: false,
+      imageUrl: preparedUploadImage.dataUrl,
+      medium,
+      classification: 'Teacher-uploaded artwork',
+      artworkType: 'Image',
+      subject: 'Teacher-uploaded artwork',
+      placeOfOrigin: '',
+      creditLine: `Teacher upload · Source: ${sourceUrl}`,
+      department: 'Teacher uploads',
+      style: '',
+      filterText: [title, artistName, medium, year, sourceUrl, 'teacher upload'].join(' '),
+      copyrightNotice: `Teacher-uploaded image. Acknowledge the source: ${sourceUrl}`,
+      apiLink: sourceUrl,
+      sourceUrl,
+    };
+    selectArtworkForActiveRoom(uploadedArtwork);
+    setSearchMessage(`Selected your uploaded artwork for ${WING_DEFINITIONS.find((wing) => wing.id === activeWingId)?.name || 'this room'}. Its compressed image will be embedded in the exported Class Pack.`);
+    closeUploadArtwork();
   };
 
   const exportClassPack = () => {
@@ -759,8 +877,16 @@ const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
         </button>
         <button
           type="button"
+          onClick={openUploadArtwork}
+          className="absolute left-[68.5%] top-[6.3%] z-20 h-[6.1%] w-[12.4%] rounded-md text-transparent outline-none transition hover:bg-white/10 focus:ring-2 focus:ring-pink-200/80"
+          aria-label="Upload artwork for the active room"
+        >
+          Upload artwork
+        </button>
+        <button
+          type="button"
           onClick={exportClassPack}
-          className="absolute left-[75%] top-[6.3%] z-20 h-[6.1%] w-[20.3%] rounded-md text-transparent outline-none transition hover:bg-white/10 focus:ring-2 focus:ring-pink-200/80"
+          className="absolute left-[81.7%] top-[6.3%] z-20 h-[6.1%] w-[10.8%] rounded-md text-transparent outline-none transition hover:bg-white/10 focus:ring-2 focus:ring-pink-200/80"
           aria-label="Export Class Pack"
         >
           Export Pack
@@ -778,6 +904,128 @@ const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
           steps={['Searching catalogues', 'Checking image records', 'Preparing artwork cards']}
         />
       )}
+
+      <Modal
+        isOpen={isUploadArtworkOpen}
+        title="Upload artwork"
+        onClose={closeUploadArtwork}
+        size="lg"
+      >
+        <form className="space-y-5" onSubmit={addUploadedArtworkToActiveRoom}>
+          <div className="grid gap-5 md:grid-cols-[minmax(14rem,0.8fr)_minmax(0,1.2fr)]">
+            <div className="rounded-xl border border-amber-300/35 bg-slate-950/60 p-4">
+              <p className="text-sm font-black text-amber-200">Artwork image</p>
+              <p className="mt-1 text-xs leading-relaxed text-gray-300">The image is resized and compressed before it is embedded in the exported JSON.</p>
+              <input
+                ref={uploadArtworkFileInputRef}
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={(event) => { void handleUploadArtworkImage(event); }}
+              />
+              <button
+                type="button"
+                onClick={() => uploadArtworkFileInputRef.current?.click()}
+                disabled={isPreparingUploadImage}
+                className="artquest-button mt-4 w-full px-4 py-3 text-sm font-black focus:outline-none focus:ring-4 focus:ring-pink-200 disabled:cursor-wait disabled:opacity-65"
+              >
+                {isPreparingUploadImage ? 'Preparing image…' : preparedUploadImage ? 'Choose another image' : 'Choose image'}
+              </button>
+              {preparedUploadImage && (
+                <div className="mt-4">
+                  <img
+                    src={preparedUploadImage.dataUrl}
+                    alt="Prepared artwork upload preview"
+                    className="h-44 w-full rounded-lg border border-amber-300/40 bg-slate-950 object-contain"
+                  />
+                  <p className="mt-2 text-center text-xs text-emerald-200">
+                    Ready: {preparedUploadImage.width} × {preparedUploadImage.height}px · about {Math.ceil(preparedUploadImage.byteLength / 1024)} KB in the pack
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="grid content-start gap-4 sm:grid-cols-2">
+              <label className="block text-sm font-bold text-amber-200 sm:col-span-2">
+                Artwork title
+                <input
+                  required
+                  value={uploadArtworkForm.title}
+                  onChange={(event) => setUploadArtworkForm((previous) => ({ ...previous, title: event.target.value }))}
+                  className="mt-1.5 w-full rounded-lg border border-amber-300/45 bg-slate-950 px-3 py-2.5 text-sm font-medium text-white outline-none focus:ring-4 focus:ring-pink-200"
+                  placeholder="e.g. The Great Wave off Kanagawa"
+                />
+              </label>
+              <label className="block text-sm font-bold text-amber-200">
+                Artist name
+                <input
+                  required
+                  value={uploadArtworkForm.artistName}
+                  onChange={(event) => setUploadArtworkForm((previous) => ({ ...previous, artistName: event.target.value }))}
+                  className="mt-1.5 w-full rounded-lg border border-amber-300/45 bg-slate-950 px-3 py-2.5 text-sm font-medium text-white outline-none focus:ring-4 focus:ring-pink-200"
+                  placeholder="Artist name"
+                />
+              </label>
+              <label className="block text-sm font-bold text-amber-200">
+                Medium
+                <input
+                  required
+                  value={uploadArtworkForm.medium}
+                  onChange={(event) => setUploadArtworkForm((previous) => ({ ...previous, medium: event.target.value }))}
+                  className="mt-1.5 w-full rounded-lg border border-amber-300/45 bg-slate-950 px-3 py-2.5 text-sm font-medium text-white outline-none focus:ring-4 focus:ring-pink-200"
+                  placeholder="e.g. Woodblock print"
+                />
+              </label>
+              <label className="block text-sm font-bold text-amber-200">
+                Year
+                <input
+                  required
+                  value={uploadArtworkForm.year}
+                  onChange={(event) => setUploadArtworkForm((previous) => ({ ...previous, year: event.target.value }))}
+                  className="mt-1.5 w-full rounded-lg border border-amber-300/45 bg-slate-950 px-3 py-2.5 text-sm font-medium text-white outline-none focus:ring-4 focus:ring-pink-200"
+                  placeholder="e.g. 1831 or c. 1831"
+                />
+              </label>
+              <label className="block text-sm font-bold text-amber-200">
+                Source website URL
+                <input
+                  required
+                  type="url"
+                  value={uploadArtworkForm.sourceUrl}
+                  onChange={(event) => setUploadArtworkForm((previous) => ({ ...previous, sourceUrl: event.target.value }))}
+                  className="mt-1.5 w-full rounded-lg border border-amber-300/45 bg-slate-950 px-3 py-2.5 text-sm font-medium text-white outline-none focus:ring-4 focus:ring-pink-200"
+                  placeholder="https://collection.example.org/artwork"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-amber-200/25 bg-slate-950/45 px-4 py-3 text-xs leading-relaxed text-gray-300">
+            Uploaded images are stored as portable Base64 data inside the exported Class Pack, capped at about {Math.round(CLASS_PACK_IMAGE_MAX_BYTES / 1024)} KB per image. Only upload artwork you are permitted to use, and provide the source website for acknowledgement.
+          </div>
+          {uploadArtworkError && (
+            <p className="rounded-lg border border-rose-300/50 bg-rose-950/45 px-4 py-3 text-sm font-semibold text-rose-100" role="alert">
+              {uploadArtworkError}
+            </p>
+          )}
+          <div className="flex flex-wrap justify-end gap-3">
+            <button
+              type="button"
+              onClick={closeUploadArtwork}
+              className="rounded-lg bg-slate-700 px-4 py-3 text-sm font-bold text-white transition hover:bg-slate-600 focus:outline-none focus:ring-4 focus:ring-slate-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isPreparingUploadImage || !preparedUploadImage}
+              className="artquest-button px-5 py-3 text-sm font-black focus:outline-none focus:ring-4 focus:ring-pink-200 disabled:cursor-not-allowed disabled:opacity-55"
+            >
+              Add to selected room
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       <Modal
         isOpen={!!viewedArtwork}

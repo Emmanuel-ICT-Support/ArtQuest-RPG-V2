@@ -4,7 +4,7 @@ import type {
   MuseumSearchScope,
 } from './MuseumArtworkFilters';
 
-export type MuseumArtworkSource = 'artic' | 'met' | 'openverse' | 'rijksmuseum';
+export type MuseumArtworkSource = 'artic' | 'met' | 'openverse' | 'rijksmuseum' | 'teacher_upload';
 
 export type MuseumArtworkMatchTier = 'best' | 'broader';
 
@@ -633,8 +633,10 @@ const scoreMuseumArtworkMatch = (
     ? 'Met'
     : artwork.sourceProvider === 'openverse'
       ? 'Openverse public-domain archive'
-      : artwork.sourceProvider === 'rijksmuseum'
+    : artwork.sourceProvider === 'rijksmuseum'
         ? 'Rijksmuseum collection'
+      : artwork.sourceProvider === 'teacher_upload'
+        ? 'teacher upload'
       : 'Art Institute of Chicago';
   const fallbackReason = `Returned by the ${providerName} catalogue search`;
   const match: MuseumArtworkMatch = {
