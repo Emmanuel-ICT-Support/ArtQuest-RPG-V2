@@ -1,6 +1,7 @@
 
 
 import React from 'react';
+import type { ClassPackExport } from './data/ClassPack';
 
 export type YearLevel = 7 | 8 | 9 | 10 | 11 | 12;
 export type SeniorCoursePathway = 'general' | 'atar';
@@ -258,6 +259,7 @@ export interface CoreSavedGameState {
   gameWon: boolean;
   gameOver: boolean;
   teacherMode?: boolean;
+  classPack?: ClassPackExport | null;
   // currentWingIdForGame is not saved here; player resumes on map.
   // narrativeLog is not saved; it's transient per wing.
   // geminiChat is not saved; it's re-initialized.
@@ -282,6 +284,7 @@ export interface AppGameState {
   gameOver: boolean;
   gameWon: boolean;
   teacherMode: boolean;
+  classPack: ClassPackExport | null;
   selectedAvatar?: PlayerAvatar;
   currentWingIdForGame: string | null;
   learningJournal: JournalEntry[];
@@ -391,6 +394,7 @@ export interface MainGameProps {
   avatarImageError: string | null;
   setAvatarImageError: (error: string | null) => void;
   teacherMode?: boolean;
+  classPack?: ClassPackExport | null;
   onUpdateTeacherYearSelection?: (yearLevel: YearLevel, coursePathway?: SeniorCoursePathway) => void;
   onPhaseComplete?: () => void;
   onRoomComplete?: () => void;
@@ -465,4 +469,4 @@ export interface AssessmentScreenProps {
 }
 
 // Union type for different game screens
-export type GameScreen = 'splash' | 'newGameSetup' | 'returnMenu' | 'teacherMode' | 'classPackBuilder' | 'map' | 'game' | 'journal' | 'inventory' | 'guide' | 'assessment';
+export type GameScreen = 'splash' | 'classPackSelection' | 'newGameSetup' | 'returnMenu' | 'teacherMode' | 'classPackBuilder' | 'map' | 'game' | 'journal' | 'inventory' | 'guide' | 'assessment';

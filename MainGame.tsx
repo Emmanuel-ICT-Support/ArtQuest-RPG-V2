@@ -222,6 +222,7 @@ const MainGameComponent: React.FC<MainGameProps> = ({
   avatarImageError,
   setAvatarImageError,
   teacherMode = false,
+  classPack = null,
   onUpdateTeacherYearSelection,
   onPhaseComplete,
   onRoomComplete,
@@ -265,7 +266,15 @@ const MainGameComponent: React.FC<MainGameProps> = ({
   const currentWingDef = WING_DEFINITIONS.find(w => w.id === currentWingId);
   const currentWingLocalState = currentWingsState[currentWingId];
   const currentArtworkBrief = selectedAvatar ? getArtworkBrief(currentWingId, selectedAvatar.selectedYearLevel) : null;
-  const currentArtwork = currentArtworkBrief?.sourceArtwork;
+  const currentClassPackRoom = classPack?.rooms.find((room) => room.id === currentWingId);
+  const currentArtwork = currentClassPackRoom?.artwork || currentArtworkBrief?.sourceArtwork;
+  const currentArtworkTitle = currentArtwork?.title;
+  const currentArtworkArtist = currentArtwork?.artistDisplay;
+  const currentArtworkDate = currentArtwork?.dateDisplay;
+  const currentArtworkMedium = currentClassPackRoom?.artwork.medium || currentArtworkBrief?.sourceArtwork?.mediumDisplay;
+  const classPackPhaseQuestion = currentClassPackRoom?.questions[
+    toQuestionPhase(currentWingLocalState?.currentQuestionLevel || 1)
+  ];
   const selectedAssessmentLabel = selectedAvatar
     ? getAssessmentDisplayLabel(selectedAvatar.selectedYearLevel, selectedAvatar.selectedCoursePathway)
     : '';
@@ -530,6 +539,10 @@ const MainGameComponent: React.FC<MainGameProps> = ({
 
         let wingInitialQuestionLevel = currentWingsState[currentWingId]?.currentQuestionLevel || 1;
         let introMessageToAI = `The player, ${selectedAvatar.name || 'the artist'} (${selectedAssessmentLabel}), is interacting with ${currentWingDef.name} (${currentWingDef.artPrinciple}). They are currently at Phase ${wingInitialQuestionLevel}. Remember to adapt your questions and feedback to their selected year level or senior course pathway as per system instructions.`;
+        const teacherChallenge = currentClassPackRoom?.questions[toQuestionPhase(wingInitialQuestionLevel)];
+        if (classPack && currentClassPackRoom && teacherChallenge) {
+          introMessageToAI += ` This is the teacher-selected Class Pack "${classPack.title}". The displayed artwork is "${currentClassPackRoom.artwork.title}" by ${currentClassPackRoom.artwork.artistDisplay}. The teacher's exact Phase ${wingInitialQuestionLevel} challenge is: "${teacherChallenge}". Do not replace or reword the teacher challenge; offer concise, encouraging context and assess the student's response against it.`;
+        }
 
         if (currentWingsState[currentWingId]?.image && currentWingsState[currentWingId]?.description) {
              introMessageToAI += ` The main artwork is already displayed. State the objective for Phase ${wingInitialQuestionLevel} for '${currentWingDef.name}', adapting it for a ${selectedAssessmentLabel} student. Then, guide the player to check 'Your Challenge' section in the UI.`;
@@ -683,6 +696,10 @@ const MainGameComponent: React.FC<MainGameProps> = ({
         ? existingPhaseResponses
         : { ...existingPhaseResponses, [currentPhase]: currentInputText };
       let messageToAI = `Player input for ${currentWingDef?.name} (Phase ${currentLevelBeingPlayed}): "${currentInputText}"`;
+      const teacherChallenge = currentClassPackRoom?.questions[currentPhase];
+      if (classPack && currentClassPackRoom && teacherChallenge) {
+        messageToAI += ` This response belongs to the teacher-selected Class Pack "${classPack.title}". Assess it against the exact Phase ${currentPhase} challenge: "${teacherChallenge}". Keep the teacher challenge intact and do not substitute a generic question.`;
+      }
       if (isPlayerImageRequest) {
         messageToAI += ` The player is requesting an image. Remember to guide them to 'Your Challenge' section if relevant after image generation.`;
       }
@@ -789,8 +806,8 @@ const MainGameComponent: React.FC<MainGameProps> = ({
                 completedDate: new Date().toISOString(),
                 mainArtworkImage: currentWingLocalState?.image,
                 mainArtworkPrompt: currentWingLocalState?.imagePrompt,
-                mainArtworkTitle: currentArtwork?.title,
-                mainArtworkArtist: currentArtwork?.artistDisplay,
+                mainArtworkTitle: currentArtworkTitle,
+                mainArtworkArtist: currentArtworkArtist,
                 playerReflection: updatedPhaseResponses[4] || currentInputText,
                 phaseResponses: updatedPhaseResponses,
                 visualLanguageLog: committedVocabulary, 
@@ -820,8 +837,8 @@ const MainGameComponent: React.FC<MainGameProps> = ({
             completedDate: new Date().toISOString(),
             mainArtworkImage: currentWingLocalState?.image,
             mainArtworkPrompt: currentWingLocalState?.imagePrompt,
-            mainArtworkTitle: currentArtwork?.title,
-            mainArtworkArtist: currentArtwork?.artistDisplay,
+            mainArtworkTitle: currentArtworkTitle,
+            mainArtworkArtist: currentArtworkArtist,
             playerReflection: updatedPhaseResponses[4] || currentInputText,
             phaseResponses: updatedPhaseResponses,
             visualLanguageLog: committedVocabulary, 
@@ -881,6 +898,8 @@ const MainGameComponent: React.FC<MainGameProps> = ({
   const isInputDisabled = isCuratorThinking || isLoadingAnyNonAvatarImage || isGeneratingAvatarPortrait || currentWingLocalState?.isSolved || isGameWonFromState || showSummaryModal || isFetchingGuideTerms;
   const activeObjectiveText = (() => {
     if (currentWingLocalState?.isSolved) return null;
+
+    if (classPackPhaseQuestion) return classPackPhaseQuestion;
 
     const activePhase = currentWingLocalState?.currentQuestionLevel;
     return currentObjectives.find(obj => {
@@ -989,6 +1008,11 @@ const MainGameComponent: React.FC<MainGameProps> = ({
               <span className="text-2xl" aria-hidden="true">{currentWingDef?.icon || '🎨'}</span>
               <span className="truncate" title={currentWingDisplayName}>{currentWingDisplayName}</span>
             </div>
+            {classPack && (
+              <p className="mt-2 text-xs font-bold text-pink-200" title={classPack.title}>
+                Class Pack: {classPack.title}
+              </p>
+            )}
             {currentWingLocalState?.isSolved && <p className="mt-2 text-xs italic text-green-300">Challenge Complete!</p>}
           </section>
 
@@ -1206,17 +1230,17 @@ const MainGameComponent: React.FC<MainGameProps> = ({
                     <div className="analysis-artwork-mat">
                       <img
                         src={wingImage}
-                        alt={`${currentArtwork?.title || currentWingDef?.name || 'ArtQuest'} artwork`}
+                        alt={`${currentArtworkTitle || currentWingDef?.name || 'ArtQuest'} artwork`}
                         className="analysis-artwork-image"
                         onError={() => setWingImageLoadFailed(true)}
                       />
                     </div>
                     {currentArtwork && (
                       <figcaption className="analysis-artwork-caption">
-                        <span className="block font-semibold text-gray-100" title={currentArtwork.title}>'{currentArtwork.title}'</span>
-                        <span className="block" title={currentArtwork.artistDisplay}>{currentArtwork.artistDisplay || 'Artist unknown'}</span>
-                        <span className="block" title={`${currentArtwork.dateDisplay} · ${currentArtwork.mediumDisplay}`}>
-                          {currentArtwork.dateDisplay || 'Date unknown'} • {currentArtwork.mediumDisplay || 'Medium unknown'}
+                        <span className="block font-semibold text-gray-100" title={currentArtworkTitle}>'{currentArtworkTitle}'</span>
+                        <span className="block" title={currentArtworkArtist}>{currentArtworkArtist || 'Artist unknown'}</span>
+                        <span className="block" title={`${currentArtworkDate} · ${currentArtworkMedium}`}>
+                          {currentArtworkDate || 'Date unknown'} • {currentArtworkMedium || 'Medium unknown'}
                         </span>
                       </figcaption>
                     )}
@@ -1319,7 +1343,7 @@ const MainGameComponent: React.FC<MainGameProps> = ({
       </Modal>
       <Modal
         isOpen={artworkModalOpen && !!wingImage && !wingImageLoadFailed}
-        title={currentArtwork?.title || 'Artwork'}
+        title={currentArtworkTitle || 'Artwork'}
         onClose={() => setArtworkModalOpen(false)}
         size="xl"
       >
@@ -1328,15 +1352,15 @@ const MainGameComponent: React.FC<MainGameProps> = ({
             <div className="analysis-enlarged-artwork-frame">
               <img
                 src={wingImage}
-                alt={`${currentArtwork?.title || currentWingDef?.name || 'ArtQuest'} enlarged artwork`}
+                alt={`${currentArtworkTitle || currentWingDef?.name || 'ArtQuest'} enlarged artwork`}
                 className="analysis-enlarged-artwork-image"
               />
             </div>
             {currentArtwork && (
               <figcaption className="analysis-enlarged-artwork-caption">
-                <p className="font-semibold text-gray-100">{currentArtwork.title}</p>
-                <p>{currentArtwork.artistDisplay || 'Artist unknown'}</p>
-                <p>{currentArtwork.dateDisplay || 'Date unknown'} · {currentArtwork.mediumDisplay || 'Medium unknown'}</p>
+                <p className="font-semibold text-gray-100">{currentArtworkTitle}</p>
+                <p>{currentArtworkArtist || 'Artist unknown'}</p>
+                <p>{currentArtworkDate || 'Date unknown'} · {currentArtworkMedium || 'Medium unknown'}</p>
               </figcaption>
             )}
           </figure>

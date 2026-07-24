@@ -1227,6 +1227,7 @@ interface CoreSavedGameState {
   gameWon: boolean;
   gameOver: boolean;
   teacherMode?: boolean;
+  classPack?: ClassPackExport | null;
   // currentWingIdForGame is not saved here; player resumes on map.
   // narrativeLog is not saved; it's transient per wing.
   // geminiChat is not saved; it's re-initialized.
@@ -1251,6 +1252,7 @@ interface AppGameState {
   gameOver: boolean;
   gameWon: boolean;
   teacherMode: boolean;
+  classPack: ClassPackExport | null;
   selectedAvatar?: PlayerAvatar;
   currentWingIdForGame: string | null;
   learningJournal: JournalEntry[];
@@ -1360,6 +1362,7 @@ interface MainGameProps {
   avatarImageError: string | null;
   setAvatarImageError: (error: string | null) => void;
   teacherMode?: boolean;
+  classPack?: ClassPackExport | null;
   onUpdateTeacherYearSelection?: (yearLevel: YearLevel, coursePathway?: SeniorCoursePathway) => void;
   onPhaseComplete?: () => void;
   onRoomComplete?: () => void;
@@ -1434,7 +1437,7 @@ interface AssessmentScreenProps {
 }
 
 // Union type for different game screens
-type GameScreen = 'splash' | 'newGameSetup' | 'returnMenu' | 'teacherMode' | 'classPackBuilder' | 'map' | 'game' | 'journal' | 'inventory' | 'guide' | 'assessment';
+type GameScreen = 'splash' | 'classPackSelection' | 'newGameSetup' | 'returnMenu' | 'teacherMode' | 'classPackBuilder' | 'map' | 'game' | 'journal' | 'inventory' | 'guide' | 'assessment';
 
 
 // --- constants.ts ---
@@ -12836,6 +12839,151 @@ const parseArtworkPrompt = (prompt: string): ParsedArtworkPrompt | null => {
 };
 
 
+// --- data/ClassPack.ts ---
+type ClassPackArtwork = MuseumArtwork & {
+  wingId?: string;
+  yearLevel?: number;
+  focus?: string;
+  visualFocus?: string;
+  focusReason?: string;
+};
+
+interface ClassPackRoom {
+  id: string;
+  name: string;
+  artPrinciple: string;
+  artwork: ClassPackArtwork;
+  questions: Record<QuestionPhase, string>;
+}
+
+interface ClassPackExport {
+  version: '1.0';
+  title: string;
+  yearLevel: YearLevel;
+  createdAt: string;
+  rooms: ClassPackRoom[];
+}
+
+const QUESTION_PHASES: readonly QuestionPhase[] = [1, 2, 3, 4];
+const MUSEUM_ARTWORK_SOURCES: readonly MuseumArtworkSource[] = ['artic', 'met', 'openverse', 'rijksmuseum'];
+const YEAR_LEVELS: readonly YearLevel[] = [7, 8, 9, 10, 11, 12];
+
+const isRecord = (value: unknown): value is Record<string, unknown> => (
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+);
+
+const requiredText = (record: Record<string, unknown>, field: string, context: string): string => {
+  const value = record[field];
+  if (typeof value !== 'string') throw new Error(`${context} is missing ${field}.`);
+  return value;
+};
+
+const optionalText = (record: Record<string, unknown>, field: string): string | undefined => (
+  typeof record[field] === 'string' ? record[field] : undefined
+);
+
+const nullableNumber = (record: Record<string, unknown>, field: string, context: string): number | null => {
+  const value = record[field];
+  if (value === null) return null;
+  if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error(`${context} has an invalid ${field}.`);
+  return value;
+};
+
+const parseArtwork = (value: unknown, roomName: string): ClassPackArtwork => {
+  const context = `The artwork for ${roomName}`;
+  if (!isRecord(value)) throw new Error(`${context} is missing.`);
+  const id = value.id;
+  const sourceProvider = value.sourceProvider;
+  if (typeof id !== 'number' || !Number.isFinite(id)) throw new Error(`${context} has an invalid id.`);
+  if (typeof sourceProvider !== 'string' || !MUSEUM_ARTWORK_SOURCES.includes(sourceProvider as MuseumArtworkSource)) {
+    throw new Error(`${context} has an unknown collection source.`);
+  }
+  if (typeof value.isPublicDomain !== 'boolean') throw new Error(`${context} has invalid image-rights data.`);
+
+  return {
+    id,
+    sourceProvider: sourceProvider as MuseumArtworkSource,
+    title: requiredText(value, 'title', context),
+    artistName: requiredText(value, 'artistName', context),
+    artistDisplay: requiredText(value, 'artistDisplay', context),
+    dateDisplay: requiredText(value, 'dateDisplay', context),
+    dateStart: nullableNumber(value, 'dateStart', context),
+    dateEnd: nullableNumber(value, 'dateEnd', context),
+    isPublicDomain: value.isPublicDomain,
+    imageUrl: requiredText(value, 'imageUrl', context),
+    ...(optionalText(value, 'fallbackImageUrl') ? { fallbackImageUrl: optionalText(value, 'fallbackImageUrl') } : {}),
+    medium: requiredText(value, 'medium', context),
+    classification: requiredText(value, 'classification', context),
+    artworkType: requiredText(value, 'artworkType', context),
+    subject: requiredText(value, 'subject', context),
+    placeOfOrigin: requiredText(value, 'placeOfOrigin', context),
+    creditLine: requiredText(value, 'creditLine', context),
+    department: requiredText(value, 'department', context),
+    style: requiredText(value, 'style', context),
+    filterText: requiredText(value, 'filterText', context),
+    copyrightNotice: requiredText(value, 'copyrightNotice', context),
+    apiLink: requiredText(value, 'apiLink', context),
+    sourceUrl: requiredText(value, 'sourceUrl', context),
+    ...(optionalText(value, 'wingId') ? { wingId: optionalText(value, 'wingId') } : {}),
+    ...(typeof value.yearLevel === 'number' ? { yearLevel: value.yearLevel } : {}),
+    ...(optionalText(value, 'focus') ? { focus: optionalText(value, 'focus') } : {}),
+    ...(optionalText(value, 'visualFocus') ? { visualFocus: optionalText(value, 'visualFocus') } : {}),
+    ...(optionalText(value, 'focusReason') ? { focusReason: optionalText(value, 'focusReason') } : {}),
+  };
+};
+
+const parseQuestions = (value: unknown, roomName: string): Record<QuestionPhase, string> => {
+  if (!isRecord(value)) throw new Error(`The questions for ${roomName} are missing.`);
+  return Object.fromEntries(QUESTION_PHASES.map((phase) => {
+    const question = value[String(phase)];
+    if (typeof question !== 'string') throw new Error(`The ${phase} question for ${roomName} is missing.`);
+    return [phase, question];
+  })) as Record<QuestionPhase, string>;
+};
+
+const parseClassPackExport = (fileContent: string): ClassPackExport => {
+  let parsedValue: unknown;
+  try {
+    parsedValue = JSON.parse(fileContent);
+  } catch {
+    throw new Error('This file is not valid JSON. Choose a Class Pack exported by ArtQuest.');
+  }
+  if (!isRecord(parsedValue)) throw new Error('This file is not an ArtQuest Class Pack.');
+  if (parsedValue.version !== '1.0') throw new Error('This Class Pack version is not supported.');
+  if (typeof parsedValue.title !== 'string' || !parsedValue.title.trim()) throw new Error('This Class Pack has no class name.');
+  if (!YEAR_LEVELS.includes(parsedValue.yearLevel as YearLevel)) throw new Error('This Class Pack has an invalid year level.');
+  if (typeof parsedValue.createdAt !== 'string') throw new Error('This Class Pack has no export date.');
+  if (!Array.isArray(parsedValue.rooms)) throw new Error('This Class Pack has no room data.');
+
+  const roomRecords = new Map<string, Record<string, unknown>>();
+  parsedValue.rooms.forEach((room) => {
+    if (!isRecord(room) || typeof room.id !== 'string') throw new Error('This Class Pack contains an invalid room.');
+    if (roomRecords.has(room.id)) throw new Error(`This Class Pack has more than one entry for ${room.id}.`);
+    roomRecords.set(room.id, room);
+  });
+
+  const rooms = WING_DEFINITIONS.map((wing) => {
+    const room = roomRecords.get(wing.id);
+    if (!room) throw new Error(`This Class Pack is missing ${wing.name}.`);
+    return {
+      id: wing.id,
+      name: typeof room.name === 'string' ? room.name : wing.name,
+      artPrinciple: typeof room.artPrinciple === 'string' ? room.artPrinciple : wing.artPrinciple,
+      artwork: parseArtwork(room.artwork, wing.name),
+      questions: parseQuestions(room.questions, wing.name),
+    };
+  });
+
+  return {
+    version: '1.0',
+    title: parsedValue.title.trim(),
+    yearLevel: parsedValue.yearLevel as YearLevel,
+    createdAt: parsedValue.createdAt,
+    rooms,
+  };
+};
+
+
 // --- data/MuseumArtworkFilters.ts ---
 type MuseumCollectionFilter = 'all' | 'artic' | 'met' | 'openverse' | 'rijksmuseum';
 
@@ -15366,6 +15514,115 @@ const getOfflinePhaseTask = (wingId: string, phase: number, yearLevel: YearLevel
 
   return getAgeAppropriatePhaseTask(content?.focus || 'this artwork', safePhase, yearLevel, coursePathway);
 };
+
+
+// --- data/preloadedClassPacks.generated.ts ---
+// Generated by scripts/build-standalone.mjs. Do not edit by hand.
+const PRELOADED_CLASS_PACK_JSON: ReadonlyArray<{ source: string; classPack: unknown }> = [];
+
+
+// --- data/preloadedClassPacks.ts ---
+interface PreloadedClassPack {
+  id: string;
+  label: string;
+  source: string;
+  classPack: ClassPackExport;
+}
+
+const toPreloadedClassPackArtwork = (wingId: string, yearLevel: YearLevel): ClassPackArtwork => {
+  const brief = getArtworkBrief(wingId, yearLevel);
+  const artwork = brief.sourceArtwork;
+
+  if (!artwork) {
+    throw new Error(`The bundled artwork for ${wingId} is unavailable.`);
+  }
+
+  return {
+    id: artwork.id,
+    sourceProvider: artwork.sourceProvider || 'artic',
+    title: artwork.title,
+    artistName: artwork.artistTitle || artwork.artistDisplay,
+    artistDisplay: artwork.artistDisplay || artwork.artistTitle,
+    dateDisplay: artwork.dateDisplay,
+    dateStart: artwork.dateStart,
+    dateEnd: artwork.dateEnd,
+    isPublicDomain: artwork.isPublicDomain,
+    imageUrl: `./public/${artwork.assetPath}`,
+    medium: artwork.mediumDisplay,
+    classification: artwork.classificationTitle,
+    artworkType: artwork.artworkTypeTitle,
+    subject: artwork.artworkTypeTitle || artwork.classificationTitle,
+    placeOfOrigin: artwork.placeOfOrigin,
+    creditLine: artwork.creditLine,
+    department: artwork.departmentTitle,
+    style: artwork.styleTitle || brief.style,
+    filterText: [
+      artwork.title,
+      artwork.artistDisplay,
+      artwork.mediumDisplay,
+      artwork.classificationTitle,
+      artwork.artworkTypeTitle,
+    ].filter(Boolean).join(' '),
+    copyrightNotice: artwork.copyrightNotice,
+    apiLink: artwork.apiLink,
+    sourceUrl: artwork.sourceUrl,
+    wingId,
+    yearLevel,
+    focus: brief.focus,
+    visualFocus: brief.visualFocus,
+    focusReason: artwork.focusReason,
+  };
+};
+
+const createStarterClassPack = (): ClassPackExport => {
+  const yearLevel: YearLevel = 9;
+  return {
+    version: '1.0',
+    title: 'Year 9 Studio Demonstration',
+    yearLevel,
+    createdAt: '2026-07-24T00:00:00.000Z',
+    rooms: WING_DEFINITIONS.map((wing) => ({
+      id: wing.id,
+      name: wing.name,
+      artPrinciple: wing.artPrinciple,
+      artwork: toPreloadedClassPackArtwork(wing.id, yearLevel),
+      questions: Object.fromEntries([1, 2, 3, 4].map((phase) => [
+        phase,
+        getOfflinePhaseTask(wing.id, phase, yearLevel),
+      ])) as Record<QuestionPhase, string>,
+    })),
+  };
+};
+
+const loadBundledClassPacks = (): PreloadedClassPack[] => {
+  const packs: PreloadedClassPack[] = [
+    {
+      id: 'year-9-studio-demonstration',
+      label: 'Year 9 Studio Demonstration',
+      source: 'Included demonstration pack',
+      classPack: createStarterClassPack(),
+    },
+  ];
+
+  PRELOADED_CLASS_PACK_JSON.forEach(({ source, classPack: moduleValue }) => {
+    try {
+      const classPack = parseClassPackExport(JSON.stringify(moduleValue));
+      const fileName = source.replace(/\.json$/i, '') || 'Class Pack';
+      packs.push({
+        id: `bundled-${fileName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+        label: classPack.title,
+        source,
+        classPack,
+      });
+    } catch (error) {
+      console.warn(`Ignoring invalid preloaded Class Pack: ${source}`, error);
+    }
+  });
+
+  return packs.sort((first, second) => first.label.localeCompare(second.label));
+};
+
+const PRELOADED_CLASS_PACKS = loadBundledClassPacks();
 
 
 // --- utils/assetPreloader.ts ---
@@ -18699,6 +18956,174 @@ const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
           </div>
         )}
       </Modal>
+    </main>
+  );
+};
+
+
+// --- components/ClassPackSelectionScreen.tsx ---
+interface ClassPackSelectionScreenProps {
+  onChooseDefault: () => void;
+  onChooseClassPack: (classPack: ClassPackExport) => void;
+  onReturnToMenu: () => void;
+}
+
+type SelectionId = 'default' | 'find' | 'import';
+
+const CLASS_PACK_SELECTION_BACKGROUND = './public/images/screens/choose-your-class-screen.png';
+const CLASS_PACK_SELECTION_FRAME_STYLE: React.CSSProperties = {
+  width: 'min(100vw, calc(100vh * 1672 / 941))',
+  height: 'min(100vh, calc(100vw * 941 / 1672))',
+};
+const CLASS_PACK_HOTSPOT_CLASS = 'absolute z-20 rounded-sm bg-transparent text-transparent transition hover:bg-white/5 focus:outline-none focus:ring-4 focus:ring-pink-200/80 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:focus:ring-0';
+
+const ClassPackSelectionScreen: React.FC<ClassPackSelectionScreenProps> = ({
+  onChooseDefault,
+  onChooseClassPack,
+  onReturnToMenu,
+}) => {
+  const [selectedId, setSelectedId] = useState<SelectionId>('default');
+  const [isClassPickerOpen, setIsClassPickerOpen] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const chooseImportedPack = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setIsImporting(true);
+    setImportError(null);
+    try {
+      onChooseClassPack(parseClassPackExport(await file.text()));
+    } catch (error) {
+      setImportError(error instanceof Error
+        ? error.message
+        : 'This Class Pack could not be read. Choose a JSON file exported by ArtQuest.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const continueWithSelection = () => {
+    if (selectedId === 'default') {
+      onChooseDefault();
+      return;
+    }
+    if (selectedId === 'find') {
+      setIsClassPickerOpen(true);
+      return;
+    }
+    fileInputRef.current?.click();
+  };
+
+  return (
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#120b20] text-gray-100 selection:bg-pink-500 selection:text-white">
+      <div className="relative overflow-hidden" style={CLASS_PACK_SELECTION_FRAME_STYLE}>
+        <img
+          src={CLASS_PACK_SELECTION_BACKGROUND}
+          alt="Choose your ArtQuest class pack"
+          className="absolute inset-0 h-full w-full object-cover"
+          draggable={false}
+        />
+
+        <button
+          type="button"
+          onClick={() => setSelectedId('default')}
+          className={`${CLASS_PACK_HOTSPOT_CLASS} ${selectedId === 'default' ? 'ring-2 ring-amber-200/70' : ''}`}
+          style={{ left: '19.1%', top: '24.8%', width: '19.1%', height: '46.6%' }}
+          aria-label="Select the default ArtQuest game"
+          aria-pressed={selectedId === 'default'}
+        >
+          Default ArtQuest
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedId('find');
+            setIsClassPickerOpen(true);
+          }}
+          className={`${CLASS_PACK_HOTSPOT_CLASS} ${selectedId === 'find' ? 'ring-2 ring-amber-200/70' : ''}`}
+          style={{ left: '39.4%', top: '24.8%', width: '20.1%', height: '46.6%' }}
+          aria-label="Find a preloaded class pack"
+          aria-pressed={selectedId === 'find'}
+        >
+          Find a Class
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedId('import');
+            fileInputRef.current?.click();
+          }}
+          disabled={isImporting}
+          className={`${CLASS_PACK_HOTSPOT_CLASS} ${selectedId === 'import' ? 'ring-2 ring-amber-200/70' : ''}`}
+          style={{ left: '60.8%', top: '24.8%', width: '20.1%', height: '46.6%' }}
+          aria-label="Import an ArtQuest Class Pack JSON file"
+          aria-pressed={selectedId === 'import'}
+        >
+          Import a Class Pack
+        </button>
+        <button
+          type="button"
+          onClick={onReturnToMenu}
+          className={CLASS_PACK_HOTSPOT_CLASS}
+          style={{ left: '24.8%', top: '86.8%', width: '22.6%', height: '8.2%' }}
+          aria-label="Return to main menu"
+        >
+          Return to Menu
+        </button>
+        <button
+          type="button"
+          onClick={continueWithSelection}
+          disabled={isImporting}
+          className={CLASS_PACK_HOTSPOT_CLASS}
+          style={{ left: '51.5%', top: '86.8%', width: '23.8%', height: '8.2%' }}
+          aria-label="Continue with the selected class option"
+        >
+          Continue
+        </button>
+      </div>
+
+      <input ref={fileInputRef} type="file" accept="application/json,.json" className="sr-only" onChange={(event) => { void chooseImportedPack(event); }} />
+
+      {isClassPickerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#08050d]/85 p-4" role="dialog" aria-modal="true" aria-labelledby="availableClassPacksTitle">
+          <div className="artquest-panel w-full max-w-2xl p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-pink-300">Teacher prepared</p>
+                <h2 id="availableClassPacksTitle" className="mt-1 text-2xl font-black text-[#ffe2f4]">Available Class Packs</h2>
+                <p className="mt-2 text-sm text-gray-300">Choose the pack your teacher has prepared for this class.</p>
+              </div>
+              <button type="button" onClick={() => setIsClassPickerOpen(false)} className="rounded bg-slate-800 px-3 py-2 font-black text-white hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-pink-200" aria-label="Close available class packs">×</button>
+            </div>
+            <div className="mt-5 max-h-[58vh] space-y-3 overflow-y-auto pr-1">
+              {PRELOADED_CLASS_PACKS.map((pack) => (
+                <button key={pack.id} type="button" onClick={() => onChooseClassPack(pack.classPack)} className="w-full border border-amber-300/40 bg-[#180f2b] p-4 text-left transition hover:border-pink-300 hover:bg-[#26133b] focus:outline-none focus:ring-4 focus:ring-pink-200">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-lg font-black text-[#ffd7eb]">{pack.label}</span>
+                    <span className="shrink-0 text-xs font-bold text-amber-200">Year {pack.classPack.yearLevel}</span>
+                  </div>
+                  <p className="mt-1 text-sm text-gray-300">{pack.classPack.rooms.length} gallery rooms · {pack.source}</p>
+                </button>
+              ))}
+            </div>
+            <button type="button" onClick={() => setIsClassPickerOpen(false)} className="mt-5 w-full rounded bg-slate-700 px-4 py-3 font-bold text-white hover:bg-slate-600 focus:outline-none focus:ring-4 focus:ring-slate-300">Back</button>
+          </div>
+        </div>
+      )}
+
+      {importError && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#08050d]/85 p-4" role="alertdialog" aria-modal="true" aria-labelledby="classPackImportErrorTitle">
+          <div className="artquest-panel w-full max-w-md p-6 shadow-2xl">
+            <h2 id="classPackImportErrorTitle" className="text-2xl font-black text-pink-100">Class Pack not opened</h2>
+            <p className="mt-3 text-sm leading-relaxed text-gray-300">{importError}</p>
+            <button type="button" onClick={() => setImportError(null)} className="artquest-button mt-6 w-full px-4 py-3 text-sm font-black focus:outline-none focus:ring-4 focus:ring-pink-200">Choose another file</button>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
@@ -30635,6 +31060,7 @@ const MainGameComponent: React.FC<MainGameProps> = ({
   avatarImageError,
   setAvatarImageError,
   teacherMode = false,
+  classPack = null,
   onUpdateTeacherYearSelection,
   onPhaseComplete,
   onRoomComplete,
@@ -30678,7 +31104,15 @@ const MainGameComponent: React.FC<MainGameProps> = ({
   const currentWingDef = WING_DEFINITIONS.find(w => w.id === currentWingId);
   const currentWingLocalState = currentWingsState[currentWingId];
   const currentArtworkBrief = selectedAvatar ? getArtworkBrief(currentWingId, selectedAvatar.selectedYearLevel) : null;
-  const currentArtwork = currentArtworkBrief?.sourceArtwork;
+  const currentClassPackRoom = classPack?.rooms.find((room) => room.id === currentWingId);
+  const currentArtwork = currentClassPackRoom?.artwork || currentArtworkBrief?.sourceArtwork;
+  const currentArtworkTitle = currentArtwork?.title;
+  const currentArtworkArtist = currentArtwork?.artistDisplay;
+  const currentArtworkDate = currentArtwork?.dateDisplay;
+  const currentArtworkMedium = currentClassPackRoom?.artwork.medium || currentArtworkBrief?.sourceArtwork?.mediumDisplay;
+  const classPackPhaseQuestion = currentClassPackRoom?.questions[
+    toQuestionPhase(currentWingLocalState?.currentQuestionLevel || 1)
+  ];
   const selectedAssessmentLabel = selectedAvatar
     ? getAssessmentDisplayLabel(selectedAvatar.selectedYearLevel, selectedAvatar.selectedCoursePathway)
     : '';
@@ -30943,6 +31377,10 @@ const MainGameComponent: React.FC<MainGameProps> = ({
 
         let wingInitialQuestionLevel = currentWingsState[currentWingId]?.currentQuestionLevel || 1;
         let introMessageToAI = `The player, ${selectedAvatar.name || 'the artist'} (${selectedAssessmentLabel}), is interacting with ${currentWingDef.name} (${currentWingDef.artPrinciple}). They are currently at Phase ${wingInitialQuestionLevel}. Remember to adapt your questions and feedback to their selected year level or senior course pathway as per system instructions.`;
+        const teacherChallenge = currentClassPackRoom?.questions[toQuestionPhase(wingInitialQuestionLevel)];
+        if (classPack && currentClassPackRoom && teacherChallenge) {
+          introMessageToAI += ` This is the teacher-selected Class Pack "${classPack.title}". The displayed artwork is "${currentClassPackRoom.artwork.title}" by ${currentClassPackRoom.artwork.artistDisplay}. The teacher's exact Phase ${wingInitialQuestionLevel} challenge is: "${teacherChallenge}". Do not replace or reword the teacher challenge; offer concise, encouraging context and assess the student's response against it.`;
+        }
 
         if (currentWingsState[currentWingId]?.image && currentWingsState[currentWingId]?.description) {
              introMessageToAI += ` The main artwork is already displayed. State the objective for Phase ${wingInitialQuestionLevel} for '${currentWingDef.name}', adapting it for a ${selectedAssessmentLabel} student. Then, guide the player to check 'Your Challenge' section in the UI.`;
@@ -31096,6 +31534,10 @@ const MainGameComponent: React.FC<MainGameProps> = ({
         ? existingPhaseResponses
         : { ...existingPhaseResponses, [currentPhase]: currentInputText };
       let messageToAI = `Player input for ${currentWingDef?.name} (Phase ${currentLevelBeingPlayed}): "${currentInputText}"`;
+      const teacherChallenge = currentClassPackRoom?.questions[currentPhase];
+      if (classPack && currentClassPackRoom && teacherChallenge) {
+        messageToAI += ` This response belongs to the teacher-selected Class Pack "${classPack.title}". Assess it against the exact Phase ${currentPhase} challenge: "${teacherChallenge}". Keep the teacher challenge intact and do not substitute a generic question.`;
+      }
       if (isPlayerImageRequest) {
         messageToAI += ` The player is requesting an image. Remember to guide them to 'Your Challenge' section if relevant after image generation.`;
       }
@@ -31202,8 +31644,8 @@ const MainGameComponent: React.FC<MainGameProps> = ({
                 completedDate: new Date().toISOString(),
                 mainArtworkImage: currentWingLocalState?.image,
                 mainArtworkPrompt: currentWingLocalState?.imagePrompt,
-                mainArtworkTitle: currentArtwork?.title,
-                mainArtworkArtist: currentArtwork?.artistDisplay,
+                mainArtworkTitle: currentArtworkTitle,
+                mainArtworkArtist: currentArtworkArtist,
                 playerReflection: updatedPhaseResponses[4] || currentInputText,
                 phaseResponses: updatedPhaseResponses,
                 visualLanguageLog: committedVocabulary, 
@@ -31233,8 +31675,8 @@ const MainGameComponent: React.FC<MainGameProps> = ({
             completedDate: new Date().toISOString(),
             mainArtworkImage: currentWingLocalState?.image,
             mainArtworkPrompt: currentWingLocalState?.imagePrompt,
-            mainArtworkTitle: currentArtwork?.title,
-            mainArtworkArtist: currentArtwork?.artistDisplay,
+            mainArtworkTitle: currentArtworkTitle,
+            mainArtworkArtist: currentArtworkArtist,
             playerReflection: updatedPhaseResponses[4] || currentInputText,
             phaseResponses: updatedPhaseResponses,
             visualLanguageLog: committedVocabulary, 
@@ -31294,6 +31736,8 @@ const MainGameComponent: React.FC<MainGameProps> = ({
   const isInputDisabled = isCuratorThinking || isLoadingAnyNonAvatarImage || isGeneratingAvatarPortrait || currentWingLocalState?.isSolved || isGameWonFromState || showSummaryModal || isFetchingGuideTerms;
   const activeObjectiveText = (() => {
     if (currentWingLocalState?.isSolved) return null;
+
+    if (classPackPhaseQuestion) return classPackPhaseQuestion;
 
     const activePhase = currentWingLocalState?.currentQuestionLevel;
     return currentObjectives.find(obj => {
@@ -31402,6 +31846,11 @@ const MainGameComponent: React.FC<MainGameProps> = ({
               <span className="text-2xl" aria-hidden="true">{currentWingDef?.icon || '🎨'}</span>
               <span className="truncate" title={currentWingDisplayName}>{currentWingDisplayName}</span>
             </div>
+            {classPack && (
+              <p className="mt-2 text-xs font-bold text-pink-200" title={classPack.title}>
+                Class Pack: {classPack.title}
+              </p>
+            )}
             {currentWingLocalState?.isSolved && <p className="mt-2 text-xs italic text-green-300">Challenge Complete!</p>}
           </section>
 
@@ -31619,17 +32068,17 @@ const MainGameComponent: React.FC<MainGameProps> = ({
                     <div className="analysis-artwork-mat">
                       <img
                         src={wingImage}
-                        alt={`${currentArtwork?.title || currentWingDef?.name || 'ArtQuest'} artwork`}
+                        alt={`${currentArtworkTitle || currentWingDef?.name || 'ArtQuest'} artwork`}
                         className="analysis-artwork-image"
                         onError={() => setWingImageLoadFailed(true)}
                       />
                     </div>
                     {currentArtwork && (
                       <figcaption className="analysis-artwork-caption">
-                        <span className="block font-semibold text-gray-100" title={currentArtwork.title}>'{currentArtwork.title}'</span>
-                        <span className="block" title={currentArtwork.artistDisplay}>{currentArtwork.artistDisplay || 'Artist unknown'}</span>
-                        <span className="block" title={`${currentArtwork.dateDisplay} · ${currentArtwork.mediumDisplay}`}>
-                          {currentArtwork.dateDisplay || 'Date unknown'} • {currentArtwork.mediumDisplay || 'Medium unknown'}
+                        <span className="block font-semibold text-gray-100" title={currentArtworkTitle}>'{currentArtworkTitle}'</span>
+                        <span className="block" title={currentArtworkArtist}>{currentArtworkArtist || 'Artist unknown'}</span>
+                        <span className="block" title={`${currentArtworkDate} · ${currentArtworkMedium}`}>
+                          {currentArtworkDate || 'Date unknown'} • {currentArtworkMedium || 'Medium unknown'}
                         </span>
                       </figcaption>
                     )}
@@ -31732,7 +32181,7 @@ const MainGameComponent: React.FC<MainGameProps> = ({
       </Modal>
       <Modal
         isOpen={artworkModalOpen && !!wingImage && !wingImageLoadFailed}
-        title={currentArtwork?.title || 'Artwork'}
+        title={currentArtworkTitle || 'Artwork'}
         onClose={() => setArtworkModalOpen(false)}
         size="xl"
       >
@@ -31741,15 +32190,15 @@ const MainGameComponent: React.FC<MainGameProps> = ({
             <div className="analysis-enlarged-artwork-frame">
               <img
                 src={wingImage}
-                alt={`${currentArtwork?.title || currentWingDef?.name || 'ArtQuest'} enlarged artwork`}
+                alt={`${currentArtworkTitle || currentWingDef?.name || 'ArtQuest'} enlarged artwork`}
                 className="analysis-enlarged-artwork-image"
               />
             </div>
             {currentArtwork && (
               <figcaption className="analysis-enlarged-artwork-caption">
-                <p className="font-semibold text-gray-100">{currentArtwork.title}</p>
-                <p>{currentArtwork.artistDisplay || 'Artist unknown'}</p>
-                <p>{currentArtwork.dateDisplay || 'Date unknown'} · {currentArtwork.mediumDisplay || 'Medium unknown'}</p>
+                <p className="font-semibold text-gray-100">{currentArtworkTitle}</p>
+                <p>{currentArtworkArtist || 'Artist unknown'}</p>
+                <p>{currentArtworkDate || 'Date unknown'} · {currentArtworkMedium || 'Medium unknown'}</p>
               </figcaption>
             )}
           </figure>
@@ -31973,7 +32422,15 @@ const getAdjacentMapScenePreloadAssets = (scene: GalleryScene, avatar?: PlayerAv
   return adjacentScenes.flatMap((adjacentScene) => getMapScenePreloadAssets(adjacentScene, avatar));
 };
 
-const getAnalysisRoomPreloadAssets = (wingId: string, avatar?: PlayerAvatar | null): PreloadAsset[] => {
+const getClassPackArtworkUrl = (classPack: ClassPackExport | null | undefined, wingId: string): string | undefined => (
+  classPack?.rooms.find((room) => room.id === wingId)?.artwork.imageUrl
+);
+
+const getAnalysisRoomPreloadAssets = (
+  wingId: string,
+  avatar?: PlayerAvatar | null,
+  classPack?: ClassPackExport | null,
+): PreloadAsset[] => {
   const yearLevel = avatar?.selectedYearLevel || 9;
   const artworkBrief = getArtworkBrief(wingId, yearLevel);
   const visualGuide = getVisualLanguageGuideForWing(
@@ -31983,7 +32440,7 @@ const getAnalysisRoomPreloadAssets = (wingId: string, avatar?: PlayerAvatar | nu
   );
 
   return [
-    imageAsset(artworkBrief.assetPath),
+    imageAsset(getClassPackArtworkUrl(classPack, wingId) || artworkBrief.assetPath),
     imageAsset(visualGuide.help.practiceImageSrc),
     imageAsset('./public/images/npcs/gallery-guide.png'),
     ...getAvatarPreloadAssets(avatar),
@@ -31993,8 +32450,9 @@ const getAnalysisRoomPreloadAssets = (wingId: string, avatar?: PlayerAvatar | nu
 const getCurrentGalleryAnalysisPreloadAssets = (
   scene: GalleryScene,
   avatar?: PlayerAvatar | null,
+  classPack?: ClassPackExport | null,
 ): PreloadAsset[] => (
-  getGalleryWingIds(scene).flatMap((wingId) => getAnalysisRoomPreloadAssets(wingId, avatar))
+  getGalleryWingIds(scene).flatMap((wingId) => getAnalysisRoomPreloadAssets(wingId, avatar, classPack))
 );
 
 const getPanelPreloadAssets = (screen: PanelScreen, avatar?: PlayerAvatar | null): PreloadAsset[] => [
@@ -32090,6 +32548,21 @@ const teacherUnlockedWingsState = (): Record<string, WingState> => {
       currentQuestionLevel: 1,
       phaseResponses: {},
       entryChallengeCompleted: true,
+    };
+  });
+  return wings;
+};
+
+const classPackWingsState = (classPack: ClassPackExport): Record<string, WingState> => {
+  const wings = initialWingsState();
+  classPack.rooms.forEach((room) => {
+    const wing = wings[room.id];
+    if (!wing) return;
+    wings[room.id] = {
+      ...wing,
+      image: room.artwork.imageUrl,
+      imagePrompt: `Teacher-selected artwork from ${classPack.title}: ${room.artwork.title}.`,
+      description: `This artwork and its four challenges were selected by your teacher for ${classPack.title}.`,
     };
   });
   return wings;
@@ -32283,6 +32756,7 @@ const initialAppGameState: AppGameState = {
     gameOver: false,
     gameWon: false,
     teacherMode: false,
+    classPack: null,
     selectedAvatar: undefined,
     currentWingIdForGame: null,
     learningJournal: [],
@@ -32363,12 +32837,13 @@ const App: React.FC = () => {
     warmAssets([
       ...getMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
       ...getAdjacentMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
-      ...getCurrentGalleryAnalysisPreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
+      ...getCurrentGalleryAnalysisPreloadAssets(currentGalleryScene, appGameState.selectedAvatar, appGameState.classPack),
       ...CORE_AUDIO_ASSETS.map(audioAsset),
     ]);
-  }, [appGameState.selectedAvatar, currentGalleryScene, currentScreen]);
+  }, [appGameState.classPack, appGameState.selectedAvatar, currentGalleryScene, currentScreen]);
 
   const handleNewGameSetupComplete = useCallback(async (avatar: PlayerAvatar) => {
+    const classPack = appGameState.classPack;
     setCurrentGalleryScene('foyer');
     setAppGameState(() => ({
         ...initialAppGameState, // Reset to initial state for a new game
@@ -32378,6 +32853,8 @@ const App: React.FC = () => {
         isGeneratingAvatarPortrait: false,
         isLoading: true,
         teacherMode: false,
+        classPack,
+        wings: classPack ? classPackWingsState(classPack) : initialWingsState(),
         playerStats: createInitialPlayerStats(),
         sideQuestState: createInitialSideQuestState(),
     }));
@@ -32394,6 +32871,7 @@ const App: React.FC = () => {
         await preloadAssets([
           ...getMapScenePreloadAssets('foyer', avatar),
           ...getAdjacentMapScenePreloadAssets('foyer', avatar),
+          ...getCurrentGalleryAnalysisPreloadAssets('foyer', avatar, classPack),
           ...CORE_AUDIO_ASSETS.map(audioAsset),
         ], { timeoutMs: 3200 });
 
@@ -32414,9 +32892,20 @@ const App: React.FC = () => {
       }));
        // Stay on newGameSetup or splash, but show error. User might need to refresh.
     }
-  }, [runLoadTransition]);
+  }, [appGameState.classPack, runLoadTransition]);
 
-  const handleNavigateToNewGameSetup = useCallback(async () => {
+  const handleNavigateToNewGameSetup = useCallback(() => {
+    setAppGameState(() => ({
+      ...initialAppGameState,
+      isLoading: false,
+      error: null,
+      sideQuestState: createInitialSideQuestState(),
+    }));
+    setCurrentGalleryScene('foyer');
+    setCurrentScreen('classPackSelection');
+  }, []);
+
+  const handleChooseClassPack = useCallback(async (classPack: ClassPackExport | null) => {
     await runLoadTransition(getNewGameSetupTransition(), async () => {
       await preloadAssets(getNewGameSetupPreloadAssets(), {
         timeoutMs: 2200,
@@ -32426,12 +32915,17 @@ const App: React.FC = () => {
         ...initialAppGameState,
         isLoading: false,
         error: null,
+        classPack,
         sideQuestState: createInitialSideQuestState(),
       }));
       setCurrentGalleryScene('foyer');
       setCurrentScreen('newGameSetup');
     });
   }, [runLoadTransition]);
+
+  const handleReturnFromClassPackSelection = useCallback(() => {
+    setCurrentScreen('splash');
+  }, []);
 
   const handleTeacherUnlock = useCallback(async (code: string): Promise<boolean> => {
     if (code.trim() !== TEACHER_UNLOCK_CODE) {
@@ -32469,6 +32963,7 @@ const App: React.FC = () => {
         playerStats: createInitialPlayerStats(),
         sideQuestState: createInitialSideQuestState(),
         teacherMode: true,
+        classPack: null,
         avatarImageUrl: teacherAvatar.imageUrl || null,
         isLoading: false,
         error: null,
@@ -32515,6 +33010,7 @@ const App: React.FC = () => {
       gameWon: appGameState.gameWon,
       gameOver: appGameState.gameOver,
       teacherMode: appGameState.teacherMode,
+      classPack: appGameState.classPack,
     };
 
     const saveData: SaveGameData = {
@@ -32561,6 +33057,9 @@ const App: React.FC = () => {
 
       // Re-initialize AI chat
       const selectedAvatar = normalizeSelectedAvatar(parsedData.gameState.selectedAvatar);
+      const classPack = parsedData.gameState.classPack
+        ? parseClassPackExport(JSON.stringify(parsedData.gameState.classPack))
+        : null;
 
       await runLoadTransition({
         title: 'Restoring the Foyer',
@@ -32573,6 +33072,7 @@ const App: React.FC = () => {
         await preloadAssets([
           ...getMapScenePreloadAssets('foyer', selectedAvatar),
           ...getAdjacentMapScenePreloadAssets('foyer', selectedAvatar),
+          ...getCurrentGalleryAnalysisPreloadAssets('foyer', selectedAvatar, classPack),
           ...CORE_AUDIO_ASSETS.map(audioAsset),
         ], { timeoutMs: 3000 });
 
@@ -32584,6 +33084,7 @@ const App: React.FC = () => {
           playerStats: normalizePlayerStats(parsedData.gameState.playerStats),
           sideQuestState: normalizeSideQuestState(parsedData.gameState.sideQuestState),
           teacherMode: !!parsedData.gameState.teacherMode,
+          classPack,
           geminiChat: chat, // Set the new chat instance
           isLoading: false,
           currentWingIdForGame: null, // Always start on map after load
@@ -32614,7 +33115,7 @@ const App: React.FC = () => {
 
     await runLoadTransition(getAnalysisTransition(wingId), async () => {
       await preloadAssets([
-        ...getAnalysisRoomPreloadAssets(wingId, appGameState.selectedAvatar),
+        ...getAnalysisRoomPreloadAssets(wingId, appGameState.selectedAvatar, appGameState.classPack),
         ...CORE_AUDIO_ASSETS.map(audioAsset),
       ], { timeoutMs: 3200 });
 
@@ -32635,7 +33136,7 @@ const App: React.FC = () => {
       });
       setCurrentScreen('game');
     });
-  }, [appGameState.selectedAvatar, appGameState.wings, runLoadTransition]);
+  }, [appGameState.classPack, appGameState.selectedAvatar, appGameState.wings, runLoadTransition]);
 
   const handleReturnToMap = useCallback(() => {
     setAppGameState(prev => ({ ...prev, currentWingIdForGame: null, focusedWingIdForJournal: null }));
@@ -33063,7 +33564,7 @@ const App: React.FC = () => {
   }, []);
 
   const activeMusicTrack = useMemo<GameMusicTrack>(() => {
-    if (currentScreen === 'splash' || currentScreen === 'newGameSetup' || currentScreen === 'returnMenu' || currentScreen === 'teacherMode' || currentScreen === 'classPackBuilder') {
+    if (currentScreen === 'splash' || currentScreen === 'classPackSelection' || currentScreen === 'newGameSetup' || currentScreen === 'returnMenu' || currentScreen === 'teacherMode' || currentScreen === 'classPackBuilder') {
       return 'start';
     }
 
@@ -33147,6 +33648,15 @@ const App: React.FC = () => {
           onReturnToGame={handleReturnToGameFromMenu}
           onTeacherUnlock={handleTeacherUnlock}
           onNavigateToGuide={handleNavigateToGuideFromReturnMenu}
+        />
+      );
+      break;
+    case 'classPackSelection':
+      screenComponent = (
+        <ClassPackSelectionScreen
+          onChooseDefault={() => { void handleChooseClassPack(null); }}
+          onChooseClassPack={(classPack) => { void handleChooseClassPack(classPack); }}
+          onReturnToMenu={handleReturnFromClassPackSelection}
         />
       );
       break;
@@ -33240,6 +33750,7 @@ const App: React.FC = () => {
             avatarImageError={appGameState.avatarImageError}
             setAvatarImageError={setAvatarImageError}
             teacherMode={appGameState.teacherMode}
+            classPack={appGameState.classPack}
             onUpdateTeacherYearSelection={handleUpdateTeacherYearSelection}
             onPhaseComplete={playPhaseCompletion}
             onRoomComplete={playRoomCompletion}

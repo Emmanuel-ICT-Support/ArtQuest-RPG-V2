@@ -4,6 +4,7 @@ import SplashScreen from './components/SplashScreen';
 import ReturnToGameScreen from './components/ReturnToGameScreen';
 import TeacherModeScreen from './components/TeacherModeScreen';
 import ClassPackBuilderScreen from './components/ClassPackBuilderScreen';
+import ClassPackSelectionScreen from './components/ClassPackSelectionScreen';
 import NewGameSetupScreen from './components/StartScreen'; // Renamed from StartScreen, actual file is StartScreen.tsx
 import { MapScreen } from './components/MapScreen';
 import MainGame from './MainGame';
@@ -149,7 +150,15 @@ const getAdjacentMapScenePreloadAssets = (scene: GalleryScene, avatar?: PlayerAv
   return adjacentScenes.flatMap((adjacentScene) => getMapScenePreloadAssets(adjacentScene, avatar));
 };
 
-const getAnalysisRoomPreloadAssets = (wingId: string, avatar?: PlayerAvatar | null): PreloadAsset[] => {
+const getClassPackArtworkUrl = (classPack: ClassPackExport | null | undefined, wingId: string): string | undefined => (
+  classPack?.rooms.find((room) => room.id === wingId)?.artwork.imageUrl
+);
+
+const getAnalysisRoomPreloadAssets = (
+  wingId: string,
+  avatar?: PlayerAvatar | null,
+  classPack?: ClassPackExport | null,
+): PreloadAsset[] => {
   const yearLevel = avatar?.selectedYearLevel || 9;
   const artworkBrief = getArtworkBrief(wingId, yearLevel);
   const visualGuide = getVisualLanguageGuideForWing(
@@ -159,7 +168,7 @@ const getAnalysisRoomPreloadAssets = (wingId: string, avatar?: PlayerAvatar | nu
   );
 
   return [
-    imageAsset(artworkBrief.assetPath),
+    imageAsset(getClassPackArtworkUrl(classPack, wingId) || artworkBrief.assetPath),
     imageAsset(visualGuide.help.practiceImageSrc),
     imageAsset('./public/images/npcs/gallery-guide.png'),
     ...getAvatarPreloadAssets(avatar),
@@ -169,8 +178,9 @@ const getAnalysisRoomPreloadAssets = (wingId: string, avatar?: PlayerAvatar | nu
 const getCurrentGalleryAnalysisPreloadAssets = (
   scene: GalleryScene,
   avatar?: PlayerAvatar | null,
+  classPack?: ClassPackExport | null,
 ): PreloadAsset[] => (
-  getGalleryWingIds(scene).flatMap((wingId) => getAnalysisRoomPreloadAssets(wingId, avatar))
+  getGalleryWingIds(scene).flatMap((wingId) => getAnalysisRoomPreloadAssets(wingId, avatar, classPack))
 );
 
 const getPanelPreloadAssets = (screen: PanelScreen, avatar?: PlayerAvatar | null): PreloadAsset[] => [
@@ -266,6 +276,21 @@ const teacherUnlockedWingsState = (): Record<string, WingState> => {
       currentQuestionLevel: 1,
       phaseResponses: {},
       entryChallengeCompleted: true,
+    };
+  });
+  return wings;
+};
+
+const classPackWingsState = (classPack: ClassPackExport): Record<string, WingState> => {
+  const wings = initialWingsState();
+  classPack.rooms.forEach((room) => {
+    const wing = wings[room.id];
+    if (!wing) return;
+    wings[room.id] = {
+      ...wing,
+      image: room.artwork.imageUrl,
+      imagePrompt: `Teacher-selected artwork from ${classPack.title}: ${room.artwork.title}.`,
+      description: `This artwork and its four challenges were selected by your teacher for ${classPack.title}.`,
     };
   });
   return wings;
@@ -459,6 +484,7 @@ const initialAppGameState: AppGameState = {
     gameOver: false,
     gameWon: false,
     teacherMode: false,
+    classPack: null,
     selectedAvatar: undefined,
     currentWingIdForGame: null,
     learningJournal: [],
@@ -539,12 +565,13 @@ export const App: React.FC = () => {
     warmAssets([
       ...getMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
       ...getAdjacentMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
-      ...getCurrentGalleryAnalysisPreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
+      ...getCurrentGalleryAnalysisPreloadAssets(currentGalleryScene, appGameState.selectedAvatar, appGameState.classPack),
       ...CORE_AUDIO_ASSETS.map(audioAsset),
     ]);
-  }, [appGameState.selectedAvatar, currentGalleryScene, currentScreen]);
+  }, [appGameState.classPack, appGameState.selectedAvatar, currentGalleryScene, currentScreen]);
 
   const handleNewGameSetupComplete = useCallback(async (avatar: PlayerAvatar) => {
+    const classPack = appGameState.classPack;
     setCurrentGalleryScene('foyer');
     setAppGameState(() => ({
         ...initialAppGameState, // Reset to initial state for a new game
@@ -554,6 +581,8 @@ export const App: React.FC = () => {
         isGeneratingAvatarPortrait: false,
         isLoading: true,
         teacherMode: false,
+        classPack,
+        wings: classPack ? classPackWingsState(classPack) : initialWingsState(),
         playerStats: createInitialPlayerStats(),
         sideQuestState: createInitialSideQuestState(),
     }));
@@ -570,6 +599,7 @@ export const App: React.FC = () => {
         await preloadAssets([
           ...getMapScenePreloadAssets('foyer', avatar),
           ...getAdjacentMapScenePreloadAssets('foyer', avatar),
+          ...getCurrentGalleryAnalysisPreloadAssets('foyer', avatar, classPack),
           ...CORE_AUDIO_ASSETS.map(audioAsset),
         ], { timeoutMs: 3200 });
 
@@ -590,9 +620,20 @@ export const App: React.FC = () => {
       }));
        // Stay on newGameSetup or splash, but show error. User might need to refresh.
     }
-  }, [runLoadTransition]);
+  }, [appGameState.classPack, runLoadTransition]);
 
-  const handleNavigateToNewGameSetup = useCallback(async () => {
+  const handleNavigateToNewGameSetup = useCallback(() => {
+    setAppGameState(() => ({
+      ...initialAppGameState,
+      isLoading: false,
+      error: null,
+      sideQuestState: createInitialSideQuestState(),
+    }));
+    setCurrentGalleryScene('foyer');
+    setCurrentScreen('classPackSelection');
+  }, []);
+
+  const handleChooseClassPack = useCallback(async (classPack: ClassPackExport | null) => {
     await runLoadTransition(getNewGameSetupTransition(), async () => {
       await preloadAssets(getNewGameSetupPreloadAssets(), {
         timeoutMs: 2200,
@@ -602,12 +643,17 @@ export const App: React.FC = () => {
         ...initialAppGameState,
         isLoading: false,
         error: null,
+        classPack,
         sideQuestState: createInitialSideQuestState(),
       }));
       setCurrentGalleryScene('foyer');
       setCurrentScreen('newGameSetup');
     });
   }, [runLoadTransition]);
+
+  const handleReturnFromClassPackSelection = useCallback(() => {
+    setCurrentScreen('splash');
+  }, []);
 
   const handleTeacherUnlock = useCallback(async (code: string): Promise<boolean> => {
     if (code.trim() !== TEACHER_UNLOCK_CODE) {
@@ -645,6 +691,7 @@ export const App: React.FC = () => {
         playerStats: createInitialPlayerStats(),
         sideQuestState: createInitialSideQuestState(),
         teacherMode: true,
+        classPack: null,
         avatarImageUrl: teacherAvatar.imageUrl || null,
         isLoading: false,
         error: null,
@@ -691,6 +738,7 @@ export const App: React.FC = () => {
       gameWon: appGameState.gameWon,
       gameOver: appGameState.gameOver,
       teacherMode: appGameState.teacherMode,
+      classPack: appGameState.classPack,
     };
 
     const saveData: SaveGameData = {
@@ -737,6 +785,9 @@ export const App: React.FC = () => {
 
       // Re-initialize AI chat
       const selectedAvatar = normalizeSelectedAvatar(parsedData.gameState.selectedAvatar);
+      const classPack = parsedData.gameState.classPack
+        ? parseClassPackExport(JSON.stringify(parsedData.gameState.classPack))
+        : null;
 
       await runLoadTransition({
         title: 'Restoring the Foyer',
@@ -749,6 +800,7 @@ export const App: React.FC = () => {
         await preloadAssets([
           ...getMapScenePreloadAssets('foyer', selectedAvatar),
           ...getAdjacentMapScenePreloadAssets('foyer', selectedAvatar),
+          ...getCurrentGalleryAnalysisPreloadAssets('foyer', selectedAvatar, classPack),
           ...CORE_AUDIO_ASSETS.map(audioAsset),
         ], { timeoutMs: 3000 });
 
@@ -760,6 +812,7 @@ export const App: React.FC = () => {
           playerStats: normalizePlayerStats(parsedData.gameState.playerStats),
           sideQuestState: normalizeSideQuestState(parsedData.gameState.sideQuestState),
           teacherMode: !!parsedData.gameState.teacherMode,
+          classPack,
           geminiChat: chat, // Set the new chat instance
           isLoading: false,
           currentWingIdForGame: null, // Always start on map after load
@@ -790,7 +843,7 @@ export const App: React.FC = () => {
 
     await runLoadTransition(getAnalysisTransition(wingId), async () => {
       await preloadAssets([
-        ...getAnalysisRoomPreloadAssets(wingId, appGameState.selectedAvatar),
+        ...getAnalysisRoomPreloadAssets(wingId, appGameState.selectedAvatar, appGameState.classPack),
         ...CORE_AUDIO_ASSETS.map(audioAsset),
       ], { timeoutMs: 3200 });
 
@@ -811,7 +864,7 @@ export const App: React.FC = () => {
       });
       setCurrentScreen('game');
     });
-  }, [appGameState.selectedAvatar, appGameState.wings, runLoadTransition]);
+  }, [appGameState.classPack, appGameState.selectedAvatar, appGameState.wings, runLoadTransition]);
 
   const handleReturnToMap = useCallback(() => {
     setAppGameState(prev => ({ ...prev, currentWingIdForGame: null, focusedWingIdForJournal: null }));
@@ -1239,7 +1292,7 @@ export const App: React.FC = () => {
   }, []);
 
   const activeMusicTrack = useMemo<GameMusicTrack>(() => {
-    if (currentScreen === 'splash' || currentScreen === 'newGameSetup' || currentScreen === 'returnMenu' || currentScreen === 'teacherMode' || currentScreen === 'classPackBuilder') {
+    if (currentScreen === 'splash' || currentScreen === 'classPackSelection' || currentScreen === 'newGameSetup' || currentScreen === 'returnMenu' || currentScreen === 'teacherMode' || currentScreen === 'classPackBuilder') {
       return 'start';
     }
 
@@ -1323,6 +1376,15 @@ export const App: React.FC = () => {
           onReturnToGame={handleReturnToGameFromMenu}
           onTeacherUnlock={handleTeacherUnlock}
           onNavigateToGuide={handleNavigateToGuideFromReturnMenu}
+        />
+      );
+      break;
+    case 'classPackSelection':
+      screenComponent = (
+        <ClassPackSelectionScreen
+          onChooseDefault={() => { void handleChooseClassPack(null); }}
+          onChooseClassPack={(classPack) => { void handleChooseClassPack(classPack); }}
+          onReturnToMenu={handleReturnFromClassPackSelection}
         />
       );
       break;
@@ -1416,6 +1478,7 @@ export const App: React.FC = () => {
             avatarImageError={appGameState.avatarImageError}
             setAvatarImageError={setAvatarImageError}
             teacherMode={appGameState.teacherMode}
+            classPack={appGameState.classPack}
             onUpdateTeacherYearSelection={handleUpdateTeacherYearSelection}
             onPhaseComplete={playPhaseCompletion}
             onRoomComplete={playRoomCompletion}
