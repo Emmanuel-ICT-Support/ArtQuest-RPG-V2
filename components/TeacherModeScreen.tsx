@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import type { YearLevel } from '../types';
 
 const TEACHER_MODE_BACKGROUND = './public/images/screens/teacher-mode-start-screen.png';
 
@@ -11,9 +12,14 @@ const TEACHER_MODE_HOTSPOT_CLASS = 'absolute z-20 rounded-sm bg-transparent text
 
 interface TeacherModeScreenProps {
   onExploreArtQuest: () => void;
+  onBuildClassPack: (yearLevel: YearLevel) => void;
 }
 
-const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest }) => (
+const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest, onBuildClassPack }) => {
+  const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
+  const [selectedYearLevel, setSelectedYearLevel] = useState<YearLevel>(9);
+
+  return (
   <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#120b20] text-gray-100 selection:bg-pink-500 selection:text-white">
     <div className="relative overflow-hidden" style={TEACHER_MODE_FRAME_STYLE}>
       <img
@@ -35,10 +41,10 @@ const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest
 
       <button
         type="button"
-        disabled
+        onClick={() => setIsYearPickerOpen(true)}
         className={TEACHER_MODE_HOTSPOT_CLASS}
         style={{ left: '28.3%', top: '55.7%', width: '43.3%', height: '10.8%' }}
-        aria-label="Build a Class Pack (coming soon)"
+        aria-label="Build a Class Pack"
       >
         Build a Class Pack
       </button>
@@ -53,7 +59,48 @@ const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest
         Edit a Class Pack
       </button>
     </div>
+
+    {isYearPickerOpen && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/80 p-4">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            onBuildClassPack(selectedYearLevel);
+          }}
+          className="artquest-panel w-full max-w-md p-6 shadow-2xl"
+        >
+          <h2 className="text-2xl font-black text-purple-100">Build a Class Pack</h2>
+          <p className="mt-2 text-sm leading-relaxed text-gray-300">Which year level would you like to prepare?</p>
+          <label className="mt-5 block text-sm font-bold text-amber-200" htmlFor="classPackYearLevel">
+            Year level
+          </label>
+          <select
+            id="classPackYearLevel"
+            value={selectedYearLevel}
+            onChange={(event) => setSelectedYearLevel(Number(event.target.value) as YearLevel)}
+            className="mt-2 w-full rounded-lg border border-amber-300/50 bg-slate-950 px-4 py-3 text-lg font-bold text-white outline-none focus:ring-4 focus:ring-pink-200"
+          >
+            {[7, 8, 9, 10, 11, 12].map((yearLevel) => (
+              <option key={yearLevel} value={yearLevel}>Year {yearLevel}</option>
+            ))}
+          </select>
+          <div className="mt-6 flex gap-3">
+            <button type="submit" className="artquest-button flex-1 px-4 py-3 text-sm font-black focus:outline-none focus:ring-4 focus:ring-pink-200">
+              Open Builder
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsYearPickerOpen(false)}
+              className="rounded-lg bg-slate-700 px-4 py-3 text-sm font-bold text-white transition hover:bg-slate-600 focus:outline-none focus:ring-4 focus:ring-slate-300"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    )}
   </main>
 );
+};
 
 export default TeacherModeScreen;

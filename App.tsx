@@ -3,6 +3,7 @@ import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import SplashScreen from './components/SplashScreen';
 import ReturnToGameScreen from './components/ReturnToGameScreen';
 import TeacherModeScreen from './components/TeacherModeScreen';
+import ClassPackBuilderScreen from './components/ClassPackBuilderScreen';
 import NewGameSetupScreen from './components/StartScreen'; // Renamed from StartScreen, actual file is StartScreen.tsx
 import { MapScreen } from './components/MapScreen';
 import MainGame from './MainGame';
@@ -471,6 +472,7 @@ const initialAppGameState: AppGameState = {
 export const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<GameScreen>('splash');
   const [currentGalleryScene, setCurrentGalleryScene] = useState<GalleryScene>('foyer');
+  const [classPackYearLevel, setClassPackYearLevel] = useState<YearLevel>(9);
   const [appGameState, setAppGameState] = useState<AppGameState>({...initialAppGameState});
   const [guideReturnTarget, setGuideReturnTarget] = useState<GuideReturnTarget>('map');
   const [returnMenuTarget, setReturnMenuTarget] = useState<ReturnMenuTarget>('map');
@@ -647,6 +649,15 @@ export const App: React.FC = () => {
       setCurrentScreen('map');
     });
   }, [runLoadTransition]);
+
+  const handleBuildClassPack = useCallback((yearLevel: YearLevel) => {
+    setClassPackYearLevel(yearLevel);
+    setCurrentScreen('classPackBuilder');
+  }, []);
+
+  const handleReturnToTeacherMenu = useCallback(() => {
+    setCurrentScreen('teacherMode');
+  }, []);
 
   const handleSaveGame = useCallback(() => {
     if (!appGameState.selectedAvatar || !appGameState.playerStats) {
@@ -1212,7 +1223,7 @@ export const App: React.FC = () => {
   }, []);
 
   const activeMusicTrack = useMemo<GameMusicTrack>(() => {
-    if (currentScreen === 'splash' || currentScreen === 'newGameSetup' || currentScreen === 'returnMenu' || currentScreen === 'teacherMode') {
+    if (currentScreen === 'splash' || currentScreen === 'newGameSetup' || currentScreen === 'returnMenu' || currentScreen === 'teacherMode' || currentScreen === 'classPackBuilder') {
       return 'start';
     }
 
@@ -1300,7 +1311,20 @@ export const App: React.FC = () => {
       );
       break;
     case 'teacherMode':
-      screenComponent = <TeacherModeScreen onExploreArtQuest={handleExploreArtQuest} />;
+      screenComponent = (
+        <TeacherModeScreen
+          onExploreArtQuest={handleExploreArtQuest}
+          onBuildClassPack={handleBuildClassPack}
+        />
+      );
+      break;
+    case 'classPackBuilder':
+      screenComponent = (
+        <ClassPackBuilderScreen
+          yearLevel={classPackYearLevel}
+          onReturnToTeacherMenu={handleReturnToTeacherMenu}
+        />
+      );
       break;
     case 'newGameSetup':
       screenComponent = (
