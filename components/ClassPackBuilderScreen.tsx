@@ -9,10 +9,11 @@ import {
   MUSEUM_SEARCH_SCOPE_OPTIONS,
 } from '../data/MuseumArtworkFilters';
 import { searchMuseumArtworks } from '../data/MuseumArtworkSearch';
+import type { ClassPackArtwork, ClassPackExport } from '../data/ClassPack';
 import { getOfflinePhaseTask } from '../data/OfflineCurator';
 import type { ArtworkBrief } from '../data/ArtworkLibrary';
 import type { MuseumArtworkFilterSelection } from '../data/MuseumArtworkFilters';
-import type { MuseumArtwork, RijksmuseumSearchCursor } from '../data/MuseumArtworkSearch';
+import type { RijksmuseumSearchCursor } from '../data/MuseumArtworkSearch';
 import type { QuestionPhase, YearLevel } from '../types';
 import GalleryLoadingScreen from './GalleryLoadingScreen';
 import Modal from './Modal';
@@ -32,17 +33,11 @@ const CLASS_PACK_PHASES: ReadonlyArray<{ phase: QuestionPhase; label: string }> 
 
 interface ClassPackBuilderScreenProps {
   yearLevel: YearLevel;
+  initialClassPack?: ClassPackExport | null;
   onReturnToTeacherMenu: () => void;
 }
 
 type ClassPackQuestions = Record<QuestionPhase, string>;
-type ClassPackArtwork = MuseumArtwork & {
-  wingId?: string;
-  yearLevel?: number;
-  focus?: string;
-  visualFocus?: string;
-  focusReason?: string;
-};
 
 interface MuseumSearchSession {
   query: string;
@@ -173,12 +168,13 @@ const describeSearchTotals = (totals: Partial<Record<'artic' | 'met' | 'openvers
 
 const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
   yearLevel,
+  initialClassPack = null,
   onReturnToTeacherMenu,
 }) => {
   const defaultRoomArtworks = useMemo(() => getArtworkBatch().map(toClassPackArtwork), []);
   const searchRequestId = useRef(0);
   const [activeWingId, setActiveWingId] = useState(WING_DEFINITIONS[0].id);
-  const [className, setClassName] = useState(`Year ${yearLevel} ArtQuest Class Pack`);
+  const [className, setClassName] = useState(initialClassPack?.title || `Year ${yearLevel} ArtQuest Class Pack`);
   const [searchQuery, setSearchQuery] = useState('');
   const [collectionFilter, setCollectionFilter] = useState<MuseumArtworkFilterSelection['collection']>('all');
   const [rightsFilter, setRightsFilter] = useState<MuseumArtworkFilterSelection['rights']>('all');
@@ -197,13 +193,17 @@ const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
     Object.fromEntries(
       WING_DEFINITIONS.map((wing) => [
         wing.id,
-        defaultRoomArtworks.find((artwork) => artwork.wingId === wing.id && artwork.yearLevel === yearLevel),
+        initialClassPack?.rooms.find((room) => room.id === wing.id)?.artwork
+          || defaultRoomArtworks.find((artwork) => artwork.wingId === wing.id && artwork.yearLevel === yearLevel),
       ]).filter(([, artwork]) => !!artwork),
     ) as Record<string, ClassPackArtwork>
   ));
   const [questionsByRoom, setQuestionsByRoom] = useState<Record<string, ClassPackQuestions>>(() => (
     Object.fromEntries(
-      WING_DEFINITIONS.map((wing) => [wing.id, getClassPackDefaultQuestions(wing.id, yearLevel)]),
+      WING_DEFINITIONS.map((wing) => [
+        wing.id,
+        initialClassPack?.rooms.find((room) => room.id === wing.id)?.questions || getClassPackDefaultQuestions(wing.id, yearLevel),
+      ]),
     ) as Record<string, ClassPackQuestions>
   ));
 
@@ -391,7 +391,7 @@ const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
   };
 
   const exportClassPack = () => {
-    const exportData = {
+    const exportData: ClassPackExport = {
       version: '1.0',
       title: className.trim() || `Year ${yearLevel} ArtQuest Class Pack`,
       yearLevel,
@@ -584,7 +584,7 @@ const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
             Next
           </button>
 
-          <div className="absolute left-[2.1%] top-[37.1%] grid h-[57.8%] w-[95.8%] grid-cols-5 grid-rows-2 gap-x-[1.4%] gap-y-[3.2%]">
+          <div className="absolute left-[5.8%] top-[37.1%] grid h-[57.8%] w-[88.4%] grid-cols-5 grid-rows-2 gap-x-[1.4%] gap-y-[3.2%]">
             {visibleArtworks.map((artwork) => {
               const isSelected = selectedArtwork?.id === artwork.id
                 && selectedArtwork?.sourceProvider === artwork.sourceProvider;

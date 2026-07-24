@@ -17728,11 +17728,32 @@ const TEACHER_MODE_HOTSPOT_CLASS = 'absolute z-20 rounded-sm bg-transparent text
 interface TeacherModeScreenProps {
   onExploreArtQuest: () => void;
   onBuildClassPack: (yearLevel: YearLevel) => void;
+  onEditClassPack: (fileContent: string) => string | null;
 }
 
-const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest, onBuildClassPack }) => {
+const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest, onBuildClassPack, onEditClassPack }) => {
   const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
   const [selectedYearLevel, setSelectedYearLevel] = useState<YearLevel>(9);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const classPackFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleClassPackFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    event.target.value = '';
+    if (!selectedFile) return;
+
+    setIsImporting(true);
+    setImportError(null);
+    try {
+      const error = onEditClassPack(await selectedFile.text());
+      if (error) setImportError(error);
+    } catch {
+      setImportError('The Class Pack could not be read. Please choose a valid exported JSON file.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
 
   return (
   <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#120b20] text-gray-100 selection:bg-pink-500 selection:text-white">
@@ -17766,13 +17787,22 @@ const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest
 
       <button
         type="button"
-        disabled
+        onClick={() => classPackFileInputRef.current?.click()}
+        disabled={isImporting}
         className={TEACHER_MODE_HOTSPOT_CLASS}
         style={{ left: '28.3%', top: '68.2%', width: '43.3%', height: '10.8%' }}
-        aria-label="Edit a Class Pack (coming soon)"
+        aria-label="Edit an exported Class Pack"
       >
         Edit a Class Pack
       </button>
+      <input
+        ref={classPackFileInputRef}
+        type="file"
+        accept="application/json,.json"
+        className="sr-only"
+        onChange={(event) => { void handleClassPackFile(event); }}
+        aria-label="Choose an exported ArtQuest Class Pack JSON file"
+      />
     </div>
 
     {isYearPickerOpen && (
@@ -17814,6 +17844,22 @@ const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest
         </form>
       </div>
     )}
+
+    {importError && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/80 p-4" role="alertdialog" aria-modal="true" aria-labelledby="classPackImportErrorTitle">
+        <div className="artquest-panel w-full max-w-md p-6 shadow-2xl">
+          <h2 id="classPackImportErrorTitle" className="text-2xl font-black text-purple-100">Class Pack not opened</h2>
+          <p className="mt-3 text-sm leading-relaxed text-gray-300">{importError}</p>
+          <button
+            type="button"
+            onClick={() => setImportError(null)}
+            className="artquest-button mt-6 w-full px-4 py-3 text-sm font-black focus:outline-none focus:ring-4 focus:ring-pink-200"
+          >
+            Choose another file
+          </button>
+        </div>
+      </div>
+    )}
   </main>
 );
 };
@@ -17835,17 +17881,11 @@ const CLASS_PACK_PHASES: ReadonlyArray<{ phase: QuestionPhase; label: string }> 
 
 interface ClassPackBuilderScreenProps {
   yearLevel: YearLevel;
+  initialClassPack?: ClassPackExport | null;
   onReturnToTeacherMenu: () => void;
 }
 
 type ClassPackQuestions = Record<QuestionPhase, string>;
-type ClassPackArtwork = MuseumArtwork & {
-  wingId?: string;
-  yearLevel?: number;
-  focus?: string;
-  visualFocus?: string;
-  focusReason?: string;
-};
 
 interface MuseumSearchSession {
   query: string;
@@ -17976,12 +18016,13 @@ const describeSearchTotals = (totals: Partial<Record<'artic' | 'met' | 'openvers
 
 const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
   yearLevel,
+  initialClassPack = null,
   onReturnToTeacherMenu,
 }) => {
   const defaultRoomArtworks = useMemo(() => getArtworkBatch().map(toClassPackArtwork), []);
   const searchRequestId = useRef(0);
   const [activeWingId, setActiveWingId] = useState(WING_DEFINITIONS[0].id);
-  const [className, setClassName] = useState(`Year ${yearLevel} ArtQuest Class Pack`);
+  const [className, setClassName] = useState(initialClassPack?.title || `Year ${yearLevel} ArtQuest Class Pack`);
   const [searchQuery, setSearchQuery] = useState('');
   const [collectionFilter, setCollectionFilter] = useState<MuseumArtworkFilterSelection['collection']>('all');
   const [rightsFilter, setRightsFilter] = useState<MuseumArtworkFilterSelection['rights']>('all');
@@ -18000,13 +18041,17 @@ const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
     Object.fromEntries(
       WING_DEFINITIONS.map((wing) => [
         wing.id,
-        defaultRoomArtworks.find((artwork) => artwork.wingId === wing.id && artwork.yearLevel === yearLevel),
+        initialClassPack?.rooms.find((room) => room.id === wing.id)?.artwork
+          || defaultRoomArtworks.find((artwork) => artwork.wingId === wing.id && artwork.yearLevel === yearLevel),
       ]).filter(([, artwork]) => !!artwork),
     ) as Record<string, ClassPackArtwork>
   ));
   const [questionsByRoom, setQuestionsByRoom] = useState<Record<string, ClassPackQuestions>>(() => (
     Object.fromEntries(
-      WING_DEFINITIONS.map((wing) => [wing.id, getClassPackDefaultQuestions(wing.id, yearLevel)]),
+      WING_DEFINITIONS.map((wing) => [
+        wing.id,
+        initialClassPack?.rooms.find((room) => room.id === wing.id)?.questions || getClassPackDefaultQuestions(wing.id, yearLevel),
+      ]),
     ) as Record<string, ClassPackQuestions>
   ));
 
@@ -18194,7 +18239,7 @@ const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
   };
 
   const exportClassPack = () => {
-    const exportData = {
+    const exportData: ClassPackExport = {
       version: '1.0',
       title: className.trim() || `Year ${yearLevel} ArtQuest Class Pack`,
       yearLevel,
@@ -18387,7 +18432,7 @@ const ClassPackBuilderScreen: React.FC<ClassPackBuilderScreenProps> = ({
             Next
           </button>
 
-          <div className="absolute left-[2.1%] top-[37.1%] grid h-[57.8%] w-[95.8%] grid-cols-5 grid-rows-2 gap-x-[1.4%] gap-y-[3.2%]">
+          <div className="absolute left-[5.8%] top-[37.1%] grid h-[57.8%] w-[88.4%] grid-cols-5 grid-rows-2 gap-x-[1.4%] gap-y-[3.2%]">
             {visibleArtworks.map((artwork) => {
               const isSelected = selectedArtwork?.id === artwork.id
                 && selectedArtwork?.sourceProvider === artwork.sourceProvider;
@@ -32254,6 +32299,7 @@ const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<GameScreen>('splash');
   const [currentGalleryScene, setCurrentGalleryScene] = useState<GalleryScene>('foyer');
   const [classPackYearLevel, setClassPackYearLevel] = useState<YearLevel>(9);
+  const [editableClassPack, setEditableClassPack] = useState<ClassPackExport | null>(null);
   const [appGameState, setAppGameState] = useState<AppGameState>({...initialAppGameState});
   const [guideReturnTarget, setGuideReturnTarget] = useState<GuideReturnTarget>('map');
   const [returnMenuTarget, setReturnMenuTarget] = useState<ReturnMenuTarget>('map');
@@ -32433,7 +32479,20 @@ const App: React.FC = () => {
 
   const handleBuildClassPack = useCallback((yearLevel: YearLevel) => {
     setClassPackYearLevel(yearLevel);
+    setEditableClassPack(null);
     setCurrentScreen('classPackBuilder');
+  }, []);
+
+  const handleEditClassPack = useCallback((fileContent: string): string | null => {
+    try {
+      const classPack = parseClassPackExport(fileContent);
+      setClassPackYearLevel(classPack.yearLevel);
+      setEditableClassPack(classPack);
+      setCurrentScreen('classPackBuilder');
+      return null;
+    } catch (error) {
+      return error instanceof Error ? error.message : 'This Class Pack could not be opened.';
+    }
   }, []);
 
   const handleReturnToTeacherMenu = useCallback(() => {
@@ -33096,6 +33155,7 @@ const App: React.FC = () => {
         <TeacherModeScreen
           onExploreArtQuest={handleExploreArtQuest}
           onBuildClassPack={handleBuildClassPack}
+          onEditClassPack={handleEditClassPack}
         />
       );
       break;
@@ -33103,6 +33163,7 @@ const App: React.FC = () => {
       screenComponent = (
         <ClassPackBuilderScreen
           yearLevel={classPackYearLevel}
+          initialClassPack={editableClassPack}
           onReturnToTeacherMenu={handleReturnToTeacherMenu}
         />
       );

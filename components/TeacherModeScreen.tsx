@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import type { YearLevel } from '../types';
 
 const TEACHER_MODE_BACKGROUND = './public/images/screens/teacher-mode-start-screen.png';
@@ -13,11 +13,32 @@ const TEACHER_MODE_HOTSPOT_CLASS = 'absolute z-20 rounded-sm bg-transparent text
 interface TeacherModeScreenProps {
   onExploreArtQuest: () => void;
   onBuildClassPack: (yearLevel: YearLevel) => void;
+  onEditClassPack: (fileContent: string) => string | null;
 }
 
-const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest, onBuildClassPack }) => {
+const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest, onBuildClassPack, onEditClassPack }) => {
   const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
   const [selectedYearLevel, setSelectedYearLevel] = useState<YearLevel>(9);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const classPackFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleClassPackFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    event.target.value = '';
+    if (!selectedFile) return;
+
+    setIsImporting(true);
+    setImportError(null);
+    try {
+      const error = onEditClassPack(await selectedFile.text());
+      if (error) setImportError(error);
+    } catch {
+      setImportError('The Class Pack could not be read. Please choose a valid exported JSON file.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
 
   return (
   <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#120b20] text-gray-100 selection:bg-pink-500 selection:text-white">
@@ -51,13 +72,22 @@ const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest
 
       <button
         type="button"
-        disabled
+        onClick={() => classPackFileInputRef.current?.click()}
+        disabled={isImporting}
         className={TEACHER_MODE_HOTSPOT_CLASS}
         style={{ left: '28.3%', top: '68.2%', width: '43.3%', height: '10.8%' }}
-        aria-label="Edit a Class Pack (coming soon)"
+        aria-label="Edit an exported Class Pack"
       >
         Edit a Class Pack
       </button>
+      <input
+        ref={classPackFileInputRef}
+        type="file"
+        accept="application/json,.json"
+        className="sr-only"
+        onChange={(event) => { void handleClassPackFile(event); }}
+        aria-label="Choose an exported ArtQuest Class Pack JSON file"
+      />
     </div>
 
     {isYearPickerOpen && (
@@ -97,6 +127,22 @@ const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest
             </button>
           </div>
         </form>
+      </div>
+    )}
+
+    {importError && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/80 p-4" role="alertdialog" aria-modal="true" aria-labelledby="classPackImportErrorTitle">
+        <div className="artquest-panel w-full max-w-md p-6 shadow-2xl">
+          <h2 id="classPackImportErrorTitle" className="text-2xl font-black text-purple-100">Class Pack not opened</h2>
+          <p className="mt-3 text-sm leading-relaxed text-gray-300">{importError}</p>
+          <button
+            type="button"
+            onClick={() => setImportError(null)}
+            className="artquest-button mt-6 w-full px-4 py-3 text-sm font-black focus:outline-none focus:ring-4 focus:ring-pink-200"
+          >
+            Choose another file
+          </button>
+        </div>
       </div>
     )}
   </main>

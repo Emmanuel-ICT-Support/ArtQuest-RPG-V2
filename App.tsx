@@ -21,6 +21,8 @@ import { AVATAR_REWARD_DEFAULT_BUILD, getAvatarBuildForAvatar, getAvatarLayerIma
 import { getArtworkBrief } from './data/ArtworkLibrary';
 import { getVisualLanguageGuideForWing } from './data/VisualLanguageGuide';
 import { SIDE_QUEST_CASES_BY_ID, createInitialSideQuestState, normalizeSideQuestState } from './data/SideQuests';
+import { parseClassPackExport } from './data/ClassPack';
+import type { ClassPackExport } from './data/ClassPack';
 import { PreloadAsset, preloadAssets, waitForMinimum, warmAssets } from './utils/assetPreloader';
 
 const TEACHER_UNLOCK_CODE = '0554';
@@ -473,6 +475,7 @@ export const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<GameScreen>('splash');
   const [currentGalleryScene, setCurrentGalleryScene] = useState<GalleryScene>('foyer');
   const [classPackYearLevel, setClassPackYearLevel] = useState<YearLevel>(9);
+  const [editableClassPack, setEditableClassPack] = useState<ClassPackExport | null>(null);
   const [appGameState, setAppGameState] = useState<AppGameState>({...initialAppGameState});
   const [guideReturnTarget, setGuideReturnTarget] = useState<GuideReturnTarget>('map');
   const [returnMenuTarget, setReturnMenuTarget] = useState<ReturnMenuTarget>('map');
@@ -652,7 +655,20 @@ export const App: React.FC = () => {
 
   const handleBuildClassPack = useCallback((yearLevel: YearLevel) => {
     setClassPackYearLevel(yearLevel);
+    setEditableClassPack(null);
     setCurrentScreen('classPackBuilder');
+  }, []);
+
+  const handleEditClassPack = useCallback((fileContent: string): string | null => {
+    try {
+      const classPack = parseClassPackExport(fileContent);
+      setClassPackYearLevel(classPack.yearLevel);
+      setEditableClassPack(classPack);
+      setCurrentScreen('classPackBuilder');
+      return null;
+    } catch (error) {
+      return error instanceof Error ? error.message : 'This Class Pack could not be opened.';
+    }
   }, []);
 
   const handleReturnToTeacherMenu = useCallback(() => {
@@ -1315,6 +1331,7 @@ export const App: React.FC = () => {
         <TeacherModeScreen
           onExploreArtQuest={handleExploreArtQuest}
           onBuildClassPack={handleBuildClassPack}
+          onEditClassPack={handleEditClassPack}
         />
       );
       break;
@@ -1322,6 +1339,7 @@ export const App: React.FC = () => {
       screenComponent = (
         <ClassPackBuilderScreen
           yearLevel={classPackYearLevel}
+          initialClassPack={editableClassPack}
           onReturnToTeacherMenu={handleReturnToTeacherMenu}
         />
       );
