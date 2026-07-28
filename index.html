@@ -28704,6 +28704,7 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
 // --- components/GameGuideScreen.tsx ---
 type GuideTabId =
   | 'quick-start'
+  | 'class-pack'
   | 'artist-setup'
   | 'map-basics'
   | 'inside-wing'
@@ -28741,7 +28742,7 @@ const GUIDE_TABS: GuideTab[] = [
     explanation: 'Use the start screen to begin a new journey, load saved progress, or open this guide before entering the gallery.',
     keyPoints: [
       'Open the question mark to learn the game before starting.',
-      'Choose New Game to build a fresh artist profile.',
+      'Choose New Game to select a Class Pack, then build a fresh artist profile.',
       'Use Load Game to continue from an exported ArtQuest save file.',
       'The lock icon opens teacher preview mode for room review.',
     ],
@@ -28755,10 +28756,30 @@ const GUIDE_TABS: GuideTab[] = [
     ],
   },
   {
+    id: 'class-pack',
+    title: 'Choose Your Class',
+    shortTitle: 'Class Pack',
+    explanation: 'Before choosing an avatar, select the ArtQuest experience prepared for the class. This determines whether the journey uses the default gallery, a preloaded class pack, or a teacher-provided JSON Class Pack.',
+    keyPoints: [
+      'Default ArtQuest starts the original gallery experience for Years 7–12.',
+      'Find a Class opens the available preloaded Class Packs for the student to choose from.',
+      'Import a Class Pack lets students open the JSON file supplied by their teacher.',
+      'Select Default ArtQuest, then choose Continue to move on to the avatar setup screen.',
+    ],
+    screenshotSrc: './public/images/screens/choose-your-class-screen.png',
+    screenshotAlt: 'ArtQuest Choose Your Class screen showing Default ArtQuest, Find a Class, Import a Class Pack, Return to Menu, and Continue.',
+    callouts: [
+      { number: 1, label: 'Default ArtQuest', description: 'Select the original gallery artworks and questions for Years 7–12.', left: '28.7%', top: '52.5%' },
+      { number: 2, label: 'Find a Class', description: 'Opens the list of preloaded Class Packs prepared for students.', left: '49.4%', top: '52.5%' },
+      { number: 3, label: 'Import a Class Pack', description: 'Choose the teacher-provided JSON Class Pack file to open it.', left: '70.6%', top: '52.5%' },
+      { number: 4, label: 'Continue', description: 'After selecting Default ArtQuest, continues to avatar setup.', left: '63.5%', top: '90.8%' },
+    ],
+  },
+  {
     id: 'artist-setup',
     title: 'Artist Setup',
     shortTitle: 'Setup',
-    explanation: 'Choose the learning level, select or build an avatar, and personalise the artist name before entering the map.',
+    explanation: 'After choosing a Class Pack, choose the learning level, select or build an avatar, and personalise the artist name before entering the map.',
     keyPoints: [
       'Pick the year level or senior pathway first so prompts and assessment language match the learner.',
       'Choose a preset avatar or build a custom pixel artist.',
