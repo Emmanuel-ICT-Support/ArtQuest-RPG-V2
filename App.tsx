@@ -21,9 +21,10 @@ import { initializeChat as initializeAiChat } from './services/aiService';
 import { AVATAR_REWARD_DEFAULT_BUILD, getAvatarBuildForAvatar, getAvatarLayerImageUrls, getAvatarSpriteUrl, getNewlyUnlockedRewardMilestones } from './data/AvatarRewards';
 import { getArtworkBrief } from './data/ArtworkLibrary';
 import { getVisualLanguageGuideForWing } from './data/VisualLanguageGuide';
-import { SIDE_QUEST_CASES_BY_ID, createInitialSideQuestState, normalizeSideQuestState } from './data/SideQuests';
+import { SIDE_QUEST_CASES, SIDE_QUEST_CASES_BY_ID, createInitialSideQuestState, normalizeSideQuestState } from './data/SideQuests';
 import { parseClassPackExport } from './data/ClassPack';
 import type { ClassPackExport } from './data/ClassPack';
+import { getDoorUnlockAssets } from './data/DoorUnlockAssets';
 import { PreloadAsset, preloadAssets, waitForMinimum, warmAssets } from './utils/assetPreloader';
 
 const TEACHER_UNLOCK_CODE = '0554';
@@ -68,12 +69,27 @@ const PANEL_IMAGE_ASSETS: Record<PanelScreen, string[]> = {
   guide: [
     './public/images/screens/guide/guidebook-preview.png',
     './public/images/screens/guide/quick-start.png',
+    './public/images/screens/choose-your-class-screen.png',
     './public/images/screens/guide/map-basics.png',
+    './public/images/screens/guide/artist-setup.png',
+    './public/images/screens/guide/inside-wing.png',
+    './public/images/screens/guide/answer-phases.png',
+    './public/images/screens/guide/inventory-rewards.png',
+    './public/images/screens/guide/journal.png',
+    './public/images/screens/guide/assessment.png',
+    './public/images/screens/guide/side-quests-pip.png',
+    './public/images/screens/guide/case-files.png',
   ],
   journal: [
     './public/images/screens/journal-blank-plate.png',
     './public/images/screens/journal-page-turns/book-rest.png',
     './public/images/screens/journal-page-turns/frame-01.png',
+    './public/images/screens/journal-page-turns/frame-02.png',
+    './public/images/screens/journal-page-turns/frame-03.png',
+    './public/images/screens/journal-page-turns/frame-04.png',
+    './public/images/screens/journal-page-turns/frame-05.png',
+    './public/images/screens/journal-page-turns/frame-06.png',
+    './public/images/screens/journal-page-turns/frame-07.png',
   ],
   inventory: [
     './public/images/screens/build-avatar-screen-v2.png',
@@ -91,6 +107,22 @@ const NEW_GAME_SETUP_IMAGE_ASSETS = [
 
 const TEACHER_MODE_IMAGE_ASSETS = [
   './public/images/screens/teacher-mode-start-screen.png',
+];
+
+const SPLASH_SCREEN_IMAGE_ASSETS = [
+  './public/images/screens/startscreen-v2.png',
+];
+
+const RETURN_MENU_IMAGE_ASSETS = [
+  './public/images/screens/return-to-game-screen.png',
+];
+
+const CLASS_PACK_SELECTION_IMAGE_ASSETS = [
+  './public/images/screens/choose-your-class-screen.png',
+];
+
+const CLASS_PACK_BUILDER_IMAGE_ASSETS = [
+  './public/images/screens/class-pack-builder-screen.png',
 ];
 
 const imageAsset = (src: string | null | undefined): PreloadAsset => ({ type: 'image', src });
@@ -150,6 +182,15 @@ const getAdjacentMapScenePreloadAssets = (scene: GalleryScene, avatar?: PlayerAv
   return adjacentScenes.flatMap((adjacentScene) => getMapScenePreloadAssets(adjacentScene, avatar));
 };
 
+const getSideQuestScenePreloadAssets = (scene: GalleryScene): PreloadAsset[] => (
+  SIDE_QUEST_CASES
+    .filter((sideQuestCase) => sideQuestCase.scene === scene)
+    .flatMap((sideQuestCase) => [
+      imageAsset(sideQuestCase.caseIconAssetUrl),
+      ...sideQuestCase.clues.map((clue) => imageAsset(clue.assetUrl)),
+    ])
+);
+
 const getClassPackArtworkUrl = (classPack: ClassPackExport | null | undefined, wingId: string): string | undefined => (
   classPack?.rooms.find((room) => room.id === wingId)?.artwork.imageUrl
 );
@@ -200,6 +241,24 @@ const getNewGameSetupTransition = (): LoadTransitionState => ({
   tone: 'setup',
   minimumMs: 560,
   steps: ['Setting cards', 'Mixing palette', 'Sharpening pencil'],
+});
+
+const getClassPackSelectionTransition = (): LoadTransitionState => ({
+  title: 'Preparing Your Class Pack',
+  message: 'Opening the gallery choices for your new ArtQuest journey.',
+  detail: 'The Class Pack screen is being readied before it appears.',
+  tone: 'setup',
+  minimumMs: 460,
+  steps: ['Opening gallery choices', 'Checking class packs', 'Ready to choose'],
+});
+
+const getMenuTransition = (title: string, message: string): LoadTransitionState => ({
+  title,
+  message,
+  detail: 'The next gallery screen is being prepared.',
+  tone: 'panel',
+  compact: true,
+  minimumMs: 300,
 });
 
 const getPanelTransition = (screen: PanelScreen): LoadTransitionState => {
@@ -301,6 +360,24 @@ const isWingEffectivelyUnlocked = (wings: Record<string, WingState>, wingId: str
   if (!wingState) return false;
   if (wingState.isUnlocked || wingState.isSolved || wingId === INITIAL_WING_ID) return true;
   return WING_DEFINITIONS.some((wing) => wing.unlocks === wingId && !!wings[wing.id]?.isSolved);
+};
+
+const getPriorityDoorPreloadAssets = (
+  scene: GalleryScene,
+  wings: Record<string, WingState>,
+): PreloadAsset[] => {
+  const wingIds = getGalleryWingIds(scene);
+  const prioritizedWingId = wingIds.find((wingId) => (
+    isWingEffectivelyUnlocked(wings, wingId) && !wings[wingId]?.isSolved
+  )) || wingIds.find((wingId) => isWingEffectivelyUnlocked(wings, wingId));
+
+  if (!prioritizedWingId) return [];
+
+  const doorAssets = getDoorUnlockAssets(prioritizedWingId);
+  return [
+    imageAsset(doorAssets.prompt),
+    ...doorAssets.frames.map(imageAsset),
+  ];
 };
 
 const normalizeUnlockedWings = (wings: Record<string, WingState>): Record<string, WingState> => {
@@ -536,7 +613,7 @@ export const App: React.FC = () => {
   const runPanelTransition = useCallback(async (screen: PanelScreen, commit: () => void) => {
     await runLoadTransition(getPanelTransition(screen), async () => {
       await preloadAssets(getPanelPreloadAssets(screen, appGameState.selectedAvatar), {
-        timeoutMs: 1800,
+        timeoutMs: 6000,
       });
       commit();
     });
@@ -552,8 +629,9 @@ export const App: React.FC = () => {
         [
           ...getMapScenePreloadAssets(nextScene, appGameState.selectedAvatar),
           ...getAdjacentMapScenePreloadAssets(nextScene, appGameState.selectedAvatar),
+          ...getSideQuestScenePreloadAssets(nextScene),
         ],
-        { timeoutMs: 2400 },
+        { timeoutMs: 6000 },
       );
       commitSceneChange();
     });
@@ -565,10 +643,12 @@ export const App: React.FC = () => {
     warmAssets([
       ...getMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
       ...getAdjacentMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
+      ...getSideQuestScenePreloadAssets(currentGalleryScene),
+      ...getPriorityDoorPreloadAssets(currentGalleryScene, appGameState.wings),
       ...getCurrentGalleryAnalysisPreloadAssets(currentGalleryScene, appGameState.selectedAvatar, appGameState.classPack),
       ...CORE_AUDIO_ASSETS.map(audioAsset),
     ]);
-  }, [appGameState.classPack, appGameState.selectedAvatar, currentGalleryScene, currentScreen]);
+  }, [appGameState.classPack, appGameState.selectedAvatar, appGameState.wings, currentGalleryScene, currentScreen]);
 
   const handleNewGameSetupComplete = useCallback(async (avatar: PlayerAvatar) => {
     const classPack = appGameState.classPack;
@@ -599,8 +679,9 @@ export const App: React.FC = () => {
         await preloadAssets([
           ...getMapScenePreloadAssets('foyer', avatar),
           ...getAdjacentMapScenePreloadAssets('foyer', avatar),
+          ...getSideQuestScenePreloadAssets('foyer'),
           ...CORE_AUDIO_ASSETS.map(audioAsset),
-        ], { timeoutMs: 3200 });
+        ], { timeoutMs: 6500 });
 
         setAppGameState(prev => ({
           ...prev,
@@ -621,21 +702,31 @@ export const App: React.FC = () => {
     }
   }, [appGameState.classPack, runLoadTransition]);
 
-  const handleNavigateToNewGameSetup = useCallback(() => {
-    setAppGameState(() => ({
-      ...initialAppGameState,
-      isLoading: false,
-      error: null,
-      sideQuestState: createInitialSideQuestState(),
-    }));
-    setCurrentGalleryScene('foyer');
-    setCurrentScreen('classPackSelection');
-  }, []);
+  const handleNavigateToNewGameSetup = useCallback(async () => {
+    await runLoadTransition(getClassPackSelectionTransition(), async () => {
+      await preloadAssets(CLASS_PACK_SELECTION_IMAGE_ASSETS.map(imageAsset), {
+        timeoutMs: 6000,
+      });
+
+      setAppGameState(() => ({
+        ...initialAppGameState,
+        isLoading: false,
+        error: null,
+        sideQuestState: createInitialSideQuestState(),
+      }));
+      setCurrentGalleryScene('foyer');
+      setCurrentScreen('classPackSelection');
+
+      // The player is deciding between packs at this point, so the setup
+      // imagery can warm quietly without delaying the Class Pack choice.
+      warmAssets(getNewGameSetupPreloadAssets());
+    });
+  }, [runLoadTransition]);
 
   const handleChooseClassPack = useCallback(async (classPack: ClassPackExport | null) => {
     await runLoadTransition(getNewGameSetupTransition(), async () => {
       await preloadAssets(getNewGameSetupPreloadAssets(), {
-        timeoutMs: 2200,
+        timeoutMs: 6000,
       });
 
       setAppGameState(() => ({
@@ -650,21 +741,37 @@ export const App: React.FC = () => {
     });
   }, [runLoadTransition]);
 
-  const handleReturnFromClassPackSelection = useCallback(() => {
-    setCurrentScreen('splash');
-  }, []);
+  const handleReturnFromClassPackSelection = useCallback(async () => {
+    await runLoadTransition(
+      getMenuTransition('Returning to the Start Menu', 'Putting the class choices away.'),
+      async () => {
+        await preloadAssets(SPLASH_SCREEN_IMAGE_ASSETS.map(imageAsset), { timeoutMs: 4200 });
+        setCurrentScreen('splash');
+      },
+    );
+  }, [runLoadTransition]);
 
   const handleTeacherUnlock = useCallback(async (code: string): Promise<boolean> => {
     if (code.trim() !== TEACHER_UNLOCK_CODE) {
       return false;
     }
 
-    await preloadAssets(TEACHER_MODE_IMAGE_ASSETS.map(imageAsset), {
-      timeoutMs: 1800,
+    await runLoadTransition({
+      title: 'Opening Teacher Mode',
+      message: 'Preparing the class tools and gallery preview controls.',
+      detail: 'Teacher Mode is being readied before it appears.',
+      tone: 'setup',
+      compact: true,
+      minimumMs: 360,
+    }, async () => {
+      await preloadAssets(TEACHER_MODE_IMAGE_ASSETS.map(imageAsset), {
+        timeoutMs: 6000,
+      });
+      setCurrentScreen('teacherMode');
+      warmAssets(CLASS_PACK_BUILDER_IMAGE_ASSETS.map(imageAsset));
     });
-    setCurrentScreen('teacherMode');
     return true;
-  }, []);
+  }, [runLoadTransition]);
 
   const handleExploreArtQuest = useCallback(async () => {
     setCurrentGalleryScene('foyer');
@@ -679,8 +786,9 @@ export const App: React.FC = () => {
       await preloadAssets([
         ...getMapScenePreloadAssets('foyer', teacherAvatar),
         ...getAdjacentMapScenePreloadAssets('foyer', teacherAvatar),
+        ...getSideQuestScenePreloadAssets('foyer'),
         ...CORE_AUDIO_ASSETS.map(audioAsset),
-      ], { timeoutMs: 2800 });
+      ], { timeoutMs: 6500 });
 
       setAppGameState(() => ({
         ...initialAppGameState,
@@ -699,23 +807,43 @@ export const App: React.FC = () => {
     });
   }, [runLoadTransition]);
 
-  const handleBuildClassPack = useCallback((yearLevel: YearLevel) => {
-    setClassPackYearLevel(yearLevel);
-    setEditableClassPack(null);
-    setCurrentScreen('classPackBuilder');
-  }, []);
+  const handleBuildClassPack = useCallback(async (yearLevel: YearLevel) => {
+    await runLoadTransition({
+      title: 'Opening Class Pack Builder',
+      message: 'Setting out the artwork library and class planning tools.',
+      detail: 'The Class Pack Builder is being prepared before it appears.',
+      tone: 'setup',
+      minimumMs: 440,
+      steps: ['Opening artwork library', 'Preparing room cards', 'Ready to build'],
+    }, async () => {
+      await preloadAssets(CLASS_PACK_BUILDER_IMAGE_ASSETS.map(imageAsset), { timeoutMs: 6000 });
+      setClassPackYearLevel(yearLevel);
+      setEditableClassPack(null);
+      setCurrentScreen('classPackBuilder');
+    });
+  }, [runLoadTransition]);
 
-  const handleEditClassPack = useCallback((fileContent: string): string | null => {
+  const handleEditClassPack = useCallback(async (fileContent: string): Promise<string | null> => {
     try {
       const classPack = parseClassPackExport(fileContent);
-      setClassPackYearLevel(classPack.yearLevel);
-      setEditableClassPack(classPack);
-      setCurrentScreen('classPackBuilder');
+      await runLoadTransition({
+        title: 'Opening Class Pack Builder',
+        message: 'Restoring the selected class rooms and artwork choices.',
+        detail: 'The Class Pack Builder is being prepared before it appears.',
+        tone: 'setup',
+        minimumMs: 440,
+        steps: ['Reading class pack', 'Preparing room cards', 'Ready to edit'],
+      }, async () => {
+        await preloadAssets(CLASS_PACK_BUILDER_IMAGE_ASSETS.map(imageAsset), { timeoutMs: 6000 });
+        setClassPackYearLevel(classPack.yearLevel);
+        setEditableClassPack(classPack);
+        setCurrentScreen('classPackBuilder');
+      });
       return null;
     } catch (error) {
       return error instanceof Error ? error.message : 'This Class Pack could not be opened.';
     }
-  }, []);
+  }, [runLoadTransition]);
 
   const handleReturnToTeacherMenu = useCallback(() => {
     setCurrentScreen('teacherMode');
@@ -799,8 +927,9 @@ export const App: React.FC = () => {
         await preloadAssets([
           ...getMapScenePreloadAssets('foyer', selectedAvatar),
           ...getAdjacentMapScenePreloadAssets('foyer', selectedAvatar),
+          ...getSideQuestScenePreloadAssets('foyer'),
           ...CORE_AUDIO_ASSETS.map(audioAsset),
-        ], { timeoutMs: 3000 });
+        ], { timeoutMs: 6500 });
 
         setAppGameState(prev => ({
           ...prev, // Keep some transient states like error handling
@@ -843,7 +972,7 @@ export const App: React.FC = () => {
       await preloadAssets([
         ...getAnalysisRoomPreloadAssets(wingId, appGameState.selectedAvatar, appGameState.classPack),
         ...CORE_AUDIO_ASSETS.map(audioAsset),
-      ], { timeoutMs: 3200 });
+      ], { timeoutMs: 7000 });
 
       setAppGameState(prev => {
         const newWingsState = normalizeUnlockedWings(prev.wings);
@@ -864,32 +993,47 @@ export const App: React.FC = () => {
     });
   }, [appGameState.classPack, appGameState.selectedAvatar, appGameState.wings, runLoadTransition]);
 
-  const handleReturnToMap = useCallback(() => {
-    setAppGameState(prev => ({ ...prev, currentWingIdForGame: null, focusedWingIdForJournal: null }));
-    setCurrentScreen('map');
-  }, []);
-
-  const handleReturnFromGameToMap = useCallback(async () => {
+  const handleReturnToMapFromPanel = useCallback(async () => {
     await runLoadTransition(getReturnTransition(currentGalleryScene), async () => {
       await preloadAssets([
         ...getMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
         ...getAdjacentMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
-      ], { timeoutMs: 2400 });
+        ...getSideQuestScenePreloadAssets(currentGalleryScene),
+      ], { timeoutMs: 6000 });
 
       setAppGameState(prev => ({ ...prev, currentWingIdForGame: null, focusedWingIdForJournal: null }));
       setCurrentScreen('map');
     });
   }, [appGameState.selectedAvatar, currentGalleryScene, runLoadTransition]);
 
-  const openReturnMenu = useCallback((target: ReturnMenuTarget) => {
-    setReturnMenuTarget(target);
-    setPendingReturnMenuTarget(null);
-    setCurrentScreen('returnMenu');
-  }, []);
+  const handleReturnFromGameToMap = useCallback(async () => {
+    await runLoadTransition(getReturnTransition(currentGalleryScene), async () => {
+      await preloadAssets([
+        ...getMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
+        ...getAdjacentMapScenePreloadAssets(currentGalleryScene, appGameState.selectedAvatar),
+        ...getSideQuestScenePreloadAssets(currentGalleryScene),
+      ], { timeoutMs: 6000 });
+
+      setAppGameState(prev => ({ ...prev, currentWingIdForGame: null, focusedWingIdForJournal: null }));
+      setCurrentScreen('map');
+    });
+  }, [appGameState.selectedAvatar, currentGalleryScene, runLoadTransition]);
+
+  const openReturnMenu = useCallback(async (target: ReturnMenuTarget) => {
+    await runLoadTransition(
+      getMenuTransition('Opening the Game Menu', 'Setting out your saved journey options.'),
+      async () => {
+        await preloadAssets(RETURN_MENU_IMAGE_ASSETS.map(imageAsset), { timeoutMs: 4200 });
+        setReturnMenuTarget(target);
+        setPendingReturnMenuTarget(null);
+        setCurrentScreen('returnMenu');
+      },
+    );
+  }, [runLoadTransition]);
 
   const handleRequestReturnMenu = useCallback((target: ReturnMenuTarget) => {
     if (!hasSaveableGame) {
-      openReturnMenu(target);
+      void openReturnMenu(target);
       return;
     }
 
@@ -910,18 +1054,24 @@ export const App: React.FC = () => {
 
   const handleContinueToReturnMenuWithoutSaving = useCallback(() => {
     if (!pendingReturnMenuTarget) return;
-    openReturnMenu(pendingReturnMenuTarget);
+    void openReturnMenu(pendingReturnMenuTarget);
   }, [openReturnMenu, pendingReturnMenuTarget]);
 
   const handleSaveAndContinueToReturnMenu = useCallback(() => {
     if (!pendingReturnMenuTarget) return;
     handleSaveGame();
-    openReturnMenu(pendingReturnMenuTarget);
+    void openReturnMenu(pendingReturnMenuTarget);
   }, [handleSaveGame, openReturnMenu, pendingReturnMenuTarget]);
 
-  const handleReturnToGameFromMenu = useCallback(() => {
+  const handleReturnToGameFromMenu = useCallback(async () => {
     if (!appGameState.selectedAvatar) {
-      setCurrentScreen('splash');
+      await runLoadTransition(
+        getMenuTransition('Returning to the Start Menu', 'Preparing the main gallery menu.'),
+        async () => {
+          await preloadAssets(SPLASH_SCREEN_IMAGE_ASSETS.map(imageAsset), { timeoutMs: 4200 });
+          setCurrentScreen('splash');
+        },
+      );
       return;
     }
 
@@ -931,18 +1081,27 @@ export const App: React.FC = () => {
       appGameState.currentWingIdForGame &&
       appGameState.wings[appGameState.currentWingIdForGame]
     ) {
-      setCurrentScreen('game');
+      const wingId = appGameState.currentWingIdForGame;
+      await runLoadTransition(getAnalysisTransition(wingId), async () => {
+        await preloadAssets(
+          getAnalysisRoomPreloadAssets(wingId, appGameState.selectedAvatar, appGameState.classPack),
+          { timeoutMs: 7000 },
+        );
+        setCurrentScreen('game');
+      });
       return;
     }
 
-    handleReturnToMap();
+    await handleReturnToMapFromPanel();
   }, [
+    appGameState.classPack,
     appGameState.currentWingIdForGame,
     appGameState.geminiChat,
     appGameState.selectedAvatar,
     appGameState.wings,
-    handleReturnToMap,
+    handleReturnToMapFromPanel,
     returnMenuTarget,
+    runLoadTransition,
   ]);
 
   const appendNarrativeEntry = useCallback((entry: Omit<NarrativeEntry, 'id' | 'timestamp'>) => {
@@ -1228,14 +1387,26 @@ export const App: React.FC = () => {
     });
   }, [runPanelTransition]);
 
-  const handleReturnFromGuide = useCallback(() => {
+  const handleReturnFromGuide = useCallback(async () => {
     if (guideReturnTarget === 'splash') {
-      setCurrentScreen('splash');
+      await runLoadTransition(
+        getMenuTransition('Returning to the Start Menu', 'Preparing the main gallery menu.'),
+        async () => {
+          await preloadAssets(SPLASH_SCREEN_IMAGE_ASSETS.map(imageAsset), { timeoutMs: 4200 });
+          setCurrentScreen('splash');
+        },
+      );
       return;
     }
 
     if (guideReturnTarget === 'returnMenu') {
-      setCurrentScreen('returnMenu');
+      await runLoadTransition(
+        getMenuTransition('Returning to the Game Menu', 'Preparing your saved journey options.'),
+        async () => {
+          await preloadAssets(RETURN_MENU_IMAGE_ASSETS.map(imageAsset), { timeoutMs: 4200 });
+          setCurrentScreen('returnMenu');
+        },
+      );
       return;
     }
 
@@ -1246,18 +1417,27 @@ export const App: React.FC = () => {
       appGameState.selectedAvatar &&
       appGameState.wings[appGameState.currentWingIdForGame]
     ) {
-      setCurrentScreen('game');
+      const wingId = appGameState.currentWingIdForGame;
+      await runLoadTransition(getAnalysisTransition(wingId), async () => {
+        await preloadAssets(
+          getAnalysisRoomPreloadAssets(wingId, appGameState.selectedAvatar, appGameState.classPack),
+          { timeoutMs: 7000 },
+        );
+        setCurrentScreen('game');
+      });
       return;
     }
 
-    handleReturnToMap();
+    await handleReturnToMapFromPanel();
   }, [
+    appGameState.classPack,
     appGameState.currentWingIdForGame,
     appGameState.geminiChat,
     appGameState.selectedAvatar,
     appGameState.wings,
     guideReturnTarget,
-    handleReturnToMap,
+    handleReturnToMapFromPanel,
+    runLoadTransition,
   ]);
 
   const handleNavigateToAssessment = useCallback(async () => {
@@ -1318,7 +1498,7 @@ export const App: React.FC = () => {
   } = useGameAudio(activeMusicTrack);
 
   // Global loading for initial AI setup or critical errors
-  if (appGameState.isLoading && !appGameState.geminiChat && currentScreen !== 'splash' && currentScreen !== 'newGameSetup') {
+  if (appGameState.isLoading && !appGameState.geminiChat && !loadTransition && currentScreen !== 'splash' && currentScreen !== 'newGameSetup') {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-gray-100 p-6" role="alert" aria-live="assertive">
         <h1 className="text-3xl font-bold text-pink-400 mb-4">ArtQuest</h1>
@@ -1537,7 +1717,7 @@ export const App: React.FC = () => {
           learningJournal={appGameState.learningJournal}
           selectedAvatar={appGameState.selectedAvatar || null}
           playerStats={appGameState.playerStats}
-          onReturnToMap={handleReturnToMap}
+          onReturnToMap={handleReturnToMapFromPanel}
           focusedWingId={appGameState.focusedWingIdForJournal}
           onClearFocusedWingId={handleClearFocusedWingId}
           onUpdateJournalEntry={handleUpdateJournalEntry}
@@ -1551,7 +1731,7 @@ export const App: React.FC = () => {
         <InventoryScreen
           playerStats={appGameState.playerStats}
           selectedAvatar={appGameState.selectedAvatar || null}
-          onReturnToMap={handleReturnToMap}
+          onReturnToMap={handleReturnToMapFromPanel}
           onUpdateAvatar={handleUpdateAvatar}
         />
       );
@@ -1573,7 +1753,7 @@ export const App: React.FC = () => {
           selectedAvatar={appGameState.selectedAvatar || null}
           playerStats={appGameState.playerStats}
           wingDefinitions={WING_DEFINITIONS}
-          onReturnToMap={handleReturnToMap}
+          onReturnToMap={handleReturnToMapFromPanel}
         />
       );
       break;

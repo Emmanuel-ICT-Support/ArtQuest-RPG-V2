@@ -66,6 +66,11 @@ const DOOR_UNLOCK_STYLES = `
     animation: doorUnlockStageReady 420ms cubic-bezier(0.18, 0.82, 0.24, 1) forwards;
   }
 
+  .door-unlock-stage-loading-state {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
   .door-unlock-stage-opening {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -320,16 +325,6 @@ const DoorUnlockAnimation = ({ assets, roomName, onCancel, onComplete, onOpenSta
     clearDoorAnimation();
   }, [clearDoorAnimation]);
 
-  useEffect(() => {
-    if (isReady) return undefined;
-
-    const loadingFallback = window.setTimeout(() => {
-      setSettledAssetCount(requiredAssetCount);
-    }, 1400);
-
-    return () => window.clearTimeout(loadingFallback);
-  }, [isReady, requiredAssetCount]);
-
   return (
     <div
       className={`door-unlock-overlay ${isReady ? 'door-unlock-overlay-ready' : ''} ${isOpening ? 'door-unlock-overlay-opening' : ''}`}
@@ -346,7 +341,7 @@ const DoorUnlockAnimation = ({ assets, roomName, onCancel, onComplete, onOpenSta
         <img src={assets.prompt} alt="" onLoad={handleAssetSettled} onError={handleAssetSettled} draggable={false} />
       </div>
       <div
-        className={`door-unlock-stage ${isReady ? 'door-unlock-stage-ready' : ''} ${isOpening ? 'door-unlock-stage-opening' : ''}`}
+        className={`door-unlock-stage ${isReady ? 'door-unlock-stage-ready' : 'door-unlock-stage-loading-state'} ${isOpening ? 'door-unlock-stage-opening' : ''}`}
         role="img"
         aria-label={`${roomName} doorway opening`}
         style={stageStyle}
@@ -361,6 +356,11 @@ const DoorUnlockAnimation = ({ assets, roomName, onCancel, onComplete, onOpenSta
           />
         ) : (
           <div className="door-unlock-stage-loading">Loading</div>
+        )}
+        {!isReady && (
+          <div className="door-unlock-stage-loading" aria-live="polite">
+            Preparing doorway artwork ({settledAssetCount}/{requiredAssetCount})
+          </div>
         )}
       </div>
       <div className="door-unlock-prompt">

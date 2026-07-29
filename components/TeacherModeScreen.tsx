@@ -13,7 +13,7 @@ const TEACHER_MODE_HOTSPOT_CLASS = 'absolute z-20 rounded-sm bg-transparent text
 interface TeacherModeScreenProps {
   onExploreArtQuest: () => void;
   onBuildClassPack: (yearLevel: YearLevel) => void;
-  onEditClassPack: (fileContent: string) => string | null;
+  onEditClassPack: (fileContent: string) => Promise<string | null>;
 }
 
 const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest, onBuildClassPack, onEditClassPack }) => {
@@ -31,7 +31,7 @@ const TeacherModeScreen: React.FC<TeacherModeScreenProps> = ({ onExploreArtQuest
     setIsImporting(true);
     setImportError(null);
     try {
-      const error = onEditClassPack(await selectedFile.text());
+      const error = await onEditClassPack(await selectedFile.text());
       if (error) setImportError(error);
     } catch {
       setImportError('The Class Pack could not be read. Please choose a valid exported JSON file.');
