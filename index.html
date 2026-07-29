@@ -16802,6 +16802,14 @@ const AVATAR_BUILDER_TABS = [
     { id: 'outfitId', label: 'Outfit', shortLabel: 'Outfit', options: OUTFITS },
     { id: 'heldObjectId', label: 'Object To Hold', shortLabel: 'Object', options: HELD_OBJECTS },
 ];
+const avatarBuilderImageAsset = (src) => ({ type: 'image', src });
+const getAvatarBuilderCriticalPreloadAssets = (avatarBuild) => [
+    avatarBuilderImageAsset(AVATAR_BUILDER_BACKGROUND),
+    ...getAvatarLayerImageUrls(avatarBuild).map(avatarBuilderImageAsset),
+];
+const getAvatarBuilderPreviewWarmAssets = () => (AVATAR_BUILDER_TABS
+    .filter((tab) => tab.id !== 'skinToneId')
+    .flatMap((tab) => tab.options.flatMap((option) => (getAvatarAssetPreviewImageUrls(DEFAULT_AVATAR_BUILD, tab.id, option.id).map(avatarBuilderImageAsset)))));
 const OUTLINE = '#111827';
 const getOptionById = (options, id) => (options.find(option => option.id === id) || options[0]);
 const getHairColorId = (hairStyleId) => hairStyleId.split('_')[0] || hairStyleId;
@@ -17162,6 +17170,7 @@ const NewGameSetupScreen = ({ onStartNewGameSetupComplete }) => {
     const [selectedAvatarId, setSelectedAvatarId] = useState(AVATARS[0].id);
     const [creationModeActive, setCreationModeActive] = useState(false);
     const [builderScreenActive, setBuilderScreenActive] = useState(false);
+    const [isPreparingAvatarBuilder, setIsPreparingAvatarBuilder] = useState(false);
     const [customAvatarName, setCustomAvatarName] = useState(AVATARS[0].name);
     const [hasEditedAvatarName, setHasEditedAvatarName] = useState(false);
     const [customArtistType, setCustomArtistType] = useState(ARTIST_TYPES[0]);
@@ -17202,11 +17211,24 @@ const NewGameSetupScreen = ({ onStartNewGameSetupComplete }) => {
         setCreationModeActive(false);
         setBuilderScreenActive(false);
     };
-    const handleSelectCreateOwn = () => {
-        setCreationModeActive(true);
-        setSelectedAvatarId(null);
-        setCustomAvatarName(hasEditedAvatarName && customAvatarName.trim() ? customAvatarName : DEFAULT_CUSTOM_AVATAR_NAME);
-        setBuilderScreenActive(true);
+    const handleSelectCreateOwn = async () => {
+        if (isPreparingAvatarBuilder)
+            return;
+        setIsPreparingAvatarBuilder(true);
+        try {
+            await preloadAssets(getAvatarBuilderCriticalPreloadAssets(avatarBuild), {
+                timeoutMs: 6500,
+                minimumMs: 600,
+            });
+            setCreationModeActive(true);
+            setSelectedAvatarId(null);
+            setCustomAvatarName(hasEditedAvatarName && customAvatarName.trim() ? customAvatarName : DEFAULT_CUSTOM_AVATAR_NAME);
+            setBuilderScreenActive(true);
+            warmAssets(getAvatarBuilderPreviewWarmAssets());
+        }
+        finally {
+            setIsPreparingAvatarBuilder(false);
+        }
     };
     const getIconInitials = (name) => {
         if (!name.trim())
@@ -17356,12 +17378,13 @@ const NewGameSetupScreen = ({ onStartNewGameSetupComplete }) => {
                 const isSelected = selectedAvatarId === avatar.id && !creationModeActive;
                 return (React.createElement("button", { key: avatar.id, type: "button", onClick: () => handleSelectAvatar(avatar.id), className: `${SCREEN_HOTSPOT_CLASS} ${isSelected ? 'bg-pink-300/10 ring-4 ring-pink-300/80' : ''}`, style: { left: leftPositions[index], top: '42.3%', width: '15.7%', height: '37.1%' }, "aria-pressed": isSelected, "aria-label": `Select ${avatar.name}, ${avatar.title}` }, avatar.name));
             }),
-            React.createElement("button", { type: "button", onClick: handleSelectCreateOwn, className: `${SCREEN_HOTSPOT_CLASS} ${creationModeActive ? 'bg-pink-300/10 ring-4 ring-pink-300/80' : ''}`, style: { left: '67%', top: '42.3%', width: '15.2%', height: '37.1%' }, "aria-pressed": creationModeActive, "aria-label": "Build your own avatar" },
+            React.createElement("button", { type: "button", onClick: handleSelectCreateOwn, disabled: isPreparingAvatarBuilder, className: `${SCREEN_HOTSPOT_CLASS} ${creationModeActive ? 'bg-pink-300/10 ring-4 ring-pink-300/80' : ''}`, style: { left: '67%', top: '42.3%', width: '15.2%', height: '37.1%' }, "aria-pressed": creationModeActive, "aria-label": "Build your own avatar" },
                 React.createElement("span", { className: "sr-only", "aria-hidden": "true" },
                     React.createElement(AvatarOutlinePlaceholder, { className: "h-1 w-1" })),
                 "Build Your Own"),
             React.createElement("input", { type: "text", id: "avatarName", value: customAvatarName, onChange: (e) => handleAvatarNameChange(e.target.value), placeholder: "Enter your artist name", className: PROFILE_TEXT_INPUT_CLASS, style: { left: '26.6%', top: '85.8%', width: '45.8%', height: '6.2%' }, "aria-label": "Enter your artist name" }),
-            React.createElement("button", { type: "button", onClick: handleStartClick, disabled: (!selectedAvatarId && !creationModeActive) || !selectedYearLevel, className: SCREEN_HOTSPOT_CLASS, style: { left: '39.3%', top: '91.4%', width: '22.5%', height: '6.7%' }, "aria-label": "Start new adventure with selected character, year level, and custom name if provided" }, "Begin ArtQuest!"))));
+            React.createElement("button", { type: "button", onClick: handleStartClick, disabled: (!selectedAvatarId && !creationModeActive) || !selectedYearLevel, className: SCREEN_HOTSPOT_CLASS, style: { left: '39.3%', top: '91.4%', width: '22.5%', height: '6.7%' }, "aria-label": "Start new adventure with selected character, year level, and custom name if provided" }, "Begin ArtQuest!")),
+        isPreparingAvatarBuilder && (React.createElement(GalleryLoadingScreen, { title: "Preparing Avatar Builder", message: "Arranging your pixel artist and the first set of custom pieces.", detail: "The builder opens once its canvas and current avatar layers are ready.", tone: "setup", steps: ['Setting canvas', 'Layering avatar', 'Ready to create'] }))));
 };
 const LEVEL_DOOR_POSITIONS_BY_GALLERY = [
     [
@@ -26223,7 +26246,7 @@ const getClassPackSelectionTransition = () => ({
     message: 'Opening the gallery choices for your new ArtQuest journey.',
     detail: 'The Class Pack screen is being readied before it appears.',
     tone: 'setup',
-    minimumMs: 460,
+    minimumMs: 650,
     steps: ['Opening gallery choices', 'Checking class packs', 'Ready to choose'],
 });
 const getMenuTransition = (title, message) => ({

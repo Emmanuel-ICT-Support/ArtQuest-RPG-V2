@@ -18,6 +18,8 @@ import {
 } from '../data/AvatarRewards';
 import AvatarAssetPreview from './AvatarAssetPreview';
 import AvatarLayeredPreview from './AvatarLayeredPreview';
+import GalleryLoadingScreen from './GalleryLoadingScreen';
+import { PreloadAsset, preloadAssets, warmAssets } from '../utils/assetPreloader';
 
 const AVATARS: Omit<PlayerAvatar, 'selectedYearLevel' | 'selectedCoursePathway'>[] = [
   {
@@ -292,6 +294,22 @@ const AVATAR_BUILDER_TABS: AvatarBuilderTab[] = [
   { id: 'outfitId', label: 'Outfit', shortLabel: 'Outfit', options: OUTFITS },
   { id: 'heldObjectId', label: 'Object To Hold', shortLabel: 'Object', options: HELD_OBJECTS },
 ];
+
+const avatarBuilderImageAsset = (src: string | null | undefined): PreloadAsset => ({ type: 'image', src });
+
+const getAvatarBuilderCriticalPreloadAssets = (avatarBuild: AvatarBuilderConfig): PreloadAsset[] => [
+  avatarBuilderImageAsset(AVATAR_BUILDER_BACKGROUND),
+  ...getAvatarLayerImageUrls(avatarBuild).map(avatarBuilderImageAsset),
+];
+
+const getAvatarBuilderPreviewWarmAssets = (): PreloadAsset[] => (
+  AVATAR_BUILDER_TABS
+    // Skin-tone choices are colour swatches rather than image previews.
+    .filter((tab) => tab.id !== 'skinToneId')
+    .flatMap((tab) => tab.options.flatMap((option) => (
+      getAvatarAssetPreviewImageUrls(DEFAULT_AVATAR_BUILD, tab.id, option.id).map(avatarBuilderImageAsset)
+    )))
+);
 
 const OUTLINE = '#111827';
 
@@ -723,6 +741,7 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | null>(AVATARS[0].id);
   const [creationModeActive, setCreationModeActive] = useState<boolean>(false);
   const [builderScreenActive, setBuilderScreenActive] = useState<boolean>(false);
+  const [isPreparingAvatarBuilder, setIsPreparingAvatarBuilder] = useState<boolean>(false);
   const [customAvatarName, setCustomAvatarName] = useState<string>(AVATARS[0].name);
   const [hasEditedAvatarName, setHasEditedAvatarName] = useState<boolean>(false);
   const [customArtistType, setCustomArtistType] = useState<ArtistType>(ARTIST_TYPES[0]);
@@ -768,11 +787,27 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
     setBuilderScreenActive(false);
   };
 
-  const handleSelectCreateOwn = () => {
-    setCreationModeActive(true);
-    setSelectedAvatarId(null);
-    setCustomAvatarName(hasEditedAvatarName && customAvatarName.trim() ? customAvatarName : DEFAULT_CUSTOM_AVATAR_NAME);
-    setBuilderScreenActive(true);
+  const handleSelectCreateOwn = async () => {
+    if (isPreparingAvatarBuilder) return;
+
+    setIsPreparingAvatarBuilder(true);
+    try {
+      await preloadAssets(getAvatarBuilderCriticalPreloadAssets(avatarBuild), {
+        timeoutMs: 6500,
+        minimumMs: 600,
+      });
+
+      setCreationModeActive(true);
+      setSelectedAvatarId(null);
+      setCustomAvatarName(hasEditedAvatarName && customAvatarName.trim() ? customAvatarName : DEFAULT_CUSTOM_AVATAR_NAME);
+      setBuilderScreenActive(true);
+
+      // Option-card previews are useful next, but they do not need to hold up
+      // the builder itself. Warming is intentionally low-priority and capped.
+      warmAssets(getAvatarBuilderPreviewWarmAssets());
+    } finally {
+      setIsPreparingAvatarBuilder(false);
+    }
   };
 
   const getIconInitials = (name: string): string => {
@@ -1163,6 +1198,7 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
         <button
           type="button"
           onClick={handleSelectCreateOwn}
+          disabled={isPreparingAvatarBuilder}
           className={`${SCREEN_HOTSPOT_CLASS} ${creationModeActive ? 'bg-pink-300/10 ring-4 ring-pink-300/80' : ''}`}
           style={{ left: '67%', top: '42.3%', width: '15.2%', height: '37.1%' }}
           aria-pressed={creationModeActive}
@@ -1196,6 +1232,15 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
           Begin ArtQuest!
         </button>
       </div>
+      {isPreparingAvatarBuilder && (
+        <GalleryLoadingScreen
+          title="Preparing Avatar Builder"
+          message="Arranging your pixel artist and the first set of custom pieces."
+          detail="The builder opens once its canvas and current avatar layers are ready."
+          tone="setup"
+          steps={['Setting canvas', 'Layering avatar', 'Ready to create']}
+        />
+      )}
     </div>
   );
 };

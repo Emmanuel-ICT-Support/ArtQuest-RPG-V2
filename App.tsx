@@ -248,7 +248,7 @@ const getClassPackSelectionTransition = (): LoadTransitionState => ({
   message: 'Opening the gallery choices for your new ArtQuest journey.',
   detail: 'The Class Pack screen is being readied before it appears.',
   tone: 'setup',
-  minimumMs: 460,
+  minimumMs: 650,
   steps: ['Opening gallery choices', 'Checking class packs', 'Ready to choose'],
 });
 
