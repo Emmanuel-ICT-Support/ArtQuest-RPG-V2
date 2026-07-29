@@ -599,7 +599,6 @@ export const App: React.FC = () => {
         await preloadAssets([
           ...getMapScenePreloadAssets('foyer', avatar),
           ...getAdjacentMapScenePreloadAssets('foyer', avatar),
-          ...getCurrentGalleryAnalysisPreloadAssets('foyer', avatar, classPack),
           ...CORE_AUDIO_ASSETS.map(audioAsset),
         ], { timeoutMs: 3200 });
 
@@ -800,7 +799,6 @@ export const App: React.FC = () => {
         await preloadAssets([
           ...getMapScenePreloadAssets('foyer', selectedAvatar),
           ...getAdjacentMapScenePreloadAssets('foyer', selectedAvatar),
-          ...getCurrentGalleryAnalysisPreloadAssets('foyer', selectedAvatar, classPack),
           ...CORE_AUDIO_ASSETS.map(audioAsset),
         ], { timeoutMs: 3000 });
 

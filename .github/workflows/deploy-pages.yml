@@ -34,7 +34,10 @@ jobs:
         run: |
           mkdir -p pages-dist
           cp index.html pages-dist/index.html
-          cp -R public pages-dist/public
+          rsync -a \
+            --exclude='assets/door sequences/' \
+            --exclude='images/avatar-layers/source/' \
+            public/ pages-dist/public/
           touch pages-dist/.nojekyll
 
       - name: Upload Pages artifact

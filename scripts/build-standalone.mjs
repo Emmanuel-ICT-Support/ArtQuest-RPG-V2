@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const classPacksDirectory = resolve(rootDir, 'data/class-packs');
@@ -32,7 +33,6 @@ const localVendorScripts = [
   './public/vendor/react.development.js',
   './public/vendor/react-dom.development.js',
   './public/vendor/jspdf.umd.min.js',
-  './public/vendor/babel.min.js',
 ];
 
 localVendorScripts.forEach((src) => {
@@ -119,7 +119,22 @@ if (!rootElement) {
 ReactDOM.createRoot(rootElement).render(
   <App />
 );
-`.replace(/<\/script/gi, '<\\/script');
+`;
+
+// Compile once during the release build instead of shipping the TypeScript source
+// and the Babel compiler to every player. The React classic transform preserves the
+// existing standalone runtime and its direct-file launch behaviour.
+const compiledAppScript = ts.transpileModule(appScript, {
+  compilerOptions: {
+    target: ts.ScriptTarget.ES2020,
+    module: ts.ModuleKind.None,
+    jsx: ts.JsxEmit.React,
+    jsxFactory: 'React.createElement',
+    removeComments: true,
+    sourceMap: false,
+  },
+  fileName: 'artquest-standalone.tsx',
+}).outputText.replace(/<\/script/gi, '<\\/script');
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -1084,21 +1099,9 @@ const html = `<!DOCTYPE html>
 <body class="bg-gradient-to-br from-gray-900 via-purple-900 to-pink-900 text-gray-100 min-h-screen">
   <noscript>ArtQuest needs JavaScript enabled to run.</noscript>
   <div id="root"></div>
-  <script type="text/plain" id="artquest-source">
-${appScript}
-  </script>
   <script>
     try {
-      const source = document.getElementById('artquest-source').textContent;
-      const compiled = Babel.transform(source, {
-        filename: 'artquest.tsx',
-        presets: [
-          ['typescript', { allExtensions: true, isTSX: true }],
-          ['react', { runtime: 'classic' }]
-        ],
-        sourceMaps: false
-      }).code;
-      (0, eval)(compiled + '\\n//# sourceURL=artquest-standalone.js');
+${compiledAppScript}
     } catch (error) {
       console.error(error);
       document.getElementById('root').innerHTML = '<div style="padding:2rem;color:#fecaca;background:#111827;min-height:100vh;font-family:system-ui"><h1 style="font-size:1.5rem;margin-bottom:1rem">ArtQuest could not start</h1><pre style="white-space:pre-wrap">' + String(error && (error.stack || error.message || error)).replace(/[&<>]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[char])) + '</pre></div>';
@@ -1109,4 +1112,4 @@ ${appScript}
 `;
 
 writeFileSync(resolve(rootDir, 'index.html'), html, 'utf8');
-console.log(`Wrote ${resolve(rootDir, 'index.html')} with ${sourceFiles.length} source files embedded.`);
+console.log(`Wrote ${resolve(rootDir, 'index.html')} with ${sourceFiles.length} source files precompiled.`);

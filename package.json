@@ -9,7 +9,7 @@
     "avatar:bounds": "python3 scripts/generate-avatar-asset-bounds.py",
     "artwork:refresh": "node scripts/fetch-artic-artwork-assets.mjs",
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/build-standalone.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

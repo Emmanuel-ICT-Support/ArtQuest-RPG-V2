@@ -4,7 +4,7 @@ This folder contains the original game structure plus a standalone `index.html` 
 
 ## Run From HTML
 
-Open `index.html` directly in a modern browser. Chrome is recommended. The page loads React, Tailwind, Babel, and jsPDF from public CDNs, then runs the existing game source embedded into the HTML file.
+Open `index.html` directly in a modern browser. Chrome is recommended. The standalone build uses local React, Tailwind, and jsPDF files, and its game code is compiled before the HTML is published. It does not need to download or compile the game source when it opens.
 
 ArtQuest now runs in offline Curator mode. It does not require a Gemini API key. Curator dialogue, progress feedback, vocabulary prompts, and the level artwork selections are generated locally from the files in this folder.
 
@@ -32,7 +32,7 @@ If you specifically want to reference AIC IIIF URLs instead of saving local JPGs
 
 The running game always uses the local artwork manifest and images. Museum APIs are used only when curating or refreshing the artwork collection.
 
-Note: this removes the AI/API requirement, but the current standalone HTML still loads React, Tailwind, Babel, and jsPDF from public CDNs. To make the app work with no internet connection at all, those browser libraries would also need to be saved locally and referenced from the folder.
+The standalone game ships its browser libraries locally, so the core game can run without an internet connection. Online museum search and any future web-backed features still require a connection.
 
 On macOS, double-click `Launch ArtQuest.command` to open `index.html` directly in Google Chrome. If Chrome is not installed, it will use the default browser.
 

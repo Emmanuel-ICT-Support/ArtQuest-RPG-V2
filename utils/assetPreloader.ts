@@ -13,6 +13,10 @@ export interface PreloadOptions {
 const imageLoadCache = new Map<string, Promise<void>>();
 const audioLoadCache = new Map<string, Promise<void>>();
 
+type IdleCallbackWindow = Window & typeof globalThis & {
+  requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
+};
+
 const wait = (ms: number): Promise<void> => new Promise((resolve) => window.setTimeout(resolve, ms));
 
 const withTimeout = (promise: Promise<void>, timeoutMs: number): Promise<void> => (
@@ -106,9 +110,22 @@ export const preloadAssets = async (
 };
 
 export const warmAssets = (assets: PreloadAsset[]): void => {
-  assets.forEach((asset) => {
-    void preloadOneAsset(asset);
-  });
+  const beginWarming = () => {
+    assets.forEach((asset) => {
+      void preloadOneAsset(asset);
+    });
+  };
+
+  // Warming is only an optimisation. Starting it after the current screen has
+  // painted keeps speculative room downloads and image decoding off the critical
+  // path, while the transition preloader still guarantees required assets.
+  const idleWindow = window as IdleCallbackWindow;
+  if (typeof idleWindow.requestIdleCallback === 'function') {
+    idleWindow.requestIdleCallback(beginWarming, { timeout: 1000 });
+    return;
+  }
+
+  window.setTimeout(beginWarming, 120);
 };
 
 export const waitForMinimum = wait;
