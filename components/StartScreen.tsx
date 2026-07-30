@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { AvatarArchetypeId, AvatarAssetTabId, AvatarBuilderConfig, PlayerAvatar, SeniorCoursePathway, YearLevel, NewGameSetupScreenProps } from '../types';
 import {
   SCSA_ASSESSMENT_YEAR_OPTIONS,
@@ -17,9 +17,15 @@ import {
   getAvatarLayerImageUrls,
 } from '../data/AvatarRewards';
 import AvatarAssetPreview from './AvatarAssetPreview';
+import AvatarAssetLoadingOverlay from './AvatarAssetLoadingOverlay';
 import AvatarLayeredPreview from './AvatarLayeredPreview';
 import GalleryLoadingScreen from './GalleryLoadingScreen';
-import { PreloadAsset, preloadAssets, warmAssets } from '../utils/assetPreloader';
+import { areAssetsPreloaded, preloadAssets, warmAssets } from '../utils/assetPreloader';
+import {
+  avatarPreloadImage,
+  getAvatarLayerPreloadAssets,
+  getAvatarTabPreviewPreloadAssets,
+} from '../utils/avatarAssetPreload';
 
 const AVATARS: Omit<PlayerAvatar, 'selectedYearLevel' | 'selectedCoursePathway'>[] = [
   {
@@ -295,20 +301,26 @@ const AVATAR_BUILDER_TABS: AvatarBuilderTab[] = [
   { id: 'heldObjectId', label: 'Object To Hold', shortLabel: 'Object', options: HELD_OBJECTS },
 ];
 
-const avatarBuilderImageAsset = (src: string | null | undefined): PreloadAsset => ({ type: 'image', src });
-
-const getAvatarBuilderCriticalPreloadAssets = (avatarBuild: AvatarBuilderConfig): PreloadAsset[] => [
-  avatarBuilderImageAsset(AVATAR_BUILDER_BACKGROUND),
-  ...getAvatarLayerImageUrls(avatarBuild).map(avatarBuilderImageAsset),
+const getAvatarBuilderCriticalPreloadAssets = (avatarBuild: AvatarBuilderConfig) => [
+  avatarPreloadImage(AVATAR_BUILDER_BACKGROUND),
+  ...getAvatarLayerPreloadAssets(avatarBuild),
 ];
 
-const getAvatarBuilderPreviewWarmAssets = (): PreloadAsset[] => (
+const getAvatarBuilderTabPreloadAssets = (
+  avatarBuild: AvatarBuilderConfig,
+  tabId: AvatarBuilderTabId,
+) => {
+  const tab = AVATAR_BUILDER_TABS.find((candidate) => candidate.id === tabId);
+  if (!tab || tabId === 'skinToneId') return [];
+
+  return getAvatarTabPreviewPreloadAssets(avatarBuild, tabId, tab.options.map((option) => option.id));
+};
+
+const getAvatarBuilderPreviewWarmAssets = () => (
   AVATAR_BUILDER_TABS
     // Skin-tone choices are colour swatches rather than image previews.
     .filter((tab) => tab.id !== 'skinToneId')
-    .flatMap((tab) => tab.options.flatMap((option) => (
-      getAvatarAssetPreviewImageUrls(DEFAULT_AVATAR_BUILD, tab.id, option.id).map(avatarBuilderImageAsset)
-    )))
+    .flatMap((tab) => getAvatarBuilderTabPreloadAssets(DEFAULT_AVATAR_BUILD, tab.id))
 );
 
 const OUTLINE = '#111827';
@@ -748,8 +760,12 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
   const [customCreativityFuel, setCustomCreativityFuel] = useState<CreativityFuel>(CREATIVITY_FUELS[0]);
   const [avatarBuild, setAvatarBuild] = useState<AvatarBuilderConfig>(DEFAULT_AVATAR_BUILD);
   const [activeBuilderTabId, setActiveBuilderTabId] = useState<AvatarBuilderTabId>(AVATAR_BUILDER_TABS[0].id);
+  const [loadingBuilderTabId, setLoadingBuilderTabId] = useState<AvatarBuilderTabId | null>(null);
+  const [isBuilderAvatarPreviewLoading, setIsBuilderAvatarPreviewLoading] = useState<boolean>(false);
   const [selectedYearLevel, setSelectedYearLevel] = useState<YearLevel>(SCSA_ASSESSMENT_YEAR_OPTIONS[0].yearLevel);
   const [selectedCoursePathway, setSelectedCoursePathway] = useState<SeniorCoursePathway | undefined>(SCSA_ASSESSMENT_YEAR_OPTIONS[0].coursePathway);
+  const builderTabLoadIdRef = useRef(0);
+  const builderPreviewLoadIdRef = useRef(0);
 
   const selectedAssessmentOptionId = getAssessmentYearOptionId(selectedYearLevel, selectedCoursePathway);
   const customAvatarImageUrls = useMemo(() => getAvatarLayerImageUrls(avatarBuild), [avatarBuild]);
@@ -785,6 +801,10 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
     setHasEditedAvatarName(false);
     setCreationModeActive(false);
     setBuilderScreenActive(false);
+    builderTabLoadIdRef.current += 1;
+    builderPreviewLoadIdRef.current += 1;
+    setLoadingBuilderTabId(null);
+    setIsBuilderAvatarPreviewLoading(false);
   };
 
   const handleSelectCreateOwn = async () => {
@@ -819,8 +839,53 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
     return words.slice(0, 2).map(word => word[0]).join('').toUpperCase();
   };
 
+  const preloadBuilderAvatarPreview = (nextBuild: AvatarBuilderConfig) => {
+    const assets = getAvatarLayerPreloadAssets(nextBuild);
+    if (areAssetsPreloaded(assets)) {
+      setIsBuilderAvatarPreviewLoading(false);
+      return;
+    }
+
+    const loadId = builderPreviewLoadIdRef.current + 1;
+    builderPreviewLoadIdRef.current = loadId;
+    setIsBuilderAvatarPreviewLoading(true);
+    void preloadAssets(assets, { timeoutMs: 6500 }).finally(() => {
+      if (builderPreviewLoadIdRef.current === loadId) {
+        setIsBuilderAvatarPreviewLoading(false);
+      }
+    });
+  };
+
+  const handleBuilderTabChange = (tabId: AvatarBuilderTabId) => {
+    setActiveBuilderTabId(tabId);
+
+    const assets = getAvatarBuilderTabPreloadAssets(avatarBuild, tabId);
+    if (areAssetsPreloaded(assets)) {
+      builderTabLoadIdRef.current += 1;
+      setLoadingBuilderTabId(null);
+      return;
+    }
+
+    const loadId = builderTabLoadIdRef.current + 1;
+    builderTabLoadIdRef.current = loadId;
+    setLoadingBuilderTabId(tabId);
+    void preloadAssets(assets, { timeoutMs: 6500 }).finally(() => {
+      if (builderTabLoadIdRef.current === loadId) {
+        setLoadingBuilderTabId(null);
+      }
+    });
+  };
+
   const updateAvatarBuild = (key: AvatarBuilderTabId, value: string) => {
-    setAvatarBuild(currentBuild => ({ ...currentBuild, [key]: value }));
+    const nextBuild = { ...avatarBuild, [key]: value };
+    setAvatarBuild(nextBuild);
+    preloadBuilderAvatarPreview(nextBuild);
+
+    // The held-object artwork is the natural next interaction after changing
+    // an outfit. Keep this deliberately speculative and low priority.
+    if (key === 'outfitId') {
+      warmAssets(getAvatarBuilderTabPreloadAssets(nextBuild, 'heldObjectId'));
+    }
   };
 
   const updateHairColor = (colorGroup: HairColorGroup) => {
@@ -1063,7 +1128,7 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
                 role="tab"
                 aria-selected={isActiveTab}
                 aria-controls={`avatar-builder-panel-${tab.id}`}
-                onClick={() => setActiveBuilderTabId(tab.id)}
+                onClick={() => handleBuilderTabChange(tab.id)}
                 className={`rounded-sm text-transparent transition hover:bg-white/5 focus:outline-none focus-visible:ring-4 focus-visible:ring-pink-200/80 ${
                   isActiveTab
                     ? 'bg-pink-300/10 ring-2 ring-pink-200/70'
@@ -1083,6 +1148,13 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
               alt="Custom pixel avatar preview"
               className="h-full w-full drop-shadow-[0_10px_0_rgba(0,0,0,0.28)]"
             />
+            {(isBuilderAvatarPreviewLoading || loadingBuilderTabId !== null) && (
+              <AvatarAssetLoadingOverlay
+                label={loadingBuilderTabId
+                  ? `Loading ${AVATAR_BUILDER_TABS.find((tab) => tab.id === loadingBuilderTabId)?.label || 'avatar'} options`
+                  : 'Updating avatar preview'}
+              />
+            )}
           </div>
 
           <input
@@ -1127,8 +1199,14 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
             <p className="mt-1 line-clamp-2 text-[10px] font-semibold leading-tight text-white sm:text-xs">{selectedArtistIdentity.description}</p>
           </div>
 
-          <div className="absolute left-[32.3%] top-[43.4%] z-30 h-[40.4%] w-[57.2%] overflow-y-auto rounded-sm bg-[#171121] p-3 shadow-inner narrative-scrollbar sm:p-4">
+          <div
+            className="absolute left-[32.3%] top-[43.4%] z-30 h-[40.4%] w-[57.2%] overflow-y-auto rounded-sm bg-[#171121] p-3 shadow-inner narrative-scrollbar sm:p-4"
+            aria-busy={loadingBuilderTabId === activeBuilderTab.id}
+          >
             {renderActiveOptionGrid()}
+            {loadingBuilderTabId === activeBuilderTab.id && (
+              <AvatarAssetLoadingOverlay label={`Loading ${activeBuilderTab.label} options`} />
+            )}
           </div>
 
           <button

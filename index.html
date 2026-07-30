@@ -14522,6 +14522,8 @@ const loadBundledClassPacks = () => {
 const PRELOADED_CLASS_PACKS = loadBundledClassPacks();
 const imageLoadCache = new Map();
 const audioLoadCache = new Map();
+const imageLoadStates = new Map();
+const audioLoadStates = new Map();
 const WARM_ASSET_CONCURRENCY = 2;
 const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
 const withTimeout = (promise, timeoutMs) => (Promise.race([promise, wait(timeoutMs)]));
@@ -14538,14 +14540,19 @@ const preloadImage = (src) => {
     const request = new Promise((resolve) => {
         const image = new Image();
         image.decoding = 'async';
-        image.onload = () => {
-            if (typeof image.decode === 'function') {
-                image.decode().catch(() => undefined).finally(resolve);
-                return;
-            }
+        imageLoadStates.set(src, 'pending');
+        const settle = () => {
+            imageLoadStates.set(src, 'settled');
             resolve();
         };
-        image.onerror = () => resolve();
+        image.onload = () => {
+            if (typeof image.decode === 'function') {
+                image.decode().catch(() => undefined).finally(settle);
+                return;
+            }
+            settle();
+        };
+        image.onerror = settle;
         image.src = src;
     });
     imageLoadCache.set(src, request);
@@ -14557,6 +14564,7 @@ const preloadAudio = (src) => {
         return cached;
     const request = new Promise((resolve) => {
         const audio = new Audio();
+        audioLoadStates.set(src, 'pending');
         function cleanup() {
             audio.removeEventListener('canplaythrough', done);
             audio.removeEventListener('loadeddata', done);
@@ -14564,6 +14572,7 @@ const preloadAudio = (src) => {
         }
         function done() {
             cleanup();
+            audioLoadStates.set(src, 'settled');
             resolve();
         }
         audio.preload = 'auto';
@@ -14581,6 +14590,25 @@ const preloadOneAsset = (asset) => {
     if (!src)
         return Promise.resolve();
     return asset.type === 'audio' ? preloadAudio(src) : preloadImage(src);
+};
+const areAssetsPreloaded = (assets) => (assets.every((asset) => {
+    const src = normalizeAssetSrc(asset.src);
+    if (!src)
+        return true;
+    const loadState = asset.type === 'audio'
+        ? audioLoadStates.get(src)
+        : imageLoadStates.get(src);
+    return loadState === 'settled';
+}));
+const markAssetPreloaded = (asset) => {
+    const src = normalizeAssetSrc(asset.src);
+    if (!src)
+        return;
+    if (asset.type === 'audio') {
+        audioLoadStates.set(src, 'settled');
+        return;
+    }
+    imageLoadStates.set(src, 'settled');
 };
 const preloadAssets = async (assets, options = {}) => {
     const timeoutMs = options.timeoutMs ?? 3500;
@@ -14638,6 +14666,12 @@ const warmAssets = (assets) => {
     window.setTimeout(beginWarming, 120);
 };
 const waitForMinimum = wait;
+const avatarPreloadImage = (src) => ({
+    type: 'image',
+    src,
+});
+const getAvatarLayerPreloadAssets = (avatarBuild) => (getAvatarLayerImageUrls(avatarBuild).map(avatarPreloadImage));
+const getAvatarTabPreviewPreloadAssets = (avatarBuild, tabId, optionIds) => (optionIds.flatMap((optionId) => (getAvatarAssetPreviewImageUrls(avatarBuild, tabId, optionId).map(avatarPreloadImage))));
 const LoadingSpinner = ({ size = 8, color = 'text-pink-400' }) => {
     return (React.createElement("svg", { className: `animate-spin h-${size} w-${size} ${color}`, xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24" },
         React.createElement("circle", { className: "opacity-25", cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "4" }),
@@ -14751,9 +14785,12 @@ const AvatarLayeredPreview = ({ imageUrls, alt, className = '', imageClassName =
     const [baseImageUrl, ...layerImageUrls] = imageUrls;
     if (!baseImageUrl)
         return null;
+    const handleImageSettled = (imageUrl) => {
+        markAssetPreloaded({ type: 'image', src: imageUrl });
+    };
     return (React.createElement("span", { className: `relative inline-flex items-center justify-center ${className}` },
-        React.createElement("img", { src: baseImageUrl, alt: alt, className: `h-full w-full object-contain ${imageClassName}`, style: { imageRendering: 'pixelated' } }),
-        layerImageUrls.map((imageUrl) => (React.createElement("img", { key: imageUrl, src: imageUrl, alt: "", className: `pointer-events-none absolute inset-0 h-full w-full object-contain ${imageClassName}`, style: { imageRendering: 'pixelated' }, "aria-hidden": "true" })))));
+        React.createElement("img", { src: baseImageUrl, alt: alt, className: `h-full w-full object-contain ${imageClassName}`, style: { imageRendering: 'pixelated' }, onLoad: () => handleImageSettled(baseImageUrl), onError: () => handleImageSettled(baseImageUrl) }),
+        layerImageUrls.map((imageUrl) => (React.createElement("img", { key: imageUrl, src: imageUrl, alt: "", className: `pointer-events-none absolute inset-0 h-full w-full object-contain ${imageClassName}`, style: { imageRendering: 'pixelated' }, "aria-hidden": "true", onLoad: () => handleImageSettled(imageUrl), onError: () => handleImageSettled(imageUrl) })))));
 };
 const assetPreviewCx = (...classes) => (classes.filter(Boolean).join(' '));
 const ASSET_PREVIEW_LONG_FILL = {
@@ -14821,16 +14858,23 @@ const getCombinedBoundsForImageUrls = (imageUrls) => (combineAssetBounds(imageUr
     .filter((bounds) => !!bounds)));
 const AssetPreviewFrame = ({ className, children, }) => (React.createElement("span", { className: assetPreviewCx('relative inline-flex items-center justify-center overflow-hidden rounded-md border border-cyan-100/20 bg-[radial-gradient(circle,rgba(226,232,240,0.24),rgba(30,41,59,0.56)_62%,rgba(3,7,18,0.86))] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]', className) }, children));
 const AvatarAssetPreview = ({ imageUrls, tabId, label, className, }) => {
+    const handleImageSettled = (imageUrl) => {
+        markAssetPreloaded({ type: 'image', src: imageUrl });
+    };
     if (imageUrls.length === 0) {
         return (React.createElement("span", { className: assetPreviewCx('flex items-center justify-center overflow-hidden rounded-md border border-dashed border-slate-500/45 bg-[#030817]/80 px-1 text-center font-serif text-[10px] font-black uppercase leading-tight text-slate-300', className) }, label));
     }
     const combinedBounds = getCombinedBoundsForImageUrls(imageUrls);
     if (!combinedBounds) {
-        return (React.createElement(AssetPreviewFrame, { className: className }, imageUrls.map(imageUrl => (React.createElement("img", { key: imageUrl, src: imageUrl, alt: "", className: "pointer-events-none absolute h-full w-full max-h-none max-w-none object-contain", style: { imageRendering: 'pixelated' }, draggable: false, "aria-hidden": "true" })))));
+        return (React.createElement(AssetPreviewFrame, { className: className }, imageUrls.map(imageUrl => (React.createElement("img", { key: imageUrl, src: imageUrl, alt: "", className: "pointer-events-none absolute h-full w-full max-h-none max-w-none object-contain", style: { imageRendering: 'pixelated' }, draggable: false, "aria-hidden": "true", onLoad: () => handleImageSettled(imageUrl), onError: () => handleImageSettled(imageUrl) })))));
     }
     const fitStyle = getAssetFitStyle(combinedBounds, tabId);
-    return (React.createElement(AssetPreviewFrame, { className: className }, imageUrls.map(imageUrl => (React.createElement("img", { key: imageUrl, src: imageUrl, alt: "", className: "pointer-events-none absolute max-h-none max-w-none object-fill", style: fitStyle, draggable: false, "aria-hidden": "true" })))));
+    return (React.createElement(AssetPreviewFrame, { className: className }, imageUrls.map(imageUrl => (React.createElement("img", { key: imageUrl, src: imageUrl, alt: "", className: "pointer-events-none absolute max-h-none max-w-none object-fill", style: fitStyle, draggable: false, "aria-hidden": "true", onLoad: () => handleImageSettled(imageUrl), onError: () => handleImageSettled(imageUrl) })))));
 };
+const AvatarAssetLoadingOverlay = ({ label }) => (React.createElement("div", { className: "absolute inset-0 z-30 grid place-items-center bg-[#050914]/82 p-2 text-center backdrop-blur-[1px]", role: "status", "aria-live": "polite", "aria-label": label },
+    React.createElement("div", { className: "flex max-w-[12rem] items-center justify-center gap-2 rounded-md border border-cyan-200/45 bg-[#111a2e]/95 px-2.5 py-2 text-[10px] font-black uppercase leading-tight text-cyan-100 shadow-[0_4px_16px_rgba(0,0,0,0.45)]" },
+        React.createElement("span", { className: "h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-cyan-100/30 border-t-amber-200", "aria-hidden": "true" }),
+        React.createElement("span", null, label))));
 const artQuestCx = (...classes) => (classes.filter(Boolean).join(' '));
 const GOLD_TEXT_CLASS = 'text-transparent bg-clip-text bg-gradient-to-b from-[#fff2bc] via-[#f3bd47] to-[#c97921]';
 const PANEL_SURFACE_CLASS = 'border border-[#a66c2b]/75 bg-[#061125]/92 shadow-[inset_0_0_0_1px_rgba(255,236,176,0.08),inset_0_0_34px_rgba(105,46,150,0.12),0_12px_28px_rgba(0,0,0,0.36)]';
@@ -16802,14 +16846,19 @@ const AVATAR_BUILDER_TABS = [
     { id: 'outfitId', label: 'Outfit', shortLabel: 'Outfit', options: OUTFITS },
     { id: 'heldObjectId', label: 'Object To Hold', shortLabel: 'Object', options: HELD_OBJECTS },
 ];
-const avatarBuilderImageAsset = (src) => ({ type: 'image', src });
 const getAvatarBuilderCriticalPreloadAssets = (avatarBuild) => [
-    avatarBuilderImageAsset(AVATAR_BUILDER_BACKGROUND),
-    ...getAvatarLayerImageUrls(avatarBuild).map(avatarBuilderImageAsset),
+    avatarPreloadImage(AVATAR_BUILDER_BACKGROUND),
+    ...getAvatarLayerPreloadAssets(avatarBuild),
 ];
+const getAvatarBuilderTabPreloadAssets = (avatarBuild, tabId) => {
+    const tab = AVATAR_BUILDER_TABS.find((candidate) => candidate.id === tabId);
+    if (!tab || tabId === 'skinToneId')
+        return [];
+    return getAvatarTabPreviewPreloadAssets(avatarBuild, tabId, tab.options.map((option) => option.id));
+};
 const getAvatarBuilderPreviewWarmAssets = () => (AVATAR_BUILDER_TABS
     .filter((tab) => tab.id !== 'skinToneId')
-    .flatMap((tab) => tab.options.flatMap((option) => (getAvatarAssetPreviewImageUrls(DEFAULT_AVATAR_BUILD, tab.id, option.id).map(avatarBuilderImageAsset)))));
+    .flatMap((tab) => getAvatarBuilderTabPreloadAssets(DEFAULT_AVATAR_BUILD, tab.id)));
 const OUTLINE = '#111827';
 const getOptionById = (options, id) => (options.find(option => option.id === id) || options[0]);
 const getHairColorId = (hairStyleId) => hairStyleId.split('_')[0] || hairStyleId;
@@ -17177,8 +17226,12 @@ const NewGameSetupScreen = ({ onStartNewGameSetupComplete }) => {
     const [customCreativityFuel, setCustomCreativityFuel] = useState(CREATIVITY_FUELS[0]);
     const [avatarBuild, setAvatarBuild] = useState(DEFAULT_AVATAR_BUILD);
     const [activeBuilderTabId, setActiveBuilderTabId] = useState(AVATAR_BUILDER_TABS[0].id);
+    const [loadingBuilderTabId, setLoadingBuilderTabId] = useState(null);
+    const [isBuilderAvatarPreviewLoading, setIsBuilderAvatarPreviewLoading] = useState(false);
     const [selectedYearLevel, setSelectedYearLevel] = useState(SCSA_ASSESSMENT_YEAR_OPTIONS[0].yearLevel);
     const [selectedCoursePathway, setSelectedCoursePathway] = useState(SCSA_ASSESSMENT_YEAR_OPTIONS[0].coursePathway);
+    const builderTabLoadIdRef = useRef(0);
+    const builderPreviewLoadIdRef = useRef(0);
     const selectedAssessmentOptionId = getAssessmentYearOptionId(selectedYearLevel, selectedCoursePathway);
     const customAvatarImageUrls = useMemo(() => getAvatarLayerImageUrls(avatarBuild), [avatarBuild]);
     const hairColorGroups = useMemo(() => buildHairColorGroups(HAIR_STYLE_OPTIONS), []);
@@ -17210,6 +17263,10 @@ const NewGameSetupScreen = ({ onStartNewGameSetupComplete }) => {
         setHasEditedAvatarName(false);
         setCreationModeActive(false);
         setBuilderScreenActive(false);
+        builderTabLoadIdRef.current += 1;
+        builderPreviewLoadIdRef.current += 1;
+        setLoadingBuilderTabId(null);
+        setIsBuilderAvatarPreviewLoading(false);
     };
     const handleSelectCreateOwn = async () => {
         if (isPreparingAvatarBuilder)
@@ -17239,8 +17296,45 @@ const NewGameSetupScreen = ({ onStartNewGameSetupComplete }) => {
         }
         return words.slice(0, 2).map(word => word[0]).join('').toUpperCase();
     };
+    const preloadBuilderAvatarPreview = (nextBuild) => {
+        const assets = getAvatarLayerPreloadAssets(nextBuild);
+        if (areAssetsPreloaded(assets)) {
+            setIsBuilderAvatarPreviewLoading(false);
+            return;
+        }
+        const loadId = builderPreviewLoadIdRef.current + 1;
+        builderPreviewLoadIdRef.current = loadId;
+        setIsBuilderAvatarPreviewLoading(true);
+        void preloadAssets(assets, { timeoutMs: 6500 }).finally(() => {
+            if (builderPreviewLoadIdRef.current === loadId) {
+                setIsBuilderAvatarPreviewLoading(false);
+            }
+        });
+    };
+    const handleBuilderTabChange = (tabId) => {
+        setActiveBuilderTabId(tabId);
+        const assets = getAvatarBuilderTabPreloadAssets(avatarBuild, tabId);
+        if (areAssetsPreloaded(assets)) {
+            builderTabLoadIdRef.current += 1;
+            setLoadingBuilderTabId(null);
+            return;
+        }
+        const loadId = builderTabLoadIdRef.current + 1;
+        builderTabLoadIdRef.current = loadId;
+        setLoadingBuilderTabId(tabId);
+        void preloadAssets(assets, { timeoutMs: 6500 }).finally(() => {
+            if (builderTabLoadIdRef.current === loadId) {
+                setLoadingBuilderTabId(null);
+            }
+        });
+    };
     const updateAvatarBuild = (key, value) => {
-        setAvatarBuild(currentBuild => ({ ...currentBuild, [key]: value }));
+        const nextBuild = { ...avatarBuild, [key]: value };
+        setAvatarBuild(nextBuild);
+        preloadBuilderAvatarPreview(nextBuild);
+        if (key === 'outfitId') {
+            warmAssets(getAvatarBuilderTabPreloadAssets(nextBuild, 'heldObjectId'));
+        }
     };
     const updateHairColor = (colorGroup) => {
         const matchingStyle = colorGroup.options.find(option => getHairStyleKey(option.id) === selectedHairStyleKey)
@@ -17351,12 +17445,15 @@ const NewGameSetupScreen = ({ onStartNewGameSetupComplete }) => {
                 React.createElement("img", { src: AVATAR_BUILDER_BACKGROUND, alt: "Build your pixel avatar screen", className: "absolute inset-0 h-full w-full object-cover", draggable: false }),
                 React.createElement("div", { className: "absolute left-[9.8%] top-[8.8%] z-40 grid h-[11.4%] w-[80.8%] grid-cols-5 gap-[1.1%]", role: "tablist", "aria-label": "Avatar builder parts" }, AVATAR_BUILDER_TABS.map((tab) => {
                     const isActiveTab = tab.id === activeBuilderTab.id;
-                    return (React.createElement("button", { key: tab.id, id: `avatar-builder-tab-${tab.id}`, type: "button", role: "tab", "aria-selected": isActiveTab, "aria-controls": `avatar-builder-panel-${tab.id}`, onClick: () => setActiveBuilderTabId(tab.id), className: `rounded-sm text-transparent transition hover:bg-white/5 focus:outline-none focus-visible:ring-4 focus-visible:ring-pink-200/80 ${isActiveTab
+                    return (React.createElement("button", { key: tab.id, id: `avatar-builder-tab-${tab.id}`, type: "button", role: "tab", "aria-selected": isActiveTab, "aria-controls": `avatar-builder-panel-${tab.id}`, onClick: () => handleBuilderTabChange(tab.id), className: `rounded-sm text-transparent transition hover:bg-white/5 focus:outline-none focus-visible:ring-4 focus-visible:ring-pink-200/80 ${isActiveTab
                             ? 'bg-pink-300/10 ring-2 ring-pink-200/70'
                             : 'bg-transparent'}`, "aria-label": `Show ${tab.label} options` }, tab.shortLabel));
                 })),
                 React.createElement("div", { className: "absolute left-[11.6%] top-[28.8%] z-30 flex h-[29.8%] w-[18.6%] items-end justify-center pointer-events-none" },
-                    React.createElement(AvatarLayeredPreview, { imageUrls: customAvatarImageUrls, alt: "Custom pixel avatar preview", className: "h-full w-full drop-shadow-[0_10px_0_rgba(0,0,0,0.28)]" })),
+                    React.createElement(AvatarLayeredPreview, { imageUrls: customAvatarImageUrls, alt: "Custom pixel avatar preview", className: "h-full w-full drop-shadow-[0_10px_0_rgba(0,0,0,0.28)]" }),
+                    (isBuilderAvatarPreviewLoading || loadingBuilderTabId !== null) && (React.createElement(AvatarAssetLoadingOverlay, { label: loadingBuilderTabId
+                            ? `Loading ${AVATAR_BUILDER_TABS.find((tab) => tab.id === loadingBuilderTabId)?.label || 'avatar'} options`
+                            : 'Updating avatar preview' }))),
                 React.createElement("input", { type: "text", id: "builderAvatarName", value: customAvatarName, onChange: (e) => handleAvatarNameChange(e.target.value), placeholder: "Enter Name", className: BUILDER_OVERLAY_NAME_INPUT_CLASS, style: { left: '19.4%', top: '64.2%', width: '9.8%', height: '4.5%' }, "aria-label": "Enter your artist name" }),
                 React.createElement("div", { className: "absolute left-[12.1%] top-[69.2%] z-30 flex h-[12.5%] w-[16.7%] items-center justify-center overflow-hidden bg-[#111126] px-2 py-1 text-center" },
                     React.createElement("p", { className: "text-sm font-bold italic leading-tight text-purple-100 sm:text-base" }, selectedArtistIdentity.title)),
@@ -17365,7 +17462,9 @@ const NewGameSetupScreen = ({ onStartNewGameSetupComplete }) => {
                 React.createElement("div", { className: "absolute left-[40.5%] top-[33.7%] z-30 h-[6.6%] w-[46.6%] overflow-hidden px-2" },
                     React.createElement("p", { className: "truncate text-sm font-black leading-tight text-pink-200 sm:text-base" }, selectedArtistIdentity.title),
                     React.createElement("p", { className: "mt-1 line-clamp-2 text-[10px] font-semibold leading-tight text-white sm:text-xs" }, selectedArtistIdentity.description)),
-                React.createElement("div", { className: "absolute left-[32.3%] top-[43.4%] z-30 h-[40.4%] w-[57.2%] overflow-y-auto rounded-sm bg-[#171121] p-3 shadow-inner narrative-scrollbar sm:p-4" }, renderActiveOptionGrid()),
+                React.createElement("div", { className: "absolute left-[32.3%] top-[43.4%] z-30 h-[40.4%] w-[57.2%] overflow-y-auto rounded-sm bg-[#171121] p-3 shadow-inner narrative-scrollbar sm:p-4", "aria-busy": loadingBuilderTabId === activeBuilderTab.id },
+                    renderActiveOptionGrid(),
+                    loadingBuilderTabId === activeBuilderTab.id && (React.createElement(AvatarAssetLoadingOverlay, { label: `Loading ${activeBuilderTab.label} options` }))),
                 React.createElement("button", { type: "button", onClick: () => setBuilderScreenActive(false), className: "absolute left-[32.1%] top-[86.1%] z-40 h-[6.6%] w-[11.6%] border-2 border-[#080814] bg-[#343142]/90 px-3 text-sm font-black uppercase text-amber-100 shadow-[0_4px_0_rgba(0,0,0,0.55)] transition hover:bg-[#454056] focus:outline-none focus:ring-4 focus:ring-pink-200 sm:text-base", "aria-label": "Back to artist profile" }, "Back"),
                 React.createElement("button", { type: "button", onClick: handleStartClick, disabled: !selectedYearLevel, className: "absolute left-[73.4%] top-[86.1%] z-40 h-[6.6%] w-[16.1%] border-2 border-[#080814] bg-[#b93473] px-3 text-sm font-black uppercase text-white shadow-[0_4px_0_rgba(0,0,0,0.55)] transition hover:bg-[#cf4a8a] focus:outline-none focus:ring-4 focus:ring-pink-200 disabled:cursor-not-allowed disabled:grayscale disabled:opacity-60 sm:text-base", "aria-label": "Begin ArtQuest with this custom avatar" }, "Begin ArtQuest"))));
     }
@@ -23026,6 +23125,12 @@ const getEnergyMilestones = (maxXp, currentXP) => ([0.25, 0.5, 0.75, 1].map((rat
     };
 }));
 const getInventoryTabById = (tabId) => (AVATAR_REWARD_BUILDER_TABS.find(tab => tab.id === tabId) || AVATAR_REWARD_BUILDER_TABS[0]);
+const getInventoryTabPreloadAssets = (avatarBuild, tabId) => {
+    const tab = getInventoryTabById(tabId);
+    if (tab.id === 'skinToneId')
+        return [];
+    return getAvatarTabPreviewPreloadAssets(avatarBuild, tab.id, tab.options.map((option) => option.id));
+};
 const getInventoryIconInitials = (name) => {
     const words = name.trim().split(/\s+/).filter(Boolean);
     if (words.length === 0)
@@ -23040,10 +23145,31 @@ const InventoryScreen = ({ playerStats, selectedAvatar, onReturnToMap, onUpdateA
     const [saveMessage, setSaveMessage] = useState(null);
     const [isEditingAvatarName, setIsEditingAvatarName] = useState(false);
     const [avatarNameDraft, setAvatarNameDraft] = useState(selectedAvatar?.name || '');
+    const [loadingInventoryTabId, setLoadingInventoryTabId] = useState(null);
+    const [isInventoryAvatarPreviewLoading, setIsInventoryAvatarPreviewLoading] = useState(false);
+    const inventoryTabLoadIdRef = useRef(0);
+    const inventoryPreviewLoadIdRef = useRef(0);
     useEffect(() => {
-        setAvatarBuild({ ...getAvatarBuildForAvatar(selectedAvatar), accessoryId: 'none' });
+        const nextBuild = { ...getAvatarBuildForAvatar(selectedAvatar), accessoryId: 'none' };
+        setAvatarBuild(nextBuild);
         setAvatarNameDraft(selectedAvatar?.name || '');
         setIsEditingAvatarName(false);
+        inventoryTabLoadIdRef.current += 1;
+        inventoryPreviewLoadIdRef.current += 1;
+        setLoadingInventoryTabId(null);
+        setIsInventoryAvatarPreviewLoading(false);
+        const initialTabId = 'hairStyleId';
+        const initialTabAssets = getInventoryTabPreloadAssets(nextBuild, initialTabId);
+        if (!areAssetsPreloaded(initialTabAssets)) {
+            const loadId = inventoryTabLoadIdRef.current + 1;
+            inventoryTabLoadIdRef.current = loadId;
+            setLoadingInventoryTabId(initialTabId);
+            void preloadAssets(initialTabAssets, { timeoutMs: 6500 }).finally(() => {
+                if (inventoryTabLoadIdRef.current === loadId) {
+                    setLoadingInventoryTabId(null);
+                }
+            });
+        }
     }, [selectedAvatar]);
     const activeTab = useMemo(() => AVATAR_REWARD_BUILDER_TABS.find(tab => tab.id === activeTabId) || AVATAR_REWARD_BUILDER_TABS[0], [activeTabId]);
     const unlockedRewards = useMemo(() => getUnlockedRewardMilestones(playerStats), [playerStats]);
@@ -23064,13 +23190,52 @@ const InventoryScreen = ({ playerStats, selectedAvatar, onReturnToMap, onUpdateA
     const energyMilestones = getEnergyMilestones(playerStats.artEnergy.maxXp, playerStats.artEnergy.currentXP);
     const nextEnergyMilestone = energyMilestones.find(milestone => !milestone.isUnlocked);
     const unlockedAssetCount = AVATAR_REWARD_BUILDER_TABS.reduce((count, tab) => (count + getUnlockedOptionsForTab(tab, playerStats).length), 0);
+    const preloadInventoryAvatarPreview = (nextBuild) => {
+        const assets = getAvatarLayerPreloadAssets(nextBuild);
+        if (areAssetsPreloaded(assets)) {
+            setIsInventoryAvatarPreviewLoading(false);
+            return;
+        }
+        const loadId = inventoryPreviewLoadIdRef.current + 1;
+        inventoryPreviewLoadIdRef.current = loadId;
+        setIsInventoryAvatarPreviewLoading(true);
+        void preloadAssets(assets, { timeoutMs: 6500 }).finally(() => {
+            if (inventoryPreviewLoadIdRef.current === loadId) {
+                setIsInventoryAvatarPreviewLoading(false);
+            }
+        });
+    };
+    const handleInventoryTabChange = (tabId) => {
+        setActiveTabId(tabId);
+        const assets = getInventoryTabPreloadAssets(avatarBuild, tabId);
+        if (areAssetsPreloaded(assets)) {
+            inventoryTabLoadIdRef.current += 1;
+            setLoadingInventoryTabId(null);
+            return;
+        }
+        const loadId = inventoryTabLoadIdRef.current + 1;
+        inventoryTabLoadIdRef.current = loadId;
+        setLoadingInventoryTabId(tabId);
+        void preloadAssets(assets, { timeoutMs: 6500 }).finally(() => {
+            if (inventoryTabLoadIdRef.current === loadId) {
+                setLoadingInventoryTabId(null);
+            }
+        });
+    };
     const updateAvatarBuild = (key, value) => {
-        setAvatarBuild(currentBuild => ({ ...currentBuild, [key]: value }));
+        const nextBuild = { ...avatarBuild, [key]: value };
+        setAvatarBuild(nextBuild);
         setSaveMessage(null);
+        preloadInventoryAvatarPreview(nextBuild);
+        if (key === 'outfitId') {
+            warmAssets(getInventoryTabPreloadAssets(nextBuild, 'heldObjectId'));
+        }
     };
     const resetAvatarBuild = () => {
-        setAvatarBuild({ ...getAvatarBuildForAvatar(selectedAvatar), accessoryId: 'none' });
+        const nextBuild = { ...getAvatarBuildForAvatar(selectedAvatar), accessoryId: 'none' };
+        setAvatarBuild(nextBuild);
         setSaveMessage(null);
+        preloadInventoryAvatarPreview(nextBuild);
     };
     const randomizeAvatarBuild = () => {
         const randomizedBuild = { ...avatarBuild };
@@ -23079,8 +23244,11 @@ const InventoryScreen = ({ playerStats, selectedAvatar, onReturnToMap, onUpdateA
             const randomOption = unlockedOptions[Math.floor(Math.random() * unlockedOptions.length)] || tab.options[0];
             randomizedBuild[tab.id] = randomOption.id;
         });
-        setAvatarBuild(normalizeAvatarBuild({ ...randomizedBuild, accessoryId: 'none' }));
+        const nextBuild = normalizeAvatarBuild({ ...randomizedBuild, accessoryId: 'none' });
+        setAvatarBuild(nextBuild);
         setSaveMessage(null);
+        preloadInventoryAvatarPreview(nextBuild);
+        warmAssets(getInventoryTabPreloadAssets(nextBuild, 'heldObjectId'));
     };
     const handleSaveAvatar = () => {
         const normalizedBuild = { ...normalizeAvatarBuild(avatarBuild), accessoryId: 'none' };
@@ -23259,12 +23427,15 @@ const InventoryScreen = ({ playerStats, selectedAvatar, onReturnToMap, onUpdateA
                                         }, maxLength: 32, className: "h-8 w-full rounded-md border border-[#dba44a]/70 bg-[#071226] px-2 text-center text-sm font-bold text-white outline-none focus:ring-2 focus:ring-fuchsia-300", "aria-label": "Edit avatar name" }),
                                     React.createElement("div", { className: "flex justify-center gap-1.5" },
                                         React.createElement("button", { type: "button", onClick: handleSaveAvatarName, className: "min-h-7 rounded-md border border-emerald-300/70 bg-emerald-700/80 px-2 text-[10px] font-black uppercase text-white shadow-[0_2px_0_rgba(0,0,0,0.35)] transition hover:brightness-115 focus:outline-none focus:ring-2 focus:ring-emerald-200" }, "Save"),
-                                        React.createElement("button", { type: "button", onClick: handleCancelEditingAvatarName, className: "min-h-7 rounded-md border border-[#9a6328]/70 bg-[#08162e]/85 px-2 text-[10px] font-black uppercase text-[#ffe8ad] shadow-[0_2px_0_rgba(0,0,0,0.35)] transition hover:border-[#f2c15c] hover:bg-[#102245] focus:outline-none focus:ring-2 focus:ring-[#ffd978]" }, "Cancel")))) : (React.createElement("button", { type: "button", onClick: handleStartEditingAvatarName, className: "mt-2 min-h-7 rounded-md border border-[#9a6328]/70 bg-[#08162e]/85 px-3 text-[10px] font-black uppercase text-[#ffe8ad] shadow-[0_2px_0_rgba(0,0,0,0.35)] transition hover:border-[#f2c15c] hover:bg-[#102245] focus:outline-none focus:ring-2 focus:ring-[#ffd978]" }, "Edit Name")))))),
+                                        React.createElement("button", { type: "button", onClick: handleCancelEditingAvatarName, className: "min-h-7 rounded-md border border-[#9a6328]/70 bg-[#08162e]/85 px-2 text-[10px] font-black uppercase text-[#ffe8ad] shadow-[0_2px_0_rgba(0,0,0,0.35)] transition hover:border-[#f2c15c] hover:bg-[#102245] focus:outline-none focus:ring-2 focus:ring-[#ffd978]" }, "Cancel")))) : (React.createElement("button", { type: "button", onClick: handleStartEditingAvatarName, className: "mt-2 min-h-7 rounded-md border border-[#9a6328]/70 bg-[#08162e]/85 px-3 text-[10px] font-black uppercase text-[#ffe8ad] shadow-[0_2px_0_rgba(0,0,0,0.35)] transition hover:border-[#f2c15c] hover:bg-[#102245] focus:outline-none focus:ring-2 focus:ring-[#ffd978]" }, "Edit Name")))),
+                        (isInventoryAvatarPreviewLoading || loadingInventoryTabId !== null) && (React.createElement(AvatarAssetLoadingOverlay, { label: loadingInventoryTabId
+                                ? `Loading ${getInventoryTabById(loadingInventoryTabId).label} options`
+                                : 'Updating avatar preview' })))),
                 React.createElement("div", { className: "min-w-0" },
                     React.createElement("div", { className: "mb-2 grid grid-cols-2 gap-1.5 sm:grid-cols-5", role: "tablist", "aria-label": "Inventory avatar editor parts" }, AVATAR_REWARD_BUILDER_TABS.map((tab, index) => {
                         const isActive = tab.id === activeTab.id;
                         const selectedOption = getAvatarRewardOptionById(tab.options, avatarBuild[tab.id]);
-                        return (React.createElement("button", { key: tab.id, type: "button", role: "tab", "aria-selected": isActive, "aria-controls": `inventory-avatar-tab-${tab.id}`, id: `inventory-avatar-tab-button-${tab.id}`, onClick: () => setActiveTabId(tab.id), className: artQuestCx('rounded-md border p-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-fuchsia-300', isActive
+                        return (React.createElement("button", { key: tab.id, type: "button", role: "tab", "aria-selected": isActive, "aria-controls": `inventory-avatar-tab-${tab.id}`, id: `inventory-avatar-tab-button-${tab.id}`, onClick: () => handleInventoryTabChange(tab.id), className: artQuestCx('rounded-md border p-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-fuchsia-300', isActive
                                 ? 'border-fuchsia-300 bg-fuchsia-500/20 text-white shadow-[0_0_22px_rgba(217,70,239,0.22)]'
                                 : 'border-[#7f5524]/70 bg-[#0b1830] text-[#e8d7bc] hover:border-fuchsia-300') },
                             React.createElement("span", { className: "mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-md border border-[#9a6328]/50 bg-[#071126]" }, renderAssetTabPreview(tab.id)),
@@ -23276,7 +23447,7 @@ const InventoryScreen = ({ playerStats, selectedAvatar, onReturnToMap, onUpdateA
                                 " - ",
                                 selectedOption.name)));
                     })),
-                    React.createElement(ArtQuestPanel, { as: "div", variant: "inner", id: `inventory-avatar-tab-${activeTab.id}`, role: "tabpanel", "aria-labelledby": `inventory-avatar-tab-button-${activeTab.id}`, className: "max-h-[330px] overflow-y-auto p-3 narrative-scrollbar xl:max-h-[360px]" },
+                    React.createElement(ArtQuestPanel, { as: "div", variant: "inner", id: `inventory-avatar-tab-${activeTab.id}`, role: "tabpanel", "aria-labelledby": `inventory-avatar-tab-button-${activeTab.id}`, className: "relative max-h-[330px] overflow-y-auto p-3 narrative-scrollbar xl:max-h-[360px]", "aria-busy": loadingInventoryTabId === activeTab.id },
                         React.createElement("div", { className: "mb-2 flex items-end justify-between gap-3" },
                             React.createElement("div", null,
                                 React.createElement("p", { className: "text-xs font-black uppercase text-cyan-200" },
@@ -23288,7 +23459,8 @@ const InventoryScreen = ({ playerStats, selectedAvatar, onReturnToMap, onUpdateA
                             React.createElement("p", { className: "text-right text-sm text-[#f4dfc1]" },
                                 "Selected: ",
                                 React.createElement("span", { className: "font-bold text-white" }, selectedActiveOption.name))),
-                        activeTab.id === 'skinToneId' ? renderSkinToneOptionGrid() : activeTab.id === 'hairStyleId' ? renderHairOptionGrid() : renderOptionGrid())))),
+                        activeTab.id === 'skinToneId' ? renderSkinToneOptionGrid() : activeTab.id === 'hairStyleId' ? renderHairOptionGrid() : renderOptionGrid(),
+                        loadingInventoryTabId === activeTab.id && (React.createElement(AvatarAssetLoadingOverlay, { label: `Loading ${activeTab.label} options` })))))),
         React.createElement("aside", { className: "xl:min-h-0" },
             React.createElement(ArtQuestPanel, { className: "p-3 xl:h-full xl:min-h-0" },
                 React.createElement(ArtQuestSectionTitle, null, "Art Energy & Rewards"),

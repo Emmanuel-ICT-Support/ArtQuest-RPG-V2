@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { AvatarAssetTabId, AvatarBuilderConfig, InventoryScreenProps, PlayerTrait, TraitName } from '../types';
 import {
   AVATAR_REWARD_BUILDER_TABS,
@@ -19,7 +19,13 @@ import {
 } from '../data/AvatarRewards';
 import type { AvatarRewardMilestone, BuilderOption } from '../data/AvatarRewards';
 import AvatarAssetPreview from './AvatarAssetPreview';
+import AvatarAssetLoadingOverlay from './AvatarAssetLoadingOverlay';
 import AvatarLayeredPreview from './AvatarLayeredPreview';
+import { areAssetsPreloaded, preloadAssets, warmAssets } from '../utils/assetPreloader';
+import {
+  getAvatarLayerPreloadAssets,
+  getAvatarTabPreviewPreloadAssets,
+} from '../utils/avatarAssetPreload';
 import {
   ArtQuestButton,
   ArtQuestIconTile,
@@ -205,6 +211,16 @@ const getInventoryTabById = (tabId: AvatarAssetTabId) => (
   AVATAR_REWARD_BUILDER_TABS.find(tab => tab.id === tabId) || AVATAR_REWARD_BUILDER_TABS[0]
 );
 
+const getInventoryTabPreloadAssets = (
+  avatarBuild: AvatarBuilderConfig,
+  tabId: AvatarAssetTabId,
+) => {
+  const tab = getInventoryTabById(tabId);
+  if (tab.id === 'skinToneId') return [];
+
+  return getAvatarTabPreviewPreloadAssets(avatarBuild, tab.id, tab.options.map((option) => option.id));
+};
+
 const getInventoryIconInitials = (name: string): string => {
   const words = name.trim().split(/\s+/).filter(Boolean);
   if (words.length === 0) return '??';
@@ -225,11 +241,36 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isEditingAvatarName, setIsEditingAvatarName] = useState<boolean>(false);
   const [avatarNameDraft, setAvatarNameDraft] = useState<string>(selectedAvatar?.name || '');
+  const [loadingInventoryTabId, setLoadingInventoryTabId] = useState<AvatarAssetTabId | null>(null);
+  const [isInventoryAvatarPreviewLoading, setIsInventoryAvatarPreviewLoading] = useState<boolean>(false);
+  const inventoryTabLoadIdRef = useRef(0);
+  const inventoryPreviewLoadIdRef = useRef(0);
 
   useEffect(() => {
-    setAvatarBuild({ ...getAvatarBuildForAvatar(selectedAvatar), accessoryId: 'none' });
+    const nextBuild = { ...getAvatarBuildForAvatar(selectedAvatar), accessoryId: 'none' };
+    setAvatarBuild(nextBuild);
     setAvatarNameDraft(selectedAvatar?.name || '');
     setIsEditingAvatarName(false);
+    inventoryTabLoadIdRef.current += 1;
+    inventoryPreviewLoadIdRef.current += 1;
+    setLoadingInventoryTabId(null);
+    setIsInventoryAvatarPreviewLoading(false);
+
+    // The live preview is ready before this component opens. Load its initial
+    // Hair tab here too, showing the same small panel loader used for later
+    // tab changes if a cold cache still needs those thumbnail images.
+    const initialTabId: AvatarAssetTabId = 'hairStyleId';
+    const initialTabAssets = getInventoryTabPreloadAssets(nextBuild, initialTabId);
+    if (!areAssetsPreloaded(initialTabAssets)) {
+      const loadId = inventoryTabLoadIdRef.current + 1;
+      inventoryTabLoadIdRef.current = loadId;
+      setLoadingInventoryTabId(initialTabId);
+      void preloadAssets(initialTabAssets, { timeoutMs: 6500 }).finally(() => {
+        if (inventoryTabLoadIdRef.current === loadId) {
+          setLoadingInventoryTabId(null);
+        }
+      });
+    }
   }, [selectedAvatar]);
 
   const activeTab = useMemo(
@@ -270,14 +311,59 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
     count + getUnlockedOptionsForTab(tab, playerStats).length
   ), 0);
 
+  const preloadInventoryAvatarPreview = (nextBuild: AvatarBuilderConfig) => {
+    const assets = getAvatarLayerPreloadAssets(nextBuild);
+    if (areAssetsPreloaded(assets)) {
+      setIsInventoryAvatarPreviewLoading(false);
+      return;
+    }
+
+    const loadId = inventoryPreviewLoadIdRef.current + 1;
+    inventoryPreviewLoadIdRef.current = loadId;
+    setIsInventoryAvatarPreviewLoading(true);
+    void preloadAssets(assets, { timeoutMs: 6500 }).finally(() => {
+      if (inventoryPreviewLoadIdRef.current === loadId) {
+        setIsInventoryAvatarPreviewLoading(false);
+      }
+    });
+  };
+
+  const handleInventoryTabChange = (tabId: AvatarAssetTabId) => {
+    setActiveTabId(tabId);
+
+    const assets = getInventoryTabPreloadAssets(avatarBuild, tabId);
+    if (areAssetsPreloaded(assets)) {
+      inventoryTabLoadIdRef.current += 1;
+      setLoadingInventoryTabId(null);
+      return;
+    }
+
+    const loadId = inventoryTabLoadIdRef.current + 1;
+    inventoryTabLoadIdRef.current = loadId;
+    setLoadingInventoryTabId(tabId);
+    void preloadAssets(assets, { timeoutMs: 6500 }).finally(() => {
+      if (inventoryTabLoadIdRef.current === loadId) {
+        setLoadingInventoryTabId(null);
+      }
+    });
+  };
+
   const updateAvatarBuild = (key: AvatarAssetTabId, value: string) => {
-    setAvatarBuild(currentBuild => ({ ...currentBuild, [key]: value }));
+    const nextBuild = { ...avatarBuild, [key]: value };
+    setAvatarBuild(nextBuild);
     setSaveMessage(null);
+    preloadInventoryAvatarPreview(nextBuild);
+
+    if (key === 'outfitId') {
+      warmAssets(getInventoryTabPreloadAssets(nextBuild, 'heldObjectId'));
+    }
   };
 
   const resetAvatarBuild = () => {
-    setAvatarBuild({ ...getAvatarBuildForAvatar(selectedAvatar), accessoryId: 'none' });
+    const nextBuild = { ...getAvatarBuildForAvatar(selectedAvatar), accessoryId: 'none' };
+    setAvatarBuild(nextBuild);
     setSaveMessage(null);
+    preloadInventoryAvatarPreview(nextBuild);
   };
 
   const randomizeAvatarBuild = () => {
@@ -289,8 +375,11 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
       randomizedBuild[tab.id] = randomOption.id;
     });
 
-    setAvatarBuild(normalizeAvatarBuild({ ...randomizedBuild, accessoryId: 'none' }));
+    const nextBuild = normalizeAvatarBuild({ ...randomizedBuild, accessoryId: 'none' });
+    setAvatarBuild(nextBuild);
     setSaveMessage(null);
+    preloadInventoryAvatarPreview(nextBuild);
+    warmAssets(getInventoryTabPreloadAssets(nextBuild, 'heldObjectId'));
   };
 
   const handleSaveAvatar = () => {
@@ -717,6 +806,13 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
                   )}
                 </div>
               </div>
+              {(isInventoryAvatarPreviewLoading || loadingInventoryTabId !== null) && (
+                <AvatarAssetLoadingOverlay
+                  label={loadingInventoryTabId
+                    ? `Loading ${getInventoryTabById(loadingInventoryTabId).label} options`
+                    : 'Updating avatar preview'}
+                />
+              )}
             </div>
           </div>
 
@@ -734,7 +830,7 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
                     aria-selected={isActive}
                     aria-controls={`inventory-avatar-tab-${tab.id}`}
                     id={`inventory-avatar-tab-button-${tab.id}`}
-                    onClick={() => setActiveTabId(tab.id)}
+                    onClick={() => handleInventoryTabChange(tab.id)}
                     className={artQuestCx(
                       'rounded-md border p-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-fuchsia-300',
                       isActive
@@ -760,7 +856,8 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
               id={`inventory-avatar-tab-${activeTab.id}`}
               role="tabpanel"
               aria-labelledby={`inventory-avatar-tab-button-${activeTab.id}`}
-              className="max-h-[330px] overflow-y-auto p-3 narrative-scrollbar xl:max-h-[360px]"
+              className="relative max-h-[330px] overflow-y-auto p-3 narrative-scrollbar xl:max-h-[360px]"
+              aria-busy={loadingInventoryTabId === activeTab.id}
             >
               <div className="mb-2 flex items-end justify-between gap-3">
                 <div>
@@ -775,6 +872,9 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
               </div>
 
               {activeTab.id === 'skinToneId' ? renderSkinToneOptionGrid() : activeTab.id === 'hairStyleId' ? renderHairOptionGrid() : renderOptionGrid()}
+              {loadingInventoryTabId === activeTab.id && (
+                <AvatarAssetLoadingOverlay label={`Loading ${activeTab.label} options`} />
+              )}
             </ArtQuestPanel>
           </div>
         </div>

@@ -12,6 +12,8 @@ export interface PreloadOptions {
 
 const imageLoadCache = new Map<string, Promise<void>>();
 const audioLoadCache = new Map<string, Promise<void>>();
+const imageLoadStates = new Map<string, 'pending' | 'settled'>();
+const audioLoadStates = new Map<string, 'pending' | 'settled'>();
 const WARM_ASSET_CONCURRENCY = 2;
 
 type IdleCallbackWindow = Window & typeof globalThis & {
@@ -37,17 +39,23 @@ const preloadImage = (src: string): Promise<void> => {
   const request = new Promise<void>((resolve) => {
     const image = new Image();
     image.decoding = 'async';
+    imageLoadStates.set(src, 'pending');
 
-    image.onload = () => {
-      if (typeof image.decode === 'function') {
-        image.decode().catch(() => undefined).finally(resolve);
-        return;
-      }
-
+    const settle = () => {
+      imageLoadStates.set(src, 'settled');
       resolve();
     };
 
-    image.onerror = () => resolve();
+    image.onload = () => {
+      if (typeof image.decode === 'function') {
+        image.decode().catch(() => undefined).finally(settle);
+        return;
+      }
+
+      settle();
+    };
+
+    image.onerror = settle;
     image.src = src;
   });
 
@@ -61,6 +69,7 @@ const preloadAudio = (src: string): Promise<void> => {
 
   const request = new Promise<void>((resolve) => {
     const audio = new Audio();
+    audioLoadStates.set(src, 'pending');
 
     function cleanup() {
       audio.removeEventListener('canplaythrough', done);
@@ -70,6 +79,7 @@ const preloadAudio = (src: string): Promise<void> => {
 
     function done() {
       cleanup();
+      audioLoadStates.set(src, 'settled');
       resolve();
     }
 
@@ -90,6 +100,36 @@ const preloadOneAsset = (asset: PreloadAsset): Promise<void> => {
   if (!src) return Promise.resolve();
 
   return asset.type === 'audio' ? preloadAudio(src) : preloadImage(src);
+};
+
+// Use this before showing a local loader. It reports whether every requested
+// asset has completed at least one browser load attempt (including an error),
+// so cache hits do not cause an unnecessary loading indicator to flash.
+export const areAssetsPreloaded = (assets: PreloadAsset[]): boolean => (
+  assets.every((asset) => {
+    const src = normalizeAssetSrc(asset.src);
+    if (!src) return true;
+
+    const loadState = asset.type === 'audio'
+      ? audioLoadStates.get(src)
+      : imageLoadStates.get(src);
+    return loadState === 'settled';
+  })
+);
+
+// Avatar previews are also rendered as regular <img> elements. Recording their
+// completed loads means a later tab switch can avoid showing a loader for an
+// image the browser has already finished drawing.
+export const markAssetPreloaded = (asset: PreloadAsset): void => {
+  const src = normalizeAssetSrc(asset.src);
+  if (!src) return;
+
+  if (asset.type === 'audio') {
+    audioLoadStates.set(src, 'settled');
+    return;
+  }
+
+  imageLoadStates.set(src, 'settled');
 };
 
 export const preloadAssets = async (

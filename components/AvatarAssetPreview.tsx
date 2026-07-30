@@ -1,6 +1,7 @@
 import React from 'react';
 import type { AvatarAssetTabId } from '../types';
 import { AVATAR_ASSET_BOUNDS_BY_URL } from '../data/AvatarAssetBounds.generated';
+import { markAssetPreloaded } from '../utils/assetPreloader';
 
 const assetPreviewCx = (...classes: Array<string | false | null | undefined>): string => (
   classes.filter(Boolean).join(' ')
@@ -120,6 +121,10 @@ const AvatarAssetPreview: React.FC<AvatarAssetPreviewProps> = ({
   label,
   className,
 }) => {
+  const handleImageSettled = (imageUrl: string) => {
+    markAssetPreloaded({ type: 'image', src: imageUrl });
+  };
+
   if (imageUrls.length === 0) {
     return (
       <span
@@ -147,6 +152,8 @@ const AvatarAssetPreview: React.FC<AvatarAssetPreviewProps> = ({
             style={{ imageRendering: 'pixelated' }}
             draggable={false}
             aria-hidden="true"
+            onLoad={() => handleImageSettled(imageUrl)}
+            onError={() => handleImageSettled(imageUrl)}
           />
         ))}
       </AssetPreviewFrame>
@@ -166,6 +173,8 @@ const AvatarAssetPreview: React.FC<AvatarAssetPreviewProps> = ({
           style={fitStyle}
           draggable={false}
           aria-hidden="true"
+          onLoad={() => handleImageSettled(imageUrl)}
+          onError={() => handleImageSettled(imageUrl)}
         />
       ))}
     </AssetPreviewFrame>

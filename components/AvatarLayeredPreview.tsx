@@ -1,4 +1,5 @@
 import React from 'react';
+import { markAssetPreloaded } from '../utils/assetPreloader';
 
 interface AvatarLayeredPreviewProps {
   imageUrls: string[];
@@ -16,6 +17,10 @@ const AvatarLayeredPreview: React.FC<AvatarLayeredPreviewProps> = ({
   const [baseImageUrl, ...layerImageUrls] = imageUrls;
   if (!baseImageUrl) return null;
 
+  const handleImageSettled = (imageUrl: string) => {
+    markAssetPreloaded({ type: 'image', src: imageUrl });
+  };
+
   return (
     <span className={`relative inline-flex items-center justify-center ${className}`}>
       <img
@@ -23,6 +28,8 @@ const AvatarLayeredPreview: React.FC<AvatarLayeredPreviewProps> = ({
         alt={alt}
         className={`h-full w-full object-contain ${imageClassName}`}
         style={{ imageRendering: 'pixelated' }}
+        onLoad={() => handleImageSettled(baseImageUrl)}
+        onError={() => handleImageSettled(baseImageUrl)}
       />
       {layerImageUrls.map((imageUrl) => (
         <img
@@ -32,6 +39,8 @@ const AvatarLayeredPreview: React.FC<AvatarLayeredPreviewProps> = ({
           className={`pointer-events-none absolute inset-0 h-full w-full object-contain ${imageClassName}`}
           style={{ imageRendering: 'pixelated' }}
           aria-hidden="true"
+          onLoad={() => handleImageSettled(imageUrl)}
+          onError={() => handleImageSettled(imageUrl)}
         />
       ))}
     </span>
