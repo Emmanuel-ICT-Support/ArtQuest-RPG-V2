@@ -181,7 +181,13 @@ const getTraitFilledPipCount = (trait: PlayerTrait): number => {
 };
 
 const getOptionRequirement = (option: BuilderOption): string => (
-  option.unlock ? `Reach ${option.unlock.level} ${option.unlock.traitName}` : 'Starter item'
+  option.unlock && option.requiresReward
+    ? `Earn through rewards or reach ${option.unlock.level} ${option.unlock.traitName}`
+    : option.unlock
+      ? `Reach ${option.unlock.level} ${option.unlock.traitName}`
+      : option.requiresReward
+        ? 'Earn through gallery rewards'
+        : 'Starter item'
 );
 
 const getNextLockedReward = (playerStats: InventoryScreenProps['playerStats']): AvatarRewardMilestone | null => {
@@ -310,6 +316,8 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
   const unlockedAssetCount = AVATAR_REWARD_BUILDER_TABS.reduce((count, tab) => (
     count + getUnlockedOptionsForTab(tab, playerStats).length
   ), 0);
+  const totalAvatarAssetCount = AVATAR_REWARD_BUILDER_TABS.reduce((count, tab) => count + tab.options.length, 0);
+  const lockedAssetCount = totalAvatarAssetCount - unlockedAssetCount;
 
   const preloadInventoryAvatarPreview = (nextBuild: AvatarBuilderConfig) => {
     const assets = getAvatarLayerPreloadAssets(nextBuild);
@@ -957,8 +965,9 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
               <p className="mt-0.5 text-[10px] font-black uppercase leading-tight text-[#d8c29a]">Rewards Unlocked</p>
             </ArtQuestPanel>
             <ArtQuestPanel as="div" variant="inner" className="p-2 text-center">
-              <p className="font-serif text-2xl font-black text-[#f7c2ff]">{unlockedAssetCount}</p>
+              <p className="font-serif text-2xl font-black text-[#f7c2ff]">{unlockedAssetCount} / {totalAvatarAssetCount}</p>
               <p className="mt-0.5 text-[10px] font-black uppercase leading-tight text-[#d8c29a]">Avatar Options</p>
+              <p className="mt-1 text-[9px] font-bold leading-tight text-cyan-100">{lockedAssetCount} discoveries await</p>
             </ArtQuestPanel>
           </div>
         </ArtQuestPanel>

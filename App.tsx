@@ -19,7 +19,7 @@ import { GameMusicTrack, useGameAudio } from './components/useGameAudio';
 import { AvatarRewardReveal, PlayerAvatar, WingState, AppGameState, NarrativeEntry, GameScreen, GalleryScene, JournalEntry, YearLevel, SeniorCoursePathway, PlayerStats, TraitName, TraitLevel, SaveGameData, CoreSavedGameState, SideQuestReward } from './types';
 import { WING_DEFINITIONS, INITIAL_WING_ID, SAVE_FILE_VERSION } from './constants';
 import { initializeChat as initializeAiChat } from './services/aiService';
-import { AVATAR_REWARD_DEFAULT_BUILD, getAvatarBuildColorClass, getAvatarBuildForAvatar, getAvatarLayerImageUrls, getAvatarSpriteUrl, getNewlyUnlockedRewardMilestones, normalizeAvatarBuild } from './data/AvatarRewards';
+import { ART_ENERGY_AVATAR_CHEST_REWARDS, AVATAR_REWARD_DEFAULT_BUILD, AvatarCollectionReward, getAvatarBuildColorClass, getAvatarBuildForAvatar, getAvatarLayerImageUrls, getAvatarSpriteUrl, getNewlyUnlockedRewardMilestones, normalizeAvatarBuild, WING_AVATAR_COLLECTION_REWARDS } from './data/AvatarRewards';
 import { getArtworkBrief } from './data/ArtworkLibrary';
 import { getVisualLanguageGuideForWing } from './data/VisualLanguageGuide';
 import { SIDE_QUEST_CASES, SIDE_QUEST_CASES_BY_ID, createInitialSideQuestState, normalizeSideQuestState } from './data/SideQuests';
@@ -589,6 +589,64 @@ const getNewSideQuestAvatarRewardReveals = (
   return !wasAlreadyUnlocked && isUnlocked && reveal ? [reveal] : [];
 };
 
+const getAvatarCollectionCategoryLabel = (category: AvatarCollectionReward['assetCategory']): string => (
+  category === 'hairStyleId'
+    ? 'Hair Style'
+    : category === 'outfitId'
+      ? 'Outfit'
+      : category === 'heldObjectId'
+        ? 'Held Item'
+        : 'Avatar Item'
+);
+
+const addAvatarCollectionRewardsToStats = (
+  stats: PlayerStats,
+  rewards: AvatarCollectionReward[],
+): PlayerStats => {
+  if (rewards.length === 0) return stats;
+
+  const unlockedAssetIds = new Set(stats.unlockedAvatarAssetIds || []);
+  rewards.forEach((reward) => unlockedAssetIds.add(reward.assetId));
+
+  return {
+    ...stats,
+    unlockedAvatarAssetIds: [...unlockedAssetIds],
+  };
+};
+
+const getNewAvatarCollectionRewardReveals = (
+  previousStats: PlayerStats,
+  nextStats: PlayerStats,
+  rewards: AvatarCollectionReward[],
+): AvatarRewardReveal[] => {
+  const previousAssetIds = new Set(previousStats.unlockedAvatarAssetIds || []);
+  const nextAssetIds = new Set(nextStats.unlockedAvatarAssetIds || []);
+
+  return rewards
+    .filter((reward) => !previousAssetIds.has(reward.assetId) && nextAssetIds.has(reward.assetId))
+    .map((reward) => ({
+      traitName: 'Focus',
+      level: 'Bronze',
+      badgeName: reward.collectionName,
+      assetName: reward.assetName,
+      assetId: reward.assetId,
+      assetCategory: reward.assetCategory,
+      assetCategoryLabel: getAvatarCollectionCategoryLabel(reward.assetCategory),
+      description: reward.description,
+      unlockSource: reward.collectionName,
+    }));
+};
+
+const getNewArtEnergyChestRewards = (
+  previousStats: PlayerStats,
+  nextStats: PlayerStats,
+): AvatarCollectionReward[] => (
+  ART_ENERGY_AVATAR_CHEST_REWARDS.filter((reward) => (
+    previousStats.artEnergy.currentXP < reward.requiredXP
+      && nextStats.artEnergy.currentXP >= reward.requiredXP
+  ))
+);
+
 const restoreCompletedSideQuestAvatarRewards = (
   stats: PlayerStats,
   sideQuestState: ReturnType<typeof normalizeSideQuestState>,
@@ -613,6 +671,19 @@ const restoreCompletedSideQuestAvatarRewards = (
       unlockedAvatarAssetIds: [...unlockedAssetIds],
     },
     rewardReveals,
+  };
+};
+
+const restoreAvatarCollectionRewards = (
+  stats: PlayerStats,
+  rewards: AvatarCollectionReward[],
+): { playerStats: PlayerStats; rewardReveals: AvatarRewardReveal[] } => {
+  const playerStats = normalizePlayerStats(stats);
+  const nextStats = addAvatarCollectionRewardsToStats(playerStats, rewards);
+
+  return {
+    playerStats: nextStats,
+    rewardReveals: getNewAvatarCollectionRewardReveals(playerStats, nextStats, rewards),
   };
 };
 
@@ -999,6 +1070,17 @@ export const App: React.FC = () => {
         normalizePlayerStats(parsedData.gameState.playerStats),
         sideQuestState,
       );
+      const wings = normalizeUnlockedWings(parsedData.gameState.wings || {});
+      const completedWingRewards = WING_DEFINITIONS.flatMap((wing) => (
+        wings[wing.id]?.isSolved ? (WING_AVATAR_COLLECTION_REWARDS[wing.id] || []) : []
+      ));
+      const earnedChestRewards = ART_ENERGY_AVATAR_CHEST_REWARDS.filter((reward) => (
+        restoredSideQuestRewards.playerStats.artEnergy.currentXP >= reward.requiredXP
+      ));
+      const restoredCollectionRewards = restoreAvatarCollectionRewards(
+        restoredSideQuestRewards.playerStats,
+        [...completedWingRewards, ...earnedChestRewards],
+      );
 
       await runLoadTransition({
         title: 'Restoring the Foyer',
@@ -1019,8 +1101,8 @@ export const App: React.FC = () => {
           ...prev, // Keep some transient states like error handling
           ...parsedData.gameState, // Load core game state
           selectedAvatar,
-          wings: normalizeUnlockedWings(parsedData.gameState.wings || {}),
-          playerStats: restoredSideQuestRewards.playerStats,
+          wings,
+          playerStats: restoredCollectionRewards.playerStats,
           sideQuestState,
           teacherMode: !!parsedData.gameState.teacherMode,
           classPack,
@@ -1030,7 +1112,10 @@ export const App: React.FC = () => {
           narrativeLog: [], // Clear previous narrative log
           avatarImageError: null, // Clear any previous avatar image errors
           isGeneratingAvatarPortrait: false,
-          pendingRewardReveals: restoredSideQuestRewards.rewardReveals,
+          pendingRewardReveals: [
+            ...restoredSideQuestRewards.rewardReveals,
+            ...restoredCollectionRewards.rewardReveals,
+          ],
         }));
         setCurrentGalleryScene('foyer');
         setCurrentScreen('map');
@@ -1220,6 +1305,37 @@ export const App: React.FC = () => {
   const unlockNextWing = useCallback((solvedWingId: string): string | null => {
     const solvedWingDef = WING_DEFINITIONS.find(w => w.id === solvedWingId);
     let unlockedWingId: string | null = null;
+
+    const collectionRewards = WING_AVATAR_COLLECTION_REWARDS[solvedWingId] || [];
+    if (collectionRewards.length > 0) {
+      setAppGameState(prev => {
+        const previousStats = prev.playerStats ? normalizePlayerStats(prev.playerStats) : createInitialPlayerStats();
+        const nextStats = addAvatarCollectionRewardsToStats(previousStats, collectionRewards);
+        const rewardReveals = getNewAvatarCollectionRewardReveals(
+          previousStats,
+          nextStats,
+          collectionRewards,
+        );
+
+        if (rewardReveals.length === 0) return prev;
+
+        const collectionName = collectionRewards[0].collectionName;
+        const collectionEntry: NarrativeEntry = {
+          speaker: 'system',
+          text: `Gallery collection recovered: ${collectionName}. ${rewardReveals.map((reward) => reward.assetName).join(', ')} added to your avatar collection.`,
+          id: `${Date.now()}-wing-collection-${solvedWingId}`,
+          timestamp: Date.now(),
+        };
+
+        return {
+          ...prev,
+          playerStats: nextStats,
+          narrativeLog: [...prev.narrativeLog, collectionEntry],
+          pendingRewardReveals: [...prev.pendingRewardReveals, ...rewardReveals],
+        };
+      });
+    }
+
     if (solvedWingDef?.unlocks) {
       const nextWingId = solvedWingDef.unlocks;
       updateWingState(nextWingId, { isUnlocked: true });
@@ -1269,23 +1385,37 @@ export const App: React.FC = () => {
   const handleUpdatePlayerStats = useCallback((newStats: PlayerStats) => {
     setAppGameState(prev => {
       const previousStats = prev.playerStats ? normalizePlayerStats(prev.playerStats) : createInitialPlayerStats();
-      const nextStats = applyTraitLevelUps({
+      const statsAfterTraitLevels = applyTraitLevelUps({
         ...newStats,
         unlockedAvatarAssetIds: Array.from(new Set([
           ...(previousStats.unlockedAvatarAssetIds || []),
           ...(newStats.unlockedAvatarAssetIds || []),
         ])),
       });
-      const rewardChange = buildRewardEntriesForStatsChange(previousStats, nextStats);
+      const chestRewards = getNewArtEnergyChestRewards(previousStats, statsAfterTraitLevels);
+      const nextStats = addAvatarCollectionRewardsToStats(statsAfterTraitLevels, chestRewards);
+      const rewardChange = buildRewardEntriesForStatsChange(previousStats, statsAfterTraitLevels);
+      const chestReveals = getNewAvatarCollectionRewardReveals(
+        statsAfterTraitLevels,
+        nextStats,
+        chestRewards,
+      );
+      const rewardReveals = [...rewardChange.rewards, ...chestReveals];
+      const chestEntries = chestReveals.map((reward, index) => ({
+        speaker: 'system' as const,
+        text: `Art Energy chest opened: ${reward.assetName} is now available in your avatar collection.`,
+        id: `${Date.now()}-art-energy-chest-${index}`,
+        timestamp: Date.now(),
+      }));
 
       return {
         ...prev,
         playerStats: nextStats,
-        narrativeLog: rewardChange.entries.length > 0
-          ? [...prev.narrativeLog, ...rewardChange.entries]
+        narrativeLog: rewardChange.entries.length > 0 || chestEntries.length > 0
+          ? [...prev.narrativeLog, ...rewardChange.entries, ...chestEntries]
           : prev.narrativeLog,
-        pendingRewardReveals: rewardChange.rewards.length > 0
-          ? [...prev.pendingRewardReveals, ...rewardChange.rewards]
+        pendingRewardReveals: rewardReveals.length > 0
+          ? [...prev.pendingRewardReveals, ...rewardReveals]
           : prev.pendingRewardReveals,
       };
     });

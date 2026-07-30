@@ -231,6 +231,7 @@ interface BuilderOption {
     traitName: string;
     level: string;
   };
+  requiresReward?: boolean;
 }
 
 interface SkinToneOption extends BuilderOption {
@@ -274,7 +275,7 @@ interface AvatarBuilderTab {
   options: BuilderOption[];
 }
 
-const isStarterOption = <T extends BuilderOption>(option: T): boolean => !option.unlock;
+const isStarterOption = <T extends BuilderOption>(option: T): boolean => !option.unlock && !option.requiresReward;
 const NO_HAIR_STYLE_ID = 'none';
 const NO_HELD_OBJECT_ID = 'none';
 
@@ -292,6 +293,16 @@ const STARTER_NO_HAIR_OPTION = HAIR_STYLES.find(option => option.id === NO_HAIR_
 const HAIR_STYLE_OPTIONS = HAIR_STYLES.filter(option => option.id !== NO_HAIR_STYLE_ID);
 
 const DEFAULT_AVATAR_BUILD: AvatarBuilderConfig = AVATAR_REWARD_DEFAULT_BUILD;
+
+const UnlockMoreOptionsTile: React.FC = () => (
+  <div
+    className="flex min-h-[8.5rem] flex-col items-center justify-center rounded-md border-2 border-dashed border-[#d6a548]/70 bg-[#120f27]/85 p-3 text-center text-[#f7d9a5] shadow-[inset_0_0_20px_rgba(245,158,11,0.08)]"
+    aria-label="Unlock more options in the game"
+  >
+    <span className="text-2xl text-[#ffd45f]" aria-hidden="true">✦</span>
+    <span className="mt-2 text-xs font-black uppercase leading-tight tracking-wide">Unlock more options<br />in the game</span>
+  </div>
+);
 
 const AVATAR_BUILDER_TABS: AvatarBuilderTab[] = [
   { id: 'skinToneId', label: 'Skin Tone', shortLabel: 'Skin', options: SKIN_TONES },
@@ -1019,6 +1030,7 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
               </button>
             );
           })}
+          <UnlockMoreOptionsTile />
         </div>
       </div>
     </div>
@@ -1051,6 +1063,7 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
           </button>
         );
       })}
+      <UnlockMoreOptionsTile />
     </div>
   );
 
@@ -1100,6 +1113,7 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
             </button>
           );
         })}
+        <UnlockMoreOptionsTile />
       </div>
       )}
     </div>

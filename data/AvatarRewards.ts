@@ -17,6 +17,7 @@ export interface BuilderOption {
     traitName: TraitName;
     level: RewardTraitLevel;
   };
+  requiresReward?: boolean;
   rewardDescription?: string;
 }
 
@@ -58,6 +59,14 @@ export interface AvatarBuilderTab {
 }
 
 export type AvatarRewardMilestone = AvatarRewardReveal;
+
+export interface AvatarCollectionReward {
+  assetId: string;
+  assetName: string;
+  assetCategory: AvatarAssetTabId;
+  collectionName: string;
+  description: string;
+}
 
 export const AVATAR_ARCHETYPE_SPRITES: Record<AvatarArchetypeId, string> = {
   nova: './public/images/Nova.png',
@@ -325,6 +334,17 @@ const withRewardUnlocks = <T extends BuilderOption>(
   })
 );
 
+const withCollectionUnlocks = <T extends BuilderOption>(
+  options: T[],
+  shouldRequireReward: (option: T) => boolean,
+): T[] => (
+  options.map((option) => (
+    shouldRequireReward(option)
+      ? { ...option, requiresReward: true }
+      : option
+  ))
+);
+
 const FACE_REWARD_UNLOCKS: Partial<Record<string, RewardConfigEntry>> = {
   surprise: {
     traitName: 'Imagination',
@@ -399,9 +419,18 @@ const HELD_OBJECT_REWARD_UNLOCKS: Partial<Record<string, RewardConfigEntry>> = {
   },
 };
 
+const STARTER_HAIR_STYLE_IDS = new Set([
+  'brown_curls',
+  'brown_ponytail',
+  'teal_long_spikes',
+]);
+
 export const AVATAR_REWARD_HAIR_STYLES: HairStyleOption[] = [
   NO_HAIR_OPTION,
-  ...GENERATED_AVATAR_HAIR_STYLES,
+  ...withCollectionUnlocks(
+    GENERATED_AVATAR_HAIR_STYLES,
+    (option) => !option.id.endsWith('_crop') && !STARTER_HAIR_STYLE_IDS.has(option.id),
+  ),
 ];
 
 export const AVATAR_REWARD_FACE_STYLES: BuilderOption[] = withRewardUnlocks(
@@ -410,16 +439,121 @@ export const AVATAR_REWARD_FACE_STYLES: BuilderOption[] = withRewardUnlocks(
 );
 
 export const AVATAR_REWARD_OUTFITS: OutfitOption[] = withRewardUnlocks(
-  GENERATED_AVATAR_OUTFITS,
+  withCollectionUnlocks(
+    GENERATED_AVATAR_OUTFITS,
+    (option) => !['artist_apron', 'mystic_robe', 'painted_hoodie'].includes(option.id),
+  ),
   OUTFIT_REWARD_UNLOCKS,
 );
 
 export const AVATAR_REWARD_HELD_OBJECTS: HeldObjectOption[] = [
   NO_HELD_OBJECT_OPTION,
   ...withRewardUnlocks(
-    GENERATED_AVATAR_HELD_OBJECTS,
+    withCollectionUnlocks(
+      GENERATED_AVATAR_HELD_OBJECTS,
+      (option) => option.id !== 'star_staff',
+    ),
     HELD_OBJECT_REWARD_UNLOCKS,
   ),
+];
+
+const collectionReward = (
+  assetId: string,
+  assetName: string,
+  assetCategory: AvatarAssetTabId,
+  collectionName: string,
+  description: string,
+): AvatarCollectionReward => ({ assetId, assetName, assetCategory, collectionName, description });
+
+const hairCollectionRewards = (
+  assetIds: string[],
+  collectionName: string,
+  description: string,
+): AvatarCollectionReward[] => (
+  assetIds.map((assetId) => {
+    const option = GENERATED_AVATAR_HAIR_STYLES.find((hairStyle) => hairStyle.id === assetId);
+    return collectionReward(assetId, option?.name || assetId, 'hairStyleId', collectionName, description);
+  })
+);
+
+const heldItemCollectionRewards = (
+  assetIds: string[],
+  collectionName: string,
+  description: string,
+): AvatarCollectionReward[] => (
+  assetIds.map((assetId) => {
+    const option = GENERATED_AVATAR_HELD_OBJECTS.find((heldObject) => heldObject.id === assetId);
+    return collectionReward(assetId, option?.name || assetId, 'heldObjectId', collectionName, description);
+  })
+);
+
+export const WING_AVATAR_COLLECTION_REWARDS: Record<string, AvatarCollectionReward[]> = {
+  hall_of_line: [
+    ...hairCollectionRewards(['auburn_curls', 'black_curls', 'blonde_curls'], 'Line Seeker Collection', 'Curled styles earned by tracing expressive lines through the gallery.'),
+    collectionReward('explorer', 'Explorer', 'outfitId', 'Line Seeker Collection', 'An explorer outfit for following every visual pathway.'),
+    ...hairCollectionRewards(['auburn_bob'], 'Line Seeker Collection', 'A classic bob for following every visual pathway.'),
+  ],
+  realm_of_colour: [
+    ...hairCollectionRewards(['red_curls', 'pink_curls', 'teal_curls'], 'Colour Weaver Collection', 'Colour-rich curls to celebrate confident visual choices.'),
+    ...heldItemCollectionRewards(['camera'], 'Colour Weaver Collection', 'A camera to capture striking colour relationships.'),
+    ...hairCollectionRewards(['black_bob'], 'Colour Weaver Collection', 'A sleek bob to frame vibrant visual choices.'),
+  ],
+  shape_form_forge: [
+    ...hairCollectionRewards(['auburn_ponytail', 'black_ponytail', 'blonde_ponytail'], 'Form Finder Collection', 'Ponytail styles shaped by geometric and organic discoveries.'),
+    collectionReward('explorers_jacket', 'Explorers Jacket', 'outfitId', 'Form Finder Collection', 'A practical jacket for investigating shape and form.'),
+    ...hairCollectionRewards(['blonde_bob'], 'Form Finder Collection', 'A sculpted bob for investigating shape and form.'),
+  ],
+  texture_tower: [
+    ...hairCollectionRewards(['red_ponytail', 'pink_ponytail', 'teal_ponytail'], 'Texture Tracker Collection', 'Ponytail styles earned by noticing surface and material.'),
+    ...heldItemCollectionRewards(['flower'], 'Texture Tracker Collection', 'A flower to remember the tactile details hidden in natural forms.'),
+    ...hairCollectionRewards(['brown_bob'], 'Texture Tracker Collection', 'A practical bob for observing subtle surface details.'),
+  ],
+  space_chamber: [
+    ...hairCollectionRewards(['auburn_long_spikes', 'black_long_spikes', 'blonde_long_spikes'], 'Space Scout Collection', 'Long-spike styles for exploring foreground, distance, and depth.'),
+    collectionReward('herbologist', 'Herbologist', 'outfitId', 'Space Scout Collection', 'An outfit inspired by observing layered natural spaces.'),
+    ...hairCollectionRewards(['pink_bob'], 'Space Scout Collection', 'A bright bob for mapping foreground and distance.'),
+  ],
+  value_vault: [
+    ...hairCollectionRewards(['brown_long_spikes', 'pink_long_spikes', 'red_long_spikes'], 'Value Vault Collection', 'Long-spike styles revealed through light, shade, and contrast.'),
+    ...heldItemCollectionRewards(['herb'], 'Value Vault Collection', 'A herb sample from the vault of tonal discoveries.'),
+    ...hairCollectionRewards(['red_bob'], 'Value Vault Collection', 'A bold bob revealed through light, shade, and contrast.'),
+  ],
+  balance_bridge: [
+    ...hairCollectionRewards(['auburn_short_spikes', 'black_short_spikes', 'blonde_short_spikes'], 'Balance Builder Collection', 'Short-spike styles for composing a confident visual equilibrium.'),
+    collectionReward('inventors_apron', 'Inventors Apron', 'outfitId', 'Balance Builder Collection', 'An apron for testing and refining balanced arrangements.'),
+    ...hairCollectionRewards(['teal_bob'], 'Balance Builder Collection', 'A balanced bob for testing a new composition.'),
+  ],
+  emphasis_arena: [
+    ...hairCollectionRewards(['brown_short_spikes', 'pink_short_spikes', 'teal_short_spikes'], 'Emphasis Arena Collection', 'Short-spike styles that make a bold focal statement.'),
+    ...heldItemCollectionRewards(['hourglass'], 'Emphasis Arena Collection', 'An hourglass for deciding where the viewer should look first.'),
+    ...hairCollectionRewards(['red_short_spikes'], 'Emphasis Arena Collection', 'Red short spikes for making a confident focal statement.'),
+  ],
+  unity_garden: [
+    ...hairCollectionRewards(['auburn_swept', 'black_swept', 'blonde_swept'], 'Unity Garden Collection', 'Swept styles that connect different visual elements into one whole.'),
+    collectionReward('masonry_overalls', 'Masonry Overalls', 'outfitId', 'Unity Garden Collection', 'Overalls for building visual connections piece by piece.'),
+    ...hairCollectionRewards(['red_swept'], 'Unity Garden Collection', 'A red swept style that brings contrasting elements together.'),
+  ],
+  rhythm_pattern_pavilion: [
+    ...hairCollectionRewards(['brown_swept', 'pink_swept', 'teal_swept'], 'Rhythm Pavilion Collection', 'Swept styles earned by following repeated beats and patterns.'),
+    ...heldItemCollectionRewards(['mallet'], 'Rhythm Pavilion Collection', 'A mallet for setting the visual rhythm.'),
+  ],
+  hall_of_movement: heldItemCollectionRewards(
+    ['map', 'potion', 'scroll', 'shield'],
+    'Movement Trail Collection',
+    'A collection for following energy, direction, and flow through an artwork.',
+  ),
+  final_room: heldItemCollectionRewards(
+    ['telescope', 'torch', 'wand', 'wrench'],
+    'Final Gallery Collection',
+    'Tools earned for bringing observation, imagination, and reflection together.',
+  ),
+};
+
+export const ART_ENERGY_AVATAR_CHEST_REWARDS: Array<AvatarCollectionReward & { requiredXP: number }> = [
+  { ...collectionReward('coin_pouch', 'Coin Pouch', 'heldObjectId', 'Art Energy Chest', 'A small treasure pouch awarded for sustained gallery effort.'), requiredXP: 150 },
+  { ...collectionReward('brush', 'Brush', 'heldObjectId', 'Art Energy Chest', 'A trusted artist’s brush earned through steady creative energy.'), requiredXP: 300 },
+  { ...collectionReward('painters_smock', 'Painters Smock', 'outfitId', 'Art Energy Chest', 'A painter’s smock for reaching the next stage of your journey.'), requiredXP: 450 },
+  { ...collectionReward('pencil', 'Pencil', 'heldObjectId', 'Art Energy Chest', 'A precise pencil awarded for seeing the whole gallery journey through.'), requiredXP: 600 },
 ];
 
 export const ACCESSORIES: AccessoryOption[] = [
@@ -434,10 +568,10 @@ export const ACCESSORIES: AccessoryOption[] = [
 export const AVATAR_REWARD_DEFAULT_BUILD: AvatarBuilderConfig = {
   archetypeId: 'nova',
   skinToneId: 'golden',
-  hairStyleId: 'brown_bob',
+  hairStyleId: 'brown_curls',
   faceId: AVATAR_REWARD_FACE_STYLES[0].id,
   outfitId: 'mystic_robe',
-  heldObjectId: 'brush',
+  heldObjectId: 'star_staff',
   accessoryId: ACCESSORIES[0].id,
 };
 
@@ -587,9 +721,10 @@ export const getAvatarBuildForAvatar = (avatar: PlayerAvatar | null): AvatarBuil
 };
 
 export const isAvatarOptionUnlocked = (option: BuilderOption, playerStats: PlayerStats | null): boolean => {
-  if (!option.unlock) return true;
+  if (!option.unlock && !option.requiresReward) return true;
   if (!playerStats) return false;
   if (playerStats.unlockedAvatarAssetIds?.includes(option.id)) return true;
+  if (!option.unlock) return false;
 
   const traitLevel = playerStats.traits[option.unlock.traitName]?.level;
   return isTraitLevelAtLeast(traitLevel, option.unlock.level);

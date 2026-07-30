@@ -7911,6 +7911,9 @@ const withRewardUnlocks = (options, unlocks) => (options.map((option) => {
         rewardDescription: unlockConfig.rewardDescription,
     };
 }));
+const withCollectionUnlocks = (options, shouldRequireReward) => (options.map((option) => (shouldRequireReward(option)
+    ? { ...option, requiresReward: true }
+    : option)));
 const FACE_REWARD_UNLOCKS = {
     surprise: {
         traitName: 'Imagination',
@@ -7982,15 +7985,88 @@ const HELD_OBJECT_REWARD_UNLOCKS = {
         rewardDescription: 'For connecting ideas across the whole Gallery of Secrets.',
     },
 };
+const STARTER_HAIR_STYLE_IDS = new Set([
+    'brown_curls',
+    'brown_ponytail',
+    'teal_long_spikes',
+]);
 const AVATAR_REWARD_HAIR_STYLES = [
     NO_HAIR_OPTION,
-    ...GENERATED_AVATAR_HAIR_STYLES,
+    ...withCollectionUnlocks(GENERATED_AVATAR_HAIR_STYLES, (option) => !option.id.endsWith('_crop') && !STARTER_HAIR_STYLE_IDS.has(option.id)),
 ];
 const AVATAR_REWARD_FACE_STYLES = withRewardUnlocks(GENERATED_AVATAR_FACE_STYLES, FACE_REWARD_UNLOCKS);
-const AVATAR_REWARD_OUTFITS = withRewardUnlocks(GENERATED_AVATAR_OUTFITS, OUTFIT_REWARD_UNLOCKS);
+const AVATAR_REWARD_OUTFITS = withRewardUnlocks(withCollectionUnlocks(GENERATED_AVATAR_OUTFITS, (option) => !['artist_apron', 'mystic_robe', 'painted_hoodie'].includes(option.id)), OUTFIT_REWARD_UNLOCKS);
 const AVATAR_REWARD_HELD_OBJECTS = [
     NO_HELD_OBJECT_OPTION,
-    ...withRewardUnlocks(GENERATED_AVATAR_HELD_OBJECTS, HELD_OBJECT_REWARD_UNLOCKS),
+    ...withRewardUnlocks(withCollectionUnlocks(GENERATED_AVATAR_HELD_OBJECTS, (option) => option.id !== 'star_staff'), HELD_OBJECT_REWARD_UNLOCKS),
+];
+const collectionReward = (assetId, assetName, assetCategory, collectionName, description) => ({ assetId, assetName, assetCategory, collectionName, description });
+const hairCollectionRewards = (assetIds, collectionName, description) => (assetIds.map((assetId) => {
+    const option = GENERATED_AVATAR_HAIR_STYLES.find((hairStyle) => hairStyle.id === assetId);
+    return collectionReward(assetId, option?.name || assetId, 'hairStyleId', collectionName, description);
+}));
+const heldItemCollectionRewards = (assetIds, collectionName, description) => (assetIds.map((assetId) => {
+    const option = GENERATED_AVATAR_HELD_OBJECTS.find((heldObject) => heldObject.id === assetId);
+    return collectionReward(assetId, option?.name || assetId, 'heldObjectId', collectionName, description);
+}));
+const WING_AVATAR_COLLECTION_REWARDS = {
+    hall_of_line: [
+        ...hairCollectionRewards(['auburn_curls', 'black_curls', 'blonde_curls'], 'Line Seeker Collection', 'Curled styles earned by tracing expressive lines through the gallery.'),
+        collectionReward('explorer', 'Explorer', 'outfitId', 'Line Seeker Collection', 'An explorer outfit for following every visual pathway.'),
+        ...hairCollectionRewards(['auburn_bob'], 'Line Seeker Collection', 'A classic bob for following every visual pathway.'),
+    ],
+    realm_of_colour: [
+        ...hairCollectionRewards(['red_curls', 'pink_curls', 'teal_curls'], 'Colour Weaver Collection', 'Colour-rich curls to celebrate confident visual choices.'),
+        ...heldItemCollectionRewards(['camera'], 'Colour Weaver Collection', 'A camera to capture striking colour relationships.'),
+        ...hairCollectionRewards(['black_bob'], 'Colour Weaver Collection', 'A sleek bob to frame vibrant visual choices.'),
+    ],
+    shape_form_forge: [
+        ...hairCollectionRewards(['auburn_ponytail', 'black_ponytail', 'blonde_ponytail'], 'Form Finder Collection', 'Ponytail styles shaped by geometric and organic discoveries.'),
+        collectionReward('explorers_jacket', 'Explorers Jacket', 'outfitId', 'Form Finder Collection', 'A practical jacket for investigating shape and form.'),
+        ...hairCollectionRewards(['blonde_bob'], 'Form Finder Collection', 'A sculpted bob for investigating shape and form.'),
+    ],
+    texture_tower: [
+        ...hairCollectionRewards(['red_ponytail', 'pink_ponytail', 'teal_ponytail'], 'Texture Tracker Collection', 'Ponytail styles earned by noticing surface and material.'),
+        ...heldItemCollectionRewards(['flower'], 'Texture Tracker Collection', 'A flower to remember the tactile details hidden in natural forms.'),
+        ...hairCollectionRewards(['brown_bob'], 'Texture Tracker Collection', 'A practical bob for observing subtle surface details.'),
+    ],
+    space_chamber: [
+        ...hairCollectionRewards(['auburn_long_spikes', 'black_long_spikes', 'blonde_long_spikes'], 'Space Scout Collection', 'Long-spike styles for exploring foreground, distance, and depth.'),
+        collectionReward('herbologist', 'Herbologist', 'outfitId', 'Space Scout Collection', 'An outfit inspired by observing layered natural spaces.'),
+        ...hairCollectionRewards(['pink_bob'], 'Space Scout Collection', 'A bright bob for mapping foreground and distance.'),
+    ],
+    value_vault: [
+        ...hairCollectionRewards(['brown_long_spikes', 'pink_long_spikes', 'red_long_spikes'], 'Value Vault Collection', 'Long-spike styles revealed through light, shade, and contrast.'),
+        ...heldItemCollectionRewards(['herb'], 'Value Vault Collection', 'A herb sample from the vault of tonal discoveries.'),
+        ...hairCollectionRewards(['red_bob'], 'Value Vault Collection', 'A bold bob revealed through light, shade, and contrast.'),
+    ],
+    balance_bridge: [
+        ...hairCollectionRewards(['auburn_short_spikes', 'black_short_spikes', 'blonde_short_spikes'], 'Balance Builder Collection', 'Short-spike styles for composing a confident visual equilibrium.'),
+        collectionReward('inventors_apron', 'Inventors Apron', 'outfitId', 'Balance Builder Collection', 'An apron for testing and refining balanced arrangements.'),
+        ...hairCollectionRewards(['teal_bob'], 'Balance Builder Collection', 'A balanced bob for testing a new composition.'),
+    ],
+    emphasis_arena: [
+        ...hairCollectionRewards(['brown_short_spikes', 'pink_short_spikes', 'teal_short_spikes'], 'Emphasis Arena Collection', 'Short-spike styles that make a bold focal statement.'),
+        ...heldItemCollectionRewards(['hourglass'], 'Emphasis Arena Collection', 'An hourglass for deciding where the viewer should look first.'),
+        ...hairCollectionRewards(['red_short_spikes'], 'Emphasis Arena Collection', 'Red short spikes for making a confident focal statement.'),
+    ],
+    unity_garden: [
+        ...hairCollectionRewards(['auburn_swept', 'black_swept', 'blonde_swept'], 'Unity Garden Collection', 'Swept styles that connect different visual elements into one whole.'),
+        collectionReward('masonry_overalls', 'Masonry Overalls', 'outfitId', 'Unity Garden Collection', 'Overalls for building visual connections piece by piece.'),
+        ...hairCollectionRewards(['red_swept'], 'Unity Garden Collection', 'A red swept style that brings contrasting elements together.'),
+    ],
+    rhythm_pattern_pavilion: [
+        ...hairCollectionRewards(['brown_swept', 'pink_swept', 'teal_swept'], 'Rhythm Pavilion Collection', 'Swept styles earned by following repeated beats and patterns.'),
+        ...heldItemCollectionRewards(['mallet'], 'Rhythm Pavilion Collection', 'A mallet for setting the visual rhythm.'),
+    ],
+    hall_of_movement: heldItemCollectionRewards(['map', 'potion', 'scroll', 'shield'], 'Movement Trail Collection', 'A collection for following energy, direction, and flow through an artwork.'),
+    final_room: heldItemCollectionRewards(['telescope', 'torch', 'wand', 'wrench'], 'Final Gallery Collection', 'Tools earned for bringing observation, imagination, and reflection together.'),
+};
+const ART_ENERGY_AVATAR_CHEST_REWARDS = [
+    { ...collectionReward('coin_pouch', 'Coin Pouch', 'heldObjectId', 'Art Energy Chest', 'A small treasure pouch awarded for sustained gallery effort.'), requiredXP: 150 },
+    { ...collectionReward('brush', 'Brush', 'heldObjectId', 'Art Energy Chest', 'A trusted artist’s brush earned through steady creative energy.'), requiredXP: 300 },
+    { ...collectionReward('painters_smock', 'Painters Smock', 'outfitId', 'Art Energy Chest', 'A painter’s smock for reaching the next stage of your journey.'), requiredXP: 450 },
+    { ...collectionReward('pencil', 'Pencil', 'heldObjectId', 'Art Energy Chest', 'A precise pencil awarded for seeing the whole gallery journey through.'), requiredXP: 600 },
 ];
 const ACCESSORIES = [
     { id: 'none', name: 'No Accessory', color: '#ffffff', accent: '#ffffff' },
@@ -8003,10 +8079,10 @@ const ACCESSORIES = [
 const AVATAR_REWARD_DEFAULT_BUILD = {
     archetypeId: 'nova',
     skinToneId: 'golden',
-    hairStyleId: 'brown_bob',
+    hairStyleId: 'brown_curls',
     faceId: AVATAR_REWARD_FACE_STYLES[0].id,
     outfitId: 'mystic_robe',
-    heldObjectId: 'brush',
+    heldObjectId: 'star_staff',
     accessoryId: ACCESSORIES[0].id,
 };
 const AVATAR_REWARD_BUILDER_TABS = [
@@ -8140,12 +8216,14 @@ const getAvatarBuildForAvatar = (avatar) => {
     }
 };
 const isAvatarOptionUnlocked = (option, playerStats) => {
-    if (!option.unlock)
+    if (!option.unlock && !option.requiresReward)
         return true;
     if (!playerStats)
         return false;
     if (playerStats.unlockedAvatarAssetIds?.includes(option.id))
         return true;
+    if (!option.unlock)
+        return false;
     const traitLevel = playerStats.traits[option.unlock.traitName]?.level;
     return isTraitLevelAtLeast(traitLevel, option.unlock.level);
 };
@@ -16949,7 +17027,7 @@ const ARTIST_IDENTITIES = {
         },
     },
 };
-const isStarterOption = (option) => !option.unlock;
+const isStarterOption = (option) => !option.unlock && !option.requiresReward;
 const NO_HAIR_STYLE_ID = 'none';
 const NO_HELD_OBJECT_ID = 'none';
 const SKIN_TONES = AVATAR_REWARD_SKIN_TONES.filter(isStarterOption);
@@ -16960,6 +17038,12 @@ const HELD_OBJECTS = AVATAR_REWARD_HELD_OBJECTS.filter(isStarterOption);
 const STARTER_NO_HAIR_OPTION = HAIR_STYLES.find(option => option.id === NO_HAIR_STYLE_ID) || HAIR_STYLES[0];
 const HAIR_STYLE_OPTIONS = HAIR_STYLES.filter(option => option.id !== NO_HAIR_STYLE_ID);
 const DEFAULT_AVATAR_BUILD = AVATAR_REWARD_DEFAULT_BUILD;
+const UnlockMoreOptionsTile = () => (React.createElement("div", { className: "flex min-h-[8.5rem] flex-col items-center justify-center rounded-md border-2 border-dashed border-[#d6a548]/70 bg-[#120f27]/85 p-3 text-center text-[#f7d9a5] shadow-[inset_0_0_20px_rgba(245,158,11,0.08)]", "aria-label": "Unlock more options in the game" },
+    React.createElement("span", { className: "text-2xl text-[#ffd45f]", "aria-hidden": "true" }, "\u2726"),
+    React.createElement("span", { className: "mt-2 text-xs font-black uppercase leading-tight tracking-wide" },
+        "Unlock more options",
+        React.createElement("br", null),
+        "in the game")));
 const AVATAR_BUILDER_TABS = [
     { id: 'skinToneId', label: 'Skin Tone', shortLabel: 'Skin', options: SKIN_TONES },
     { id: 'hairStyleId', label: 'Hair Style', shortLabel: 'Hair', options: HAIR_STYLES },
@@ -17522,23 +17606,27 @@ const NewGameSetupScreen = ({ onStartNewGameSetupComplete }) => {
             }))),
         React.createElement("div", null,
             React.createElement("p", { className: "mb-2 text-xs font-black uppercase tracking-normal text-teal-200" }, "Style"),
-            React.createElement("div", { className: "grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4" }, selectedHairColorOptions.map(option => {
-                const isSelected = avatarBuild.hairStyleId === option.id;
-                const previewImageUrls = getAvatarAssetPreviewImageUrls(avatarBuild, 'hairStyleId', option.id);
-                return (React.createElement("button", { key: option.id, type: "button", onClick: () => updateAvatarBuild('hairStyleId', option.id), className: `flex min-h-[8.5rem] flex-col items-center justify-between rounded-md border-2 p-2 text-center transition focus:outline-none focus:ring-2 focus:ring-pink-300 ${isSelected
-                        ? 'border-pink-400 bg-[#5a1b49] text-white'
-                        : 'border-gray-600 bg-[#283140] text-gray-200 hover:border-pink-300 hover:bg-[#333d4f]'}`, "aria-pressed": isSelected, "aria-label": `Choose ${option.name} hair style` },
-                    React.createElement(AvatarAssetPreview, { imageUrls: previewImageUrls, tabId: "hairStyleId", label: option.name, className: "h-28 w-28" }),
-                    React.createElement("span", { className: "mt-1 text-xs font-bold leading-tight" }, getHairStyleLabel(option))));
-            })))));
-    const renderSkinToneOptionGrid = () => (React.createElement("div", { className: "grid grid-cols-2 gap-3 sm:grid-cols-4" }, SKIN_TONES.map(option => {
-        const isSelected = avatarBuild.skinToneId === option.id;
-        return (React.createElement("button", { key: option.id, type: "button", onClick: () => updateAvatarBuild('skinToneId', option.id), className: `relative flex min-h-[7.5rem] flex-col items-center justify-center rounded-md border-2 p-3 text-center transition focus:outline-none focus:ring-2 focus:ring-pink-300 ${isSelected
-                ? 'border-pink-400 bg-[#5a1b49] text-white shadow-[0_0_22px_rgba(244,114,182,0.28)]'
-                : 'border-gray-600 bg-[#283140] text-gray-200 hover:border-pink-300 hover:bg-[#333d4f]'}`, "aria-pressed": isSelected, "aria-label": `Choose ${option.name} skin tone` },
-            React.createElement("span", { className: "mb-2 h-12 w-12 rounded-md border-2 border-[#080814] shadow-[inset_0_0_0_2px_rgba(255,255,255,0.12),0_5px_0_rgba(0,0,0,0.35)]", style: { backgroundColor: option.color }, "aria-hidden": "true" }),
-            React.createElement("span", { className: "text-sm font-black leading-tight" }, option.name)));
-    })));
+            React.createElement("div", { className: "grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4" },
+                selectedHairColorOptions.map(option => {
+                    const isSelected = avatarBuild.hairStyleId === option.id;
+                    const previewImageUrls = getAvatarAssetPreviewImageUrls(avatarBuild, 'hairStyleId', option.id);
+                    return (React.createElement("button", { key: option.id, type: "button", onClick: () => updateAvatarBuild('hairStyleId', option.id), className: `flex min-h-[8.5rem] flex-col items-center justify-between rounded-md border-2 p-2 text-center transition focus:outline-none focus:ring-2 focus:ring-pink-300 ${isSelected
+                            ? 'border-pink-400 bg-[#5a1b49] text-white'
+                            : 'border-gray-600 bg-[#283140] text-gray-200 hover:border-pink-300 hover:bg-[#333d4f]'}`, "aria-pressed": isSelected, "aria-label": `Choose ${option.name} hair style` },
+                        React.createElement(AvatarAssetPreview, { imageUrls: previewImageUrls, tabId: "hairStyleId", label: option.name, className: "h-28 w-28" }),
+                        React.createElement("span", { className: "mt-1 text-xs font-bold leading-tight" }, getHairStyleLabel(option))));
+                }),
+                React.createElement(UnlockMoreOptionsTile, null)))));
+    const renderSkinToneOptionGrid = () => (React.createElement("div", { className: "grid grid-cols-2 gap-3 sm:grid-cols-4" },
+        SKIN_TONES.map(option => {
+            const isSelected = avatarBuild.skinToneId === option.id;
+            return (React.createElement("button", { key: option.id, type: "button", onClick: () => updateAvatarBuild('skinToneId', option.id), className: `relative flex min-h-[7.5rem] flex-col items-center justify-center rounded-md border-2 p-3 text-center transition focus:outline-none focus:ring-2 focus:ring-pink-300 ${isSelected
+                    ? 'border-pink-400 bg-[#5a1b49] text-white shadow-[0_0_22px_rgba(244,114,182,0.28)]'
+                    : 'border-gray-600 bg-[#283140] text-gray-200 hover:border-pink-300 hover:bg-[#333d4f]'}`, "aria-pressed": isSelected, "aria-label": `Choose ${option.name} skin tone` },
+                React.createElement("span", { className: "mb-2 h-12 w-12 rounded-md border-2 border-[#080814] shadow-[inset_0_0_0_2px_rgba(255,255,255,0.12),0_5px_0_rgba(0,0,0,0.35)]", style: { backgroundColor: option.color }, "aria-hidden": "true" }),
+                React.createElement("span", { className: "text-sm font-black leading-tight" }, option.name)));
+        }),
+        React.createElement(UnlockMoreOptionsTile, null)));
     const renderActiveOptionGrid = () => (React.createElement("div", { id: `avatar-builder-panel-${activeBuilderTab.id}`, role: "tabpanel", "aria-labelledby": `avatar-builder-tab-${activeBuilderTab.id}` },
         React.createElement("div", { className: "mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between" },
             React.createElement("div", null,
@@ -17551,15 +17639,17 @@ const NewGameSetupScreen = ({ onStartNewGameSetupComplete }) => {
             React.createElement("p", { className: "max-w-full text-sm text-gray-400 sm:text-right" },
                 "Selected: ",
                 React.createElement("span", { className: "font-bold text-gray-100" }, getOptionById(activeBuilderTab.options, avatarBuild[activeBuilderTab.id]).name))),
-        activeBuilderTab.id === 'skinToneId' ? renderSkinToneOptionGrid() : activeBuilderTab.id === 'hairStyleId' ? renderHairOptionGrid() : (React.createElement("div", { className: "grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4" }, activeBuilderTab.options.map(option => {
-            const isSelected = avatarBuild[activeBuilderTab.id] === option.id;
-            const previewImageUrls = getAvatarAssetPreviewImageUrls(avatarBuild, activeBuilderTab.id, option.id);
-            return (React.createElement("button", { key: option.id, type: "button", onClick: () => updateAvatarBuild(activeBuilderTab.id, option.id), className: `flex min-h-[8.5rem] flex-col items-center justify-between rounded-md border-2 p-2 text-center transition focus:outline-none focus:ring-2 focus:ring-pink-300 ${isSelected
-                    ? 'border-pink-400 bg-[#5a1b49] text-white'
-                    : 'border-gray-600 bg-[#283140] text-gray-200 hover:border-pink-300 hover:bg-[#333d4f]'}`, "aria-pressed": isSelected, "aria-label": `Choose ${option.name} ${activeBuilderTab.label.toLowerCase()}` },
-                React.createElement(AvatarAssetPreview, { imageUrls: previewImageUrls, tabId: activeBuilderTab.id, label: option.name, className: "h-28 w-28" }),
-                React.createElement("span", { className: "mt-1 text-xs font-bold leading-tight" }, option.name)));
-        })))));
+        activeBuilderTab.id === 'skinToneId' ? renderSkinToneOptionGrid() : activeBuilderTab.id === 'hairStyleId' ? renderHairOptionGrid() : (React.createElement("div", { className: "grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4" },
+            activeBuilderTab.options.map(option => {
+                const isSelected = avatarBuild[activeBuilderTab.id] === option.id;
+                const previewImageUrls = getAvatarAssetPreviewImageUrls(avatarBuild, activeBuilderTab.id, option.id);
+                return (React.createElement("button", { key: option.id, type: "button", onClick: () => updateAvatarBuild(activeBuilderTab.id, option.id), className: `flex min-h-[8.5rem] flex-col items-center justify-between rounded-md border-2 p-2 text-center transition focus:outline-none focus:ring-2 focus:ring-pink-300 ${isSelected
+                        ? 'border-pink-400 bg-[#5a1b49] text-white'
+                        : 'border-gray-600 bg-[#283140] text-gray-200 hover:border-pink-300 hover:bg-[#333d4f]'}`, "aria-pressed": isSelected, "aria-label": `Choose ${option.name} ${activeBuilderTab.label.toLowerCase()}` },
+                    React.createElement(AvatarAssetPreview, { imageUrls: previewImageUrls, tabId: activeBuilderTab.id, label: option.name, className: "h-28 w-28" }),
+                    React.createElement("span", { className: "mt-1 text-xs font-bold leading-tight" }, option.name)));
+            }),
+            React.createElement(UnlockMoreOptionsTile, null)))));
     if (builderScreenActive) {
         return (React.createElement("div", { className: "relative flex min-h-screen items-center justify-center overflow-hidden bg-[#100b18] text-gray-100 selection:bg-pink-500 selection:text-white" },
             React.createElement("div", { className: "relative overflow-hidden", style: ARTIST_SETUP_SCREEN_FRAME_STYLE },
@@ -23224,7 +23314,13 @@ const getTraitFilledPipCount = (trait) => {
         : 0;
     return Math.max(0, Math.min(6, (getInventoryTraitLevelRank(trait.level) * 2) + progressPips));
 };
-const getOptionRequirement = (option) => (option.unlock ? `Reach ${option.unlock.level} ${option.unlock.traitName}` : 'Starter item');
+const getOptionRequirement = (option) => (option.unlock && option.requiresReward
+    ? `Earn through rewards or reach ${option.unlock.level} ${option.unlock.traitName}`
+    : option.unlock
+        ? `Reach ${option.unlock.level} ${option.unlock.traitName}`
+        : option.requiresReward
+            ? 'Earn through gallery rewards'
+            : 'Starter item');
 const getNextLockedReward = (playerStats) => {
     if (!playerStats)
         return null;
@@ -23311,6 +23407,8 @@ const InventoryScreen = ({ playerStats, selectedAvatar, onReturnToMap, onUpdateA
     const energyMilestones = getEnergyMilestones(playerStats.artEnergy.maxXp, playerStats.artEnergy.currentXP);
     const nextEnergyMilestone = energyMilestones.find(milestone => !milestone.isUnlocked);
     const unlockedAssetCount = AVATAR_REWARD_BUILDER_TABS.reduce((count, tab) => (count + getUnlockedOptionsForTab(tab, playerStats).length), 0);
+    const totalAvatarAssetCount = AVATAR_REWARD_BUILDER_TABS.reduce((count, tab) => count + tab.options.length, 0);
+    const lockedAssetCount = totalAvatarAssetCount - unlockedAssetCount;
     const preloadInventoryAvatarPreview = (nextBuild) => {
         const assets = getAvatarLayerPreloadAssets(nextBuild);
         if (areAssetsPreloaded(assets)) {
@@ -23631,8 +23729,14 @@ const InventoryScreen = ({ playerStats, selectedAvatar, onReturnToMap, onUpdateA
                         React.createElement("p", { className: "font-serif text-2xl font-black text-[#eaffff]" }, unlockedRewards.length),
                         React.createElement("p", { className: "mt-0.5 text-[10px] font-black uppercase leading-tight text-[#d8c29a]" }, "Rewards Unlocked")),
                     React.createElement(ArtQuestPanel, { as: "div", variant: "inner", className: "p-2 text-center" },
-                        React.createElement("p", { className: "font-serif text-2xl font-black text-[#f7c2ff]" }, unlockedAssetCount),
-                        React.createElement("p", { className: "mt-0.5 text-[10px] font-black uppercase leading-tight text-[#d8c29a]" }, "Avatar Options")))))));
+                        React.createElement("p", { className: "font-serif text-2xl font-black text-[#f7c2ff]" },
+                            unlockedAssetCount,
+                            " / ",
+                            totalAvatarAssetCount),
+                        React.createElement("p", { className: "mt-0.5 text-[10px] font-black uppercase leading-tight text-[#d8c29a]" }, "Avatar Options"),
+                        React.createElement("p", { className: "mt-1 text-[9px] font-bold leading-tight text-cyan-100" },
+                            lockedAssetCount,
+                            " discoveries await")))))));
 };
 const GUIDE_TABS = [
     {
@@ -26827,6 +26931,42 @@ const getNewSideQuestAvatarRewardReveals = (previousStats, nextStats, reward) =>
     const reveal = buildSideQuestAvatarRewardReveal(reward);
     return !wasAlreadyUnlocked && isUnlocked && reveal ? [reveal] : [];
 };
+const getAvatarCollectionCategoryLabel = (category) => (category === 'hairStyleId'
+    ? 'Hair Style'
+    : category === 'outfitId'
+        ? 'Outfit'
+        : category === 'heldObjectId'
+            ? 'Held Item'
+            : 'Avatar Item');
+const addAvatarCollectionRewardsToStats = (stats, rewards) => {
+    if (rewards.length === 0)
+        return stats;
+    const unlockedAssetIds = new Set(stats.unlockedAvatarAssetIds || []);
+    rewards.forEach((reward) => unlockedAssetIds.add(reward.assetId));
+    return {
+        ...stats,
+        unlockedAvatarAssetIds: [...unlockedAssetIds],
+    };
+};
+const getNewAvatarCollectionRewardReveals = (previousStats, nextStats, rewards) => {
+    const previousAssetIds = new Set(previousStats.unlockedAvatarAssetIds || []);
+    const nextAssetIds = new Set(nextStats.unlockedAvatarAssetIds || []);
+    return rewards
+        .filter((reward) => !previousAssetIds.has(reward.assetId) && nextAssetIds.has(reward.assetId))
+        .map((reward) => ({
+        traitName: 'Focus',
+        level: 'Bronze',
+        badgeName: reward.collectionName,
+        assetName: reward.assetName,
+        assetId: reward.assetId,
+        assetCategory: reward.assetCategory,
+        assetCategoryLabel: getAvatarCollectionCategoryLabel(reward.assetCategory),
+        description: reward.description,
+        unlockSource: reward.collectionName,
+    }));
+};
+const getNewArtEnergyChestRewards = (previousStats, nextStats) => (ART_ENERGY_AVATAR_CHEST_REWARDS.filter((reward) => (previousStats.artEnergy.currentXP < reward.requiredXP
+    && nextStats.artEnergy.currentXP >= reward.requiredXP)));
 const restoreCompletedSideQuestAvatarRewards = (stats, sideQuestState) => {
     const playerStats = normalizePlayerStats(stats);
     const unlockedAssetIds = new Set(playerStats.unlockedAvatarAssetIds || []);
@@ -26847,6 +26987,14 @@ const restoreCompletedSideQuestAvatarRewards = (stats, sideQuestState) => {
             unlockedAvatarAssetIds: [...unlockedAssetIds],
         },
         rewardReveals,
+    };
+};
+const restoreAvatarCollectionRewards = (stats, rewards) => {
+    const playerStats = normalizePlayerStats(stats);
+    const nextStats = addAvatarCollectionRewardsToStats(playerStats, rewards);
+    return {
+        playerStats: nextStats,
+        rewardReveals: getNewAvatarCollectionRewardReveals(playerStats, nextStats, rewards),
     };
 };
 const formatSideQuestRewardSummary = (reward) => {
@@ -27181,6 +27329,10 @@ const App = () => {
                 : null;
             const sideQuestState = normalizeSideQuestState(parsedData.gameState.sideQuestState);
             const restoredSideQuestRewards = restoreCompletedSideQuestAvatarRewards(normalizePlayerStats(parsedData.gameState.playerStats), sideQuestState);
+            const wings = normalizeUnlockedWings(parsedData.gameState.wings || {});
+            const completedWingRewards = WING_DEFINITIONS.flatMap((wing) => (wings[wing.id]?.isSolved ? (WING_AVATAR_COLLECTION_REWARDS[wing.id] || []) : []));
+            const earnedChestRewards = ART_ENERGY_AVATAR_CHEST_REWARDS.filter((reward) => (restoredSideQuestRewards.playerStats.artEnergy.currentXP >= reward.requiredXP));
+            const restoredCollectionRewards = restoreAvatarCollectionRewards(restoredSideQuestRewards.playerStats, [...completedWingRewards, ...earnedChestRewards]);
             await runLoadTransition({
                 title: 'Restoring the Foyer',
                 message: `${selectedAvatar.name || 'Your artist'} is reopening the saved sketchbook.`,
@@ -27199,8 +27351,8 @@ const App = () => {
                     ...prev,
                     ...parsedData.gameState,
                     selectedAvatar,
-                    wings: normalizeUnlockedWings(parsedData.gameState.wings || {}),
-                    playerStats: restoredSideQuestRewards.playerStats,
+                    wings,
+                    playerStats: restoredCollectionRewards.playerStats,
                     sideQuestState,
                     teacherMode: !!parsedData.gameState.teacherMode,
                     classPack,
@@ -27210,7 +27362,10 @@ const App = () => {
                     narrativeLog: [],
                     avatarImageError: null,
                     isGeneratingAvatarPortrait: false,
-                    pendingRewardReveals: restoredSideQuestRewards.rewardReveals,
+                    pendingRewardReveals: [
+                        ...restoredSideQuestRewards.rewardReveals,
+                        ...restoredCollectionRewards.rewardReveals,
+                    ],
                 }));
                 setCurrentGalleryScene('foyer');
                 setCurrentScreen('map');
@@ -27369,6 +27524,29 @@ const App = () => {
     const unlockNextWing = useCallback((solvedWingId) => {
         const solvedWingDef = WING_DEFINITIONS.find(w => w.id === solvedWingId);
         let unlockedWingId = null;
+        const collectionRewards = WING_AVATAR_COLLECTION_REWARDS[solvedWingId] || [];
+        if (collectionRewards.length > 0) {
+            setAppGameState(prev => {
+                const previousStats = prev.playerStats ? normalizePlayerStats(prev.playerStats) : createInitialPlayerStats();
+                const nextStats = addAvatarCollectionRewardsToStats(previousStats, collectionRewards);
+                const rewardReveals = getNewAvatarCollectionRewardReveals(previousStats, nextStats, collectionRewards);
+                if (rewardReveals.length === 0)
+                    return prev;
+                const collectionName = collectionRewards[0].collectionName;
+                const collectionEntry = {
+                    speaker: 'system',
+                    text: `Gallery collection recovered: ${collectionName}. ${rewardReveals.map((reward) => reward.assetName).join(', ')} added to your avatar collection.`,
+                    id: `${Date.now()}-wing-collection-${solvedWingId}`,
+                    timestamp: Date.now(),
+                };
+                return {
+                    ...prev,
+                    playerStats: nextStats,
+                    narrativeLog: [...prev.narrativeLog, collectionEntry],
+                    pendingRewardReveals: [...prev.pendingRewardReveals, ...rewardReveals],
+                };
+            });
+        }
         if (solvedWingDef?.unlocks) {
             const nextWingId = solvedWingDef.unlocks;
             updateWingState(nextWingId, { isUnlocked: true });
@@ -27411,22 +27589,32 @@ const App = () => {
     const handleUpdatePlayerStats = useCallback((newStats) => {
         setAppGameState(prev => {
             const previousStats = prev.playerStats ? normalizePlayerStats(prev.playerStats) : createInitialPlayerStats();
-            const nextStats = applyTraitLevelUps({
+            const statsAfterTraitLevels = applyTraitLevelUps({
                 ...newStats,
                 unlockedAvatarAssetIds: Array.from(new Set([
                     ...(previousStats.unlockedAvatarAssetIds || []),
                     ...(newStats.unlockedAvatarAssetIds || []),
                 ])),
             });
-            const rewardChange = buildRewardEntriesForStatsChange(previousStats, nextStats);
+            const chestRewards = getNewArtEnergyChestRewards(previousStats, statsAfterTraitLevels);
+            const nextStats = addAvatarCollectionRewardsToStats(statsAfterTraitLevels, chestRewards);
+            const rewardChange = buildRewardEntriesForStatsChange(previousStats, statsAfterTraitLevels);
+            const chestReveals = getNewAvatarCollectionRewardReveals(statsAfterTraitLevels, nextStats, chestRewards);
+            const rewardReveals = [...rewardChange.rewards, ...chestReveals];
+            const chestEntries = chestReveals.map((reward, index) => ({
+                speaker: 'system',
+                text: `Art Energy chest opened: ${reward.assetName} is now available in your avatar collection.`,
+                id: `${Date.now()}-art-energy-chest-${index}`,
+                timestamp: Date.now(),
+            }));
             return {
                 ...prev,
                 playerStats: nextStats,
-                narrativeLog: rewardChange.entries.length > 0
-                    ? [...prev.narrativeLog, ...rewardChange.entries]
+                narrativeLog: rewardChange.entries.length > 0 || chestEntries.length > 0
+                    ? [...prev.narrativeLog, ...rewardChange.entries, ...chestEntries]
                     : prev.narrativeLog,
-                pendingRewardReveals: rewardChange.rewards.length > 0
-                    ? [...prev.pendingRewardReveals, ...rewardChange.rewards]
+                pendingRewardReveals: rewardReveals.length > 0
+                    ? [...prev.pendingRewardReveals, ...rewardReveals]
                     : prev.pendingRewardReveals,
             };
         });
