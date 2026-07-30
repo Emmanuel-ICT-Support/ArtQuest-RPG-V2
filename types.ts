@@ -155,6 +155,19 @@ export interface PlayerStats {
     maxXp: number;
   };
   traits: Record<TraitName, PlayerTrait>;
+  unlockedAvatarAssetIds?: string[];
+}
+
+export interface AvatarRewardReveal {
+  traitName: TraitName;
+  level: Exclude<TraitLevel, 'Locked'>;
+  badgeName: string;
+  assetName: string;
+  assetId: string;
+  assetCategory: AvatarAssetTabId;
+  assetCategoryLabel: string;
+  description: string;
+  unlockSource?: string;
 }
 
 export type SideQuestCaseStatus = 'notStarted' | 'active' | 'readyToSolve' | 'completed';
@@ -175,6 +188,12 @@ export interface SideQuestReward {
   artEnergy: number;
   traits: Partial<Record<TraitName, number>>;
   badge: string;
+  avatarReward?: {
+    assetId: string;
+    assetName: string;
+    assetCategory: AvatarAssetTabId;
+    description: string;
+  };
   avatarRewardHint?: string;
 }
 
@@ -294,6 +313,8 @@ export interface AppGameState {
   avatarImageError: string | null;
   focusedWingIdForJournal?: string | null;
   sideQuestState: SideQuestProgressState;
+  // Ephemeral: shown as an overlay and never written to save files.
+  pendingRewardReveals: AvatarRewardReveal[];
 }
 
 // Props for UI components

@@ -14,11 +14,12 @@ import GameGuideScreen from './components/GameGuideScreen';
 import AssessmentScreen from './components/AssessmentScreen';
 import GalleryLoadingScreen, { GalleryLoadingTone } from './components/GalleryLoadingScreen';
 import Modal from './components/Modal';
+import RewardRevealPanel from './components/RewardRevealPanel';
 import { GameMusicTrack, useGameAudio } from './components/useGameAudio';
-import { PlayerAvatar, WingState, AppGameState, NarrativeEntry, GameScreen, GalleryScene, JournalEntry, YearLevel, SeniorCoursePathway, PlayerStats, TraitName, TraitLevel, SaveGameData, CoreSavedGameState, SideQuestReward } from './types';
+import { AvatarRewardReveal, PlayerAvatar, WingState, AppGameState, NarrativeEntry, GameScreen, GalleryScene, JournalEntry, YearLevel, SeniorCoursePathway, PlayerStats, TraitName, TraitLevel, SaveGameData, CoreSavedGameState, SideQuestReward } from './types';
 import { WING_DEFINITIONS, INITIAL_WING_ID, SAVE_FILE_VERSION } from './constants';
 import { initializeChat as initializeAiChat } from './services/aiService';
-import { AVATAR_REWARD_DEFAULT_BUILD, getAvatarBuildForAvatar, getAvatarLayerImageUrls, getAvatarSpriteUrl, getNewlyUnlockedRewardMilestones } from './data/AvatarRewards';
+import { AVATAR_REWARD_DEFAULT_BUILD, getAvatarBuildColorClass, getAvatarBuildForAvatar, getAvatarLayerImageUrls, getAvatarSpriteUrl, getNewlyUnlockedRewardMilestones, normalizeAvatarBuild } from './data/AvatarRewards';
 import { getArtworkBrief } from './data/ArtworkLibrary';
 import { getVisualLanguageGuideForWing } from './data/VisualLanguageGuide';
 import { SIDE_QUEST_CASES, SIDE_QUEST_CASES_BY_ID, createInitialSideQuestState, normalizeSideQuestState } from './data/SideQuests';
@@ -63,6 +64,7 @@ const CORE_AUDIO_ASSETS = [
   './public/audio/main-game-exploration.mp3',
   './public/audio/door-opening.m4a',
   './public/audio/page-turn.mp3',
+  './public/audio/reward-unlocked.mp3',
 ];
 
 const PANEL_IMAGE_ASSETS: Record<PanelScreen, string[]> = {
@@ -428,6 +430,7 @@ const TRAIT_LEVEL_ORDER: TraitLevel[] = ['Locked', 'Bronze', 'Silver', 'Gold'];
 
 const initialPlayerStats: PlayerStats = {
   artEnergy: { currentXP: 0, maxXp: ART_ENERGY_MAX_XP },
+  unlockedAvatarAssetIds: [],
   traits: {
     Focus: { name: 'Focus', icon: '🎯', description: 'Precision in responses, addressing prompts directly.', level: 'Locked', currentXP: 0, xpToNextLevel: 12 },
     Expression: { name: 'Expression', icon: '✍️', description: 'Use of creative or emotive language.', level: 'Locked', currentXP: 0, xpToNextLevel: 12 },
@@ -468,6 +471,9 @@ const normalizePlayerStats = (stats?: PlayerStats | null): PlayerStats => {
 
   normalized.artEnergy.currentXP = Math.max(0, Math.min(stats.artEnergy?.currentXP ?? 0, ART_ENERGY_MAX_XP));
   normalized.artEnergy.maxXp = ART_ENERGY_MAX_XP;
+  normalized.unlockedAvatarAssetIds = Array.from(new Set(
+    (stats.unlockedAvatarAssetIds || []).filter((assetId): assetId is string => typeof assetId === 'string'),
+  ));
 
   (Object.keys(normalized.traits) as TraitName[]).forEach(traitName => {
     const savedTrait = stats.traits?.[traitName];
@@ -497,15 +503,18 @@ const normalizePlayerStats = (stats?: PlayerStats | null): PlayerStats => {
 const buildRewardEntriesForStatsChange = (
   previousStats: PlayerStats,
   nextStats: PlayerStats,
-): NarrativeEntry[] => {
+): { entries: NarrativeEntry[]; rewards: AvatarRewardReveal[] } => {
   const unlockedRewards = getNewlyUnlockedRewardMilestones(previousStats, nextStats);
 
-  return unlockedRewards.map((reward, index) => ({
-    speaker: 'system',
-    text: `Badge unlocked: ${reward.badgeName}. New avatar ${reward.assetCategoryLabel.toLowerCase()}: ${reward.assetName}.`,
-    id: `${Date.now()}-reward-${index}`,
-    timestamp: Date.now(),
-  }));
+  return {
+    rewards: unlockedRewards,
+    entries: unlockedRewards.map((reward, index) => ({
+      speaker: 'system',
+      text: `Badge unlocked: ${reward.badgeName}. New avatar ${reward.assetCategoryLabel.toLowerCase()}: ${reward.assetName}.`,
+      id: `${Date.now()}-reward-${index}`,
+      timestamp: Date.now(),
+    })),
+  };
 };
 
 const applyTraitLevelUps = (stats: PlayerStats): PlayerStats => {
@@ -540,7 +549,71 @@ const addSideQuestRewardToStats = (stats: PlayerStats, reward: SideQuestReward):
       trait.currentXP += amount;
     });
 
+  if (reward.avatarReward && !nextStats.unlockedAvatarAssetIds?.includes(reward.avatarReward.assetId)) {
+    nextStats.unlockedAvatarAssetIds = [
+      ...(nextStats.unlockedAvatarAssetIds || []),
+      reward.avatarReward.assetId,
+    ];
+  }
+
   return nextStats;
+};
+
+const buildSideQuestAvatarRewardReveal = (reward: SideQuestReward): AvatarRewardReveal | null => {
+  if (!reward.avatarReward) return null;
+
+  return {
+    traitName: 'Focus',
+    level: 'Bronze',
+    badgeName: reward.badge,
+    assetName: reward.avatarReward.assetName,
+    assetId: reward.avatarReward.assetId,
+    assetCategory: reward.avatarReward.assetCategory,
+    assetCategoryLabel: reward.avatarReward.assetCategory === 'heldObjectId' ? 'Held Item' : 'Avatar Item',
+    description: reward.avatarReward.description,
+    unlockSource: `Side Quest · ${reward.badge}`,
+  };
+};
+
+const getNewSideQuestAvatarRewardReveals = (
+  previousStats: PlayerStats,
+  nextStats: PlayerStats,
+  reward: SideQuestReward,
+): AvatarRewardReveal[] => {
+  const sideQuestReward = reward.avatarReward;
+  if (!sideQuestReward) return [];
+
+  const wasAlreadyUnlocked = previousStats.unlockedAvatarAssetIds?.includes(sideQuestReward.assetId);
+  const isUnlocked = nextStats.unlockedAvatarAssetIds?.includes(sideQuestReward.assetId);
+  const reveal = buildSideQuestAvatarRewardReveal(reward);
+  return !wasAlreadyUnlocked && isUnlocked && reveal ? [reveal] : [];
+};
+
+const restoreCompletedSideQuestAvatarRewards = (
+  stats: PlayerStats,
+  sideQuestState: ReturnType<typeof normalizeSideQuestState>,
+): { playerStats: PlayerStats; rewardReveals: AvatarRewardReveal[] } => {
+  const playerStats = normalizePlayerStats(stats);
+  const unlockedAssetIds = new Set(playerStats.unlockedAvatarAssetIds || []);
+  const rewardReveals: AvatarRewardReveal[] = [];
+
+  SIDE_QUEST_CASES.forEach((sideQuestCase) => {
+    const sideQuestReward = sideQuestCase.reward.avatarReward;
+    const isCompleted = sideQuestState.cases[sideQuestCase.id]?.status === 'completed';
+    if (!isCompleted || !sideQuestReward || unlockedAssetIds.has(sideQuestReward.assetId)) return;
+
+    unlockedAssetIds.add(sideQuestReward.assetId);
+    const reveal = buildSideQuestAvatarRewardReveal(sideQuestCase.reward);
+    if (reveal) rewardReveals.push(reveal);
+  });
+
+  return {
+    playerStats: {
+      ...playerStats,
+      unlockedAvatarAssetIds: [...unlockedAssetIds],
+    },
+    rewardReveals,
+  };
 };
 
 const formatSideQuestRewardSummary = (reward: SideQuestReward): string => {
@@ -548,7 +621,12 @@ const formatSideQuestRewardSummary = (reward: SideQuestReward): string => {
     .filter(([, amount]) => amount > 0)
     .map(([traitName, amount]) => `${traitName} +${amount}`);
 
-  return [`Art Energy +${reward.artEnergy}`, ...traitParts, `Badge: ${reward.badge}`].join(', ');
+  return [
+    `Art Energy +${reward.artEnergy}`,
+    ...traitParts,
+    ...(reward.avatarReward ? [`Avatar item: ${reward.avatarReward.assetName}`] : []),
+    `Badge: ${reward.badge}`,
+  ].join(', ');
 };
 
 const initialAppGameState: AppGameState = {
@@ -571,6 +649,7 @@ const initialAppGameState: AppGameState = {
     avatarImageError: null,
     focusedWingIdForJournal: null,
     sideQuestState: createInitialSideQuestState(),
+    pendingRewardReveals: [],
 };
 
 
@@ -915,6 +994,11 @@ export const App: React.FC = () => {
       const classPack = parsedData.gameState.classPack
         ? parseClassPackExport(JSON.stringify(parsedData.gameState.classPack))
         : null;
+      const sideQuestState = normalizeSideQuestState(parsedData.gameState.sideQuestState);
+      const restoredSideQuestRewards = restoreCompletedSideQuestAvatarRewards(
+        normalizePlayerStats(parsedData.gameState.playerStats),
+        sideQuestState,
+      );
 
       await runLoadTransition({
         title: 'Restoring the Foyer',
@@ -936,8 +1020,8 @@ export const App: React.FC = () => {
           ...parsedData.gameState, // Load core game state
           selectedAvatar,
           wings: normalizeUnlockedWings(parsedData.gameState.wings || {}),
-          playerStats: normalizePlayerStats(parsedData.gameState.playerStats),
-          sideQuestState: normalizeSideQuestState(parsedData.gameState.sideQuestState),
+          playerStats: restoredSideQuestRewards.playerStats,
+          sideQuestState,
           teacherMode: !!parsedData.gameState.teacherMode,
           classPack,
           geminiChat: chat, // Set the new chat instance
@@ -946,6 +1030,7 @@ export const App: React.FC = () => {
           narrativeLog: [], // Clear previous narrative log
           avatarImageError: null, // Clear any previous avatar image errors
           isGeneratingAvatarPortrait: false,
+          pendingRewardReveals: restoredSideQuestRewards.rewardReveals,
         }));
         setCurrentGalleryScene('foyer');
         setCurrentScreen('map');
@@ -1184,15 +1269,24 @@ export const App: React.FC = () => {
   const handleUpdatePlayerStats = useCallback((newStats: PlayerStats) => {
     setAppGameState(prev => {
       const previousStats = prev.playerStats ? normalizePlayerStats(prev.playerStats) : createInitialPlayerStats();
-      const nextStats = applyTraitLevelUps(newStats);
-      const rewardEntries = buildRewardEntriesForStatsChange(previousStats, nextStats);
+      const nextStats = applyTraitLevelUps({
+        ...newStats,
+        unlockedAvatarAssetIds: Array.from(new Set([
+          ...(previousStats.unlockedAvatarAssetIds || []),
+          ...(newStats.unlockedAvatarAssetIds || []),
+        ])),
+      });
+      const rewardChange = buildRewardEntriesForStatsChange(previousStats, nextStats);
 
       return {
         ...prev,
         playerStats: nextStats,
-        narrativeLog: rewardEntries.length > 0
-          ? [...prev.narrativeLog, ...rewardEntries]
+        narrativeLog: rewardChange.entries.length > 0
+          ? [...prev.narrativeLog, ...rewardChange.entries]
           : prev.narrativeLog,
+        pendingRewardReveals: rewardChange.rewards.length > 0
+          ? [...prev.pendingRewardReveals, ...rewardChange.rewards]
+          : prev.pendingRewardReveals,
       };
     });
   }, []);
@@ -1278,9 +1372,18 @@ export const App: React.FC = () => {
         ? previousStats
         : addSideQuestRewardToStats(previousStats, sideQuestCase.reward);
       const nextStats = applyTraitLevelUps(rewardedStats);
-      const rewardEntries = caseProgress.rewardAwarded
-        ? []
+      const rewardChange = caseProgress.rewardAwarded
+        ? { entries: [], rewards: [] }
         : buildRewardEntriesForStatsChange(previousStats, nextStats);
+      const sideQuestRewardReveals = caseProgress.rewardAwarded
+        ? []
+        : getNewSideQuestAvatarRewardReveals(previousStats, nextStats, sideQuestCase.reward);
+      const rewardReveals = [
+        ...sideQuestRewardReveals,
+        ...rewardChange.rewards.filter((reward) => (
+          !sideQuestRewardReveals.some((sideQuestReward) => sideQuestReward.assetId === reward.assetId)
+        )),
+      ];
       const completionEntry: NarrativeEntry = {
         speaker: 'system',
         text: `Case closed: ${sideQuestCase.title}. ${formatSideQuestRewardSummary(sideQuestCase.reward)}.`,
@@ -1303,7 +1406,10 @@ export const App: React.FC = () => {
             },
           },
         },
-        narrativeLog: [...prev.narrativeLog, completionEntry, ...rewardEntries],
+        narrativeLog: [...prev.narrativeLog, completionEntry, ...rewardChange.entries],
+        pendingRewardReveals: rewardReveals.length > 0
+          ? [...prev.pendingRewardReveals, ...rewardReveals]
+          : prev.pendingRewardReveals,
       };
     });
   }, []);
@@ -1454,6 +1560,40 @@ export const App: React.FC = () => {
     }));
   }, []);
 
+  const handleDismissRewardReveal = useCallback(() => {
+    setAppGameState(prev => ({
+      ...prev,
+      pendingRewardReveals: prev.pendingRewardReveals.slice(1),
+    }));
+  }, []);
+
+  const handleEquipReward = useCallback((reward: AvatarRewardReveal) => {
+    setAppGameState(prev => {
+      const pendingRewardReveals = prev.pendingRewardReveals.slice(1);
+      if (!prev.selectedAvatar) return { ...prev, pendingRewardReveals };
+
+      const currentAvatarBuild = getAvatarBuildForAvatar(prev.selectedAvatar);
+      const nextAvatarBuild = normalizeAvatarBuild({
+        ...currentAvatarBuild,
+        [reward.assetCategory]: reward.assetId,
+      });
+      const updatedAvatar = normalizeSelectedAvatar({
+        ...prev.selectedAvatar,
+        id: 'custom',
+        colorClass: getAvatarBuildColorClass(nextAvatarBuild),
+        avatarArchetypeId: prev.selectedAvatar.avatarArchetypeId || nextAvatarBuild.archetypeId,
+        avatarBuild: nextAvatarBuild,
+      });
+
+      return {
+        ...prev,
+        pendingRewardReveals,
+        selectedAvatar: updatedAvatar,
+        avatarImageUrl: updatedAvatar.imageUrl || null,
+      };
+    });
+  }, []);
+
   const handleUpdateTeacherYearSelection = useCallback((yearLevel: YearLevel, coursePathway?: SeniorCoursePathway) => {
     setAppGameState(prev => {
       if (!prev.teacherMode || !prev.selectedAvatar) return prev;
@@ -1493,6 +1633,7 @@ export const App: React.FC = () => {
     playRoomCompletion,
     playUnlockDoor,
     playDoorOpening,
+    playRewardUnlock,
     pauseActiveTrack,
     resumeActiveTrack,
   } = useGameAudio(activeMusicTrack);
@@ -1781,6 +1922,13 @@ export const App: React.FC = () => {
           steps={loadTransition.steps}
         />
       )}
+      <RewardRevealPanel
+        rewards={appGameState.pendingRewardReveals}
+        avatar={appGameState.selectedAvatar}
+        onEquip={handleEquipReward}
+        onDismiss={handleDismissRewardReveal}
+        onReveal={playRewardUnlock}
+      />
       <Modal
         isOpen={pendingReturnMenuTarget !== null}
         title="Save Progress?"

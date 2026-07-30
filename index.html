@@ -7976,6 +7976,11 @@ const HELD_OBJECT_REWARD_UNLOCKS = {
         level: 'Silver',
         rewardDescription: 'For making original connections between symbols and stories.',
     },
+    crystal_staff: {
+        traitName: 'Imagination',
+        level: 'Gold',
+        rewardDescription: 'For connecting ideas across the whole Gallery of Secrets.',
+    },
 };
 const AVATAR_REWARD_HAIR_STYLES = [
     NO_HAIR_OPTION,
@@ -8139,6 +8144,8 @@ const isAvatarOptionUnlocked = (option, playerStats) => {
         return true;
     if (!playerStats)
         return false;
+    if (playerStats.unlockedAvatarAssetIds?.includes(option.id))
+        return true;
     const traitLevel = playerStats.traits[option.unlock.traitName]?.level;
     return isTraitLevelAtLeast(traitLevel, option.unlock.level);
 };
@@ -8872,6 +8879,12 @@ const SIDE_QUEST_CASES = [
             artEnergy: 5,
             traits: { Focus: 1, Expression: 1, Insight: 1 },
             badge: 'Gallery Detective',
+            avatarReward: {
+                assetId: 'magnifying_glass',
+                assetName: 'Magnifying Glass',
+                assetCategory: 'heldObjectId',
+                description: "Mira's restored Gallery Kit now includes a magnifying glass for close visual observation.",
+            },
             avatarRewardHint: 'Magnifying Glass',
         },
     },
@@ -8985,6 +8998,12 @@ const SIDE_QUEST_CASES = [
             artEnergy: 8,
             traits: { Focus: 2, Insight: 2, Expression: 1 },
             badge: "Archivist's Assistant",
+            avatarReward: {
+                assetId: 'quill',
+                assetName: 'Quill',
+                assetCategory: 'heldObjectId',
+                description: 'The recovered quill is ready to help you collect precise visual language.',
+            },
             avatarRewardHint: 'Quill',
         },
     },
@@ -9097,6 +9116,12 @@ const SIDE_QUEST_CASES = [
             artEnergy: 8,
             traits: { Expression: 2, Focus: 1, Insight: 2 },
             badge: "Restorer's Eye",
+            avatarReward: {
+                assetId: 'key',
+                assetName: 'Key',
+                assetCategory: 'heldObjectId',
+                description: 'The restored key represents evidence-led interpretation across the gallery.',
+            },
             avatarRewardHint: 'Key',
         },
     },
@@ -9208,6 +9233,12 @@ const SIDE_QUEST_CASES = [
             artEnergy: 10,
             traits: { Insight: 3, Focus: 1, Imagination: 1 },
             badge: "Critic's Lens",
+            avatarReward: {
+                assetId: 'compass',
+                assetName: 'Compass',
+                assetCategory: 'heldObjectId',
+                description: 'The compass is yours for tracing visual pathways and focal points.',
+            },
             avatarRewardHint: 'Compass',
         },
     },
@@ -9321,6 +9352,12 @@ const SIDE_QUEST_CASES = [
             artEnergy: 12,
             traits: { Imagination: 3, Insight: 2, Focus: 1 },
             badge: 'Keystone Seeker',
+            avatarReward: {
+                assetId: 'crystal_staff',
+                assetName: 'Crystal Staff',
+                assetCategory: 'heldObjectId',
+                description: 'The awakened Crystal Staff marks your final connection across the gallery.',
+            },
             avatarRewardHint: 'Crystal Staff',
         },
     },
@@ -14875,6 +14912,67 @@ const AvatarAssetLoadingOverlay = ({ label }) => (React.createElement("div", { c
     React.createElement("div", { className: "flex max-w-[12rem] items-center justify-center gap-2 rounded-md border border-cyan-200/45 bg-[#111a2e]/95 px-2.5 py-2 text-[10px] font-black uppercase leading-tight text-cyan-100 shadow-[0_4px_16px_rgba(0,0,0,0.45)]" },
         React.createElement("span", { className: "h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-cyan-100/30 border-t-amber-200", "aria-hidden": "true" }),
         React.createElement("span", null, label))));
+const TRAIT_ICONS = {
+    Focus: '🎯',
+    Expression: '✍️',
+    Insight: '🧠',
+    Imagination: '🎨',
+};
+const RewardRevealPanel = ({ rewards, avatar, onEquip, onDismiss, onReveal, }) => {
+    const reward = rewards[0];
+    const lastRevealedRewardRef = useRef(null);
+    useEffect(() => {
+        if (!reward || lastRevealedRewardRef.current === reward)
+            return;
+        lastRevealedRewardRef.current = reward;
+        onReveal();
+    }, [onReveal, reward]);
+    useEffect(() => {
+        if (!reward)
+            return undefined;
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape')
+                onDismiss();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onDismiss, reward]);
+    if (!reward)
+        return null;
+    const previewBuild = {
+        ...getAvatarBuildForAvatar(avatar || null),
+        [reward.assetCategory]: reward.assetId,
+    };
+    const previewImageUrls = getAvatarAssetPreviewImageUrls(previewBuild, reward.assetCategory, reward.assetId);
+    const hasMoreRewards = rewards.length > 1;
+    const unlockLabel = reward.unlockSource || `${reward.traitName} ${reward.level} · ${reward.badgeName}`;
+    return (React.createElement("div", { className: "fixed inset-0 z-[120] flex items-center justify-center bg-[#02030a]/80 p-4 backdrop-blur-sm", role: "dialog", "aria-modal": "true", "aria-labelledby": "reward-reveal-title", "aria-describedby": "reward-reveal-description" },
+        React.createElement("section", { className: "relative w-full max-w-md overflow-hidden rounded-xl border border-[#ffd978]/75 bg-[#07152e] shadow-[0_0_0_1px_rgba(255,239,183,0.18),0_24px_80px_rgba(0,0,0,0.72),0_0_48px_rgba(217,70,239,0.28)]" },
+            React.createElement("div", { className: "pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(251,191,36,0.28),transparent_31%),radial-gradient(circle_at_8%_88%,rgba(34,211,238,0.18),transparent_35%),radial-gradient(circle_at_92%_80%,rgba(217,70,239,0.2),transparent_35%)]", "aria-hidden": "true" }),
+            React.createElement("div", { className: "relative p-5 sm:p-6" },
+                React.createElement("div", { className: "flex items-start justify-between gap-4" },
+                    React.createElement("div", null,
+                        React.createElement("p", { className: "text-xs font-black uppercase tracking-[0.2em] text-[#ffe39a]" }, "Reward Unlocked"),
+                        React.createElement("h2", { id: "reward-reveal-title", className: "mt-1 font-serif text-3xl font-black text-white" }, reward.assetName)),
+                    React.createElement("span", { className: "flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#ffe5a4]/70 bg-[#573278]/75 text-2xl shadow-[0_0_24px_rgba(250,204,21,0.45)]", "aria-hidden": "true" }, "\u2726")),
+                React.createElement("div", { className: "mt-5 grid grid-cols-[minmax(0,1fr)_9.5rem] items-center gap-4 rounded-lg border border-[#d38c2e]/55 bg-[#020a1c]/60 p-3 sm:grid-cols-[minmax(0,1fr)_11rem]" },
+                    React.createElement("div", { className: "min-w-0" },
+                        React.createElement("p", { className: "text-xs font-black uppercase tracking-wider text-cyan-200" },
+                            "New ",
+                            reward.assetCategoryLabel),
+                        React.createElement("p", { id: "reward-reveal-description", className: "mt-2 text-sm leading-relaxed text-[#f8e7c7]" }, reward.description),
+                        React.createElement("div", { className: "mt-3 inline-flex items-center gap-2 rounded-full border border-fuchsia-200/35 bg-fuchsia-500/15 px-3 py-1.5 text-xs font-bold text-fuchsia-100" },
+                            React.createElement("span", { "aria-hidden": "true" }, reward.unlockSource ? '✦' : TRAIT_ICONS[reward.traitName]),
+                            unlockLabel)),
+                    React.createElement(AvatarAssetPreview, { imageUrls: previewImageUrls, tabId: reward.assetCategory, label: reward.assetName, className: "h-36 w-full border-[#ffe2a2]/45 sm:h-40" })),
+                React.createElement("div", { className: "mt-5 flex flex-col gap-2 sm:flex-row" },
+                    React.createElement("button", { type: "button", onClick: () => onEquip(reward), className: "artquest-button min-h-12 flex-1 px-4 py-3 text-sm font-black focus:outline-none focus:ring-4 focus:ring-[#ffe39a]", autoFocus: true }, "Equip Now"),
+                    React.createElement("button", { type: "button", onClick: onDismiss, className: "min-h-12 flex-1 rounded-md border border-[#c79655]/70 bg-[#0a1c39]/90 px-4 py-3 text-sm font-black text-[#ffe7bc] transition hover:border-[#ffe39a] hover:bg-[#102a52] focus:outline-none focus:ring-4 focus:ring-fuchsia-300" }, "Keep Exploring")),
+                hasMoreRewards && (React.createElement("p", { className: "mt-4 text-center text-xs font-semibold text-[#d8c29a]", "aria-live": "polite" },
+                    "Reward 1 of ",
+                    rewards.length,
+                    ". Choose an option to reveal the next reward."))))));
+};
 const artQuestCx = (...classes) => (classes.filter(Boolean).join(' '));
 const GOLD_TEXT_CLASS = 'text-transparent bg-clip-text bg-gradient-to-b from-[#fff2bc] via-[#f3bd47] to-[#c97921]';
 const PANEL_SURFACE_CLASS = 'border border-[#a66c2b]/75 bg-[#061125]/92 shadow-[inset_0_0_0_1px_rgba(255,236,176,0.08),inset_0_0_34px_rgba(105,46,150,0.12),0_12px_28px_rgba(0,0,0,0.36)]';
@@ -15047,6 +15145,9 @@ const UNLOCK_DOOR_POOL_SIZE = 2;
 const DOOR_OPENING_SRC = './public/audio/door-opening.m4a';
 const DOOR_OPENING_VOLUME = 0.92;
 const DOOR_OPENING_POOL_SIZE = 2;
+const REWARD_UNLOCK_SRC = './public/audio/reward-unlocked.mp3';
+const REWARD_UNLOCK_VOLUME = 0.9;
+const REWARD_UNLOCK_POOL_SIZE = 2;
 const pauseAudio = (audio) => {
     if (!audio)
         return;
@@ -15106,6 +15207,12 @@ const createDoorOpeningAudio = () => {
     audio.volume = DOOR_OPENING_VOLUME;
     return audio;
 };
+const createRewardUnlockAudio = () => {
+    const audio = new Audio(REWARD_UNLOCK_SRC);
+    audio.preload = 'auto';
+    audio.volume = REWARD_UNLOCK_VOLUME;
+    return audio;
+};
 const useGameAudio = (activeTrack) => {
     const activeTrackRef = useRef(activeTrack);
     const isMusicSuppressedRef = useRef(false);
@@ -15123,6 +15230,8 @@ const useGameAudio = (activeTrack) => {
     const unlockDoorIndexRef = useRef(0);
     const doorOpeningPoolRef = useRef([]);
     const doorOpeningIndexRef = useRef(0);
+    const rewardUnlockPoolRef = useRef([]);
+    const rewardUnlockIndexRef = useRef(0);
     const getMusicAudio = useCallback((track) => {
         if (!musicAudioRef.current[track]) {
             musicAudioRef.current[track] = createMusicAudio(track);
@@ -15181,6 +15290,7 @@ const useGameAudio = (activeTrack) => {
         roomCompletionPoolRef.current.forEach(pauseAudio);
         unlockDoorPoolRef.current.forEach(pauseAudio);
         doorOpeningPoolRef.current.forEach(pauseAudio);
+        rewardUnlockPoolRef.current.forEach(pauseAudio);
     }), []);
     const playWalkingTap = useCallback(() => {
         if (!walkingTapRef.current) {
@@ -15253,6 +15363,16 @@ const useGameAudio = (activeTrack) => {
         audio.volume = DOOR_OPENING_VOLUME;
         tryPlay(audio);
     }, []);
+    const playRewardUnlock = useCallback(() => {
+        if (rewardUnlockPoolRef.current.length === 0) {
+            rewardUnlockPoolRef.current = Array.from({ length: REWARD_UNLOCK_POOL_SIZE }, createRewardUnlockAudio);
+        }
+        const audio = rewardUnlockPoolRef.current[rewardUnlockIndexRef.current % rewardUnlockPoolRef.current.length];
+        rewardUnlockIndexRef.current += 1;
+        audio.currentTime = 0;
+        audio.volume = REWARD_UNLOCK_VOLUME;
+        tryPlay(audio);
+    }, []);
     return {
         playWalkingTap,
         playPageTurn,
@@ -15261,6 +15381,7 @@ const useGameAudio = (activeTrack) => {
         playRoomCompletion,
         playUnlockDoor,
         playDoorOpening,
+        playRewardUnlock,
         pauseActiveTrack,
         resumeActiveTrack,
     };
@@ -26277,6 +26398,7 @@ const CORE_AUDIO_ASSETS = [
     './public/audio/main-game-exploration.mp3',
     './public/audio/door-opening.m4a',
     './public/audio/page-turn.mp3',
+    './public/audio/reward-unlocked.mp3',
 ];
 const PANEL_IMAGE_ASSETS = {
     guide: [
@@ -26574,6 +26696,7 @@ const ART_ENERGY_MAX_XP = WING_DEFINITIONS.length * 50;
 const TRAIT_LEVEL_ORDER = ['Locked', 'Bronze', 'Silver', 'Gold'];
 const initialPlayerStats = {
     artEnergy: { currentXP: 0, maxXp: ART_ENERGY_MAX_XP },
+    unlockedAvatarAssetIds: [],
     traits: {
         Focus: { name: 'Focus', icon: '🎯', description: 'Precision in responses, addressing prompts directly.', level: 'Locked', currentXP: 0, xpToNextLevel: 12 },
         Expression: { name: 'Expression', icon: '✍️', description: 'Use of creative or emotive language.', level: 'Locked', currentXP: 0, xpToNextLevel: 12 },
@@ -26609,6 +26732,7 @@ const normalizePlayerStats = (stats) => {
         return normalized;
     normalized.artEnergy.currentXP = Math.max(0, Math.min(stats.artEnergy?.currentXP ?? 0, ART_ENERGY_MAX_XP));
     normalized.artEnergy.maxXp = ART_ENERGY_MAX_XP;
+    normalized.unlockedAvatarAssetIds = Array.from(new Set((stats.unlockedAvatarAssetIds || []).filter((assetId) => typeof assetId === 'string')));
     Object.keys(normalized.traits).forEach(traitName => {
         const savedTrait = stats.traits?.[traitName];
         if (!savedTrait)
@@ -26633,12 +26757,15 @@ const normalizePlayerStats = (stats) => {
 };
 const buildRewardEntriesForStatsChange = (previousStats, nextStats) => {
     const unlockedRewards = getNewlyUnlockedRewardMilestones(previousStats, nextStats);
-    return unlockedRewards.map((reward, index) => ({
-        speaker: 'system',
-        text: `Badge unlocked: ${reward.badgeName}. New avatar ${reward.assetCategoryLabel.toLowerCase()}: ${reward.assetName}.`,
-        id: `${Date.now()}-reward-${index}`,
-        timestamp: Date.now(),
-    }));
+    return {
+        rewards: unlockedRewards,
+        entries: unlockedRewards.map((reward, index) => ({
+            speaker: 'system',
+            text: `Badge unlocked: ${reward.badgeName}. New avatar ${reward.assetCategoryLabel.toLowerCase()}: ${reward.assetName}.`,
+            id: `${Date.now()}-reward-${index}`,
+            timestamp: Date.now(),
+        })),
+    };
 };
 const applyTraitLevelUps = (stats) => {
     const normalizedStats = normalizePlayerStats(stats);
@@ -26668,13 +26795,70 @@ const addSideQuestRewardToStats = (stats, reward) => {
             return;
         trait.currentXP += amount;
     });
+    if (reward.avatarReward && !nextStats.unlockedAvatarAssetIds?.includes(reward.avatarReward.assetId)) {
+        nextStats.unlockedAvatarAssetIds = [
+            ...(nextStats.unlockedAvatarAssetIds || []),
+            reward.avatarReward.assetId,
+        ];
+    }
     return nextStats;
+};
+const buildSideQuestAvatarRewardReveal = (reward) => {
+    if (!reward.avatarReward)
+        return null;
+    return {
+        traitName: 'Focus',
+        level: 'Bronze',
+        badgeName: reward.badge,
+        assetName: reward.avatarReward.assetName,
+        assetId: reward.avatarReward.assetId,
+        assetCategory: reward.avatarReward.assetCategory,
+        assetCategoryLabel: reward.avatarReward.assetCategory === 'heldObjectId' ? 'Held Item' : 'Avatar Item',
+        description: reward.avatarReward.description,
+        unlockSource: `Side Quest · ${reward.badge}`,
+    };
+};
+const getNewSideQuestAvatarRewardReveals = (previousStats, nextStats, reward) => {
+    const sideQuestReward = reward.avatarReward;
+    if (!sideQuestReward)
+        return [];
+    const wasAlreadyUnlocked = previousStats.unlockedAvatarAssetIds?.includes(sideQuestReward.assetId);
+    const isUnlocked = nextStats.unlockedAvatarAssetIds?.includes(sideQuestReward.assetId);
+    const reveal = buildSideQuestAvatarRewardReveal(reward);
+    return !wasAlreadyUnlocked && isUnlocked && reveal ? [reveal] : [];
+};
+const restoreCompletedSideQuestAvatarRewards = (stats, sideQuestState) => {
+    const playerStats = normalizePlayerStats(stats);
+    const unlockedAssetIds = new Set(playerStats.unlockedAvatarAssetIds || []);
+    const rewardReveals = [];
+    SIDE_QUEST_CASES.forEach((sideQuestCase) => {
+        const sideQuestReward = sideQuestCase.reward.avatarReward;
+        const isCompleted = sideQuestState.cases[sideQuestCase.id]?.status === 'completed';
+        if (!isCompleted || !sideQuestReward || unlockedAssetIds.has(sideQuestReward.assetId))
+            return;
+        unlockedAssetIds.add(sideQuestReward.assetId);
+        const reveal = buildSideQuestAvatarRewardReveal(sideQuestCase.reward);
+        if (reveal)
+            rewardReveals.push(reveal);
+    });
+    return {
+        playerStats: {
+            ...playerStats,
+            unlockedAvatarAssetIds: [...unlockedAssetIds],
+        },
+        rewardReveals,
+    };
 };
 const formatSideQuestRewardSummary = (reward) => {
     const traitParts = Object.entries(reward.traits)
         .filter(([, amount]) => amount > 0)
         .map(([traitName, amount]) => `${traitName} +${amount}`);
-    return [`Art Energy +${reward.artEnergy}`, ...traitParts, `Badge: ${reward.badge}`].join(', ');
+    return [
+        `Art Energy +${reward.artEnergy}`,
+        ...traitParts,
+        ...(reward.avatarReward ? [`Avatar item: ${reward.avatarReward.assetName}`] : []),
+        `Badge: ${reward.badge}`,
+    ].join(', ');
 };
 const initialAppGameState = {
     wings: initialWingsState(),
@@ -26696,6 +26880,7 @@ const initialAppGameState = {
     avatarImageError: null,
     focusedWingIdForJournal: null,
     sideQuestState: createInitialSideQuestState(),
+    pendingRewardReveals: [],
 };
 const App = () => {
     const [currentScreen, setCurrentScreen] = useState('splash');
@@ -26994,6 +27179,8 @@ const App = () => {
             const classPack = parsedData.gameState.classPack
                 ? parseClassPackExport(JSON.stringify(parsedData.gameState.classPack))
                 : null;
+            const sideQuestState = normalizeSideQuestState(parsedData.gameState.sideQuestState);
+            const restoredSideQuestRewards = restoreCompletedSideQuestAvatarRewards(normalizePlayerStats(parsedData.gameState.playerStats), sideQuestState);
             await runLoadTransition({
                 title: 'Restoring the Foyer',
                 message: `${selectedAvatar.name || 'Your artist'} is reopening the saved sketchbook.`,
@@ -27013,8 +27200,8 @@ const App = () => {
                     ...parsedData.gameState,
                     selectedAvatar,
                     wings: normalizeUnlockedWings(parsedData.gameState.wings || {}),
-                    playerStats: normalizePlayerStats(parsedData.gameState.playerStats),
-                    sideQuestState: normalizeSideQuestState(parsedData.gameState.sideQuestState),
+                    playerStats: restoredSideQuestRewards.playerStats,
+                    sideQuestState,
                     teacherMode: !!parsedData.gameState.teacherMode,
                     classPack,
                     geminiChat: chat,
@@ -27023,6 +27210,7 @@ const App = () => {
                     narrativeLog: [],
                     avatarImageError: null,
                     isGeneratingAvatarPortrait: false,
+                    pendingRewardReveals: restoredSideQuestRewards.rewardReveals,
                 }));
                 setCurrentGalleryScene('foyer');
                 setCurrentScreen('map');
@@ -27223,14 +27411,23 @@ const App = () => {
     const handleUpdatePlayerStats = useCallback((newStats) => {
         setAppGameState(prev => {
             const previousStats = prev.playerStats ? normalizePlayerStats(prev.playerStats) : createInitialPlayerStats();
-            const nextStats = applyTraitLevelUps(newStats);
-            const rewardEntries = buildRewardEntriesForStatsChange(previousStats, nextStats);
+            const nextStats = applyTraitLevelUps({
+                ...newStats,
+                unlockedAvatarAssetIds: Array.from(new Set([
+                    ...(previousStats.unlockedAvatarAssetIds || []),
+                    ...(newStats.unlockedAvatarAssetIds || []),
+                ])),
+            });
+            const rewardChange = buildRewardEntriesForStatsChange(previousStats, nextStats);
             return {
                 ...prev,
                 playerStats: nextStats,
-                narrativeLog: rewardEntries.length > 0
-                    ? [...prev.narrativeLog, ...rewardEntries]
+                narrativeLog: rewardChange.entries.length > 0
+                    ? [...prev.narrativeLog, ...rewardChange.entries]
                     : prev.narrativeLog,
+                pendingRewardReveals: rewardChange.rewards.length > 0
+                    ? [...prev.pendingRewardReveals, ...rewardChange.rewards]
+                    : prev.pendingRewardReveals,
             };
         });
     }, []);
@@ -27306,9 +27503,16 @@ const App = () => {
                 ? previousStats
                 : addSideQuestRewardToStats(previousStats, sideQuestCase.reward);
             const nextStats = applyTraitLevelUps(rewardedStats);
-            const rewardEntries = caseProgress.rewardAwarded
-                ? []
+            const rewardChange = caseProgress.rewardAwarded
+                ? { entries: [], rewards: [] }
                 : buildRewardEntriesForStatsChange(previousStats, nextStats);
+            const sideQuestRewardReveals = caseProgress.rewardAwarded
+                ? []
+                : getNewSideQuestAvatarRewardReveals(previousStats, nextStats, sideQuestCase.reward);
+            const rewardReveals = [
+                ...sideQuestRewardReveals,
+                ...rewardChange.rewards.filter((reward) => (!sideQuestRewardReveals.some((sideQuestReward) => sideQuestReward.assetId === reward.assetId))),
+            ];
             const completionEntry = {
                 speaker: 'system',
                 text: `Case closed: ${sideQuestCase.title}. ${formatSideQuestRewardSummary(sideQuestCase.reward)}.`,
@@ -27330,7 +27534,10 @@ const App = () => {
                         },
                     },
                 },
-                narrativeLog: [...prev.narrativeLog, completionEntry, ...rewardEntries],
+                narrativeLog: [...prev.narrativeLog, completionEntry, ...rewardChange.entries],
+                pendingRewardReveals: rewardReveals.length > 0
+                    ? [...prev.pendingRewardReveals, ...rewardReveals]
+                    : prev.pendingRewardReveals,
             };
         });
     }, []);
@@ -27449,6 +27656,37 @@ const App = () => {
             avatarImageUrl: avatar.imageUrl || null,
         }));
     }, []);
+    const handleDismissRewardReveal = useCallback(() => {
+        setAppGameState(prev => ({
+            ...prev,
+            pendingRewardReveals: prev.pendingRewardReveals.slice(1),
+        }));
+    }, []);
+    const handleEquipReward = useCallback((reward) => {
+        setAppGameState(prev => {
+            const pendingRewardReveals = prev.pendingRewardReveals.slice(1);
+            if (!prev.selectedAvatar)
+                return { ...prev, pendingRewardReveals };
+            const currentAvatarBuild = getAvatarBuildForAvatar(prev.selectedAvatar);
+            const nextAvatarBuild = normalizeAvatarBuild({
+                ...currentAvatarBuild,
+                [reward.assetCategory]: reward.assetId,
+            });
+            const updatedAvatar = normalizeSelectedAvatar({
+                ...prev.selectedAvatar,
+                id: 'custom',
+                colorClass: getAvatarBuildColorClass(nextAvatarBuild),
+                avatarArchetypeId: prev.selectedAvatar.avatarArchetypeId || nextAvatarBuild.archetypeId,
+                avatarBuild: nextAvatarBuild,
+            });
+            return {
+                ...prev,
+                pendingRewardReveals,
+                selectedAvatar: updatedAvatar,
+                avatarImageUrl: updatedAvatar.imageUrl || null,
+            };
+        });
+    }, []);
     const handleUpdateTeacherYearSelection = useCallback((yearLevel, coursePathway) => {
         setAppGameState(prev => {
             if (!prev.teacherMode || !prev.selectedAvatar)
@@ -27475,7 +27713,7 @@ const App = () => {
         }
         return null;
     }, [currentScreen, guideReturnTarget]);
-    const { playWalkingTap, playPageTurn, playFastPageTurn, playPhaseCompletion, playRoomCompletion, playUnlockDoor, playDoorOpening, pauseActiveTrack, resumeActiveTrack, } = useGameAudio(activeMusicTrack);
+    const { playWalkingTap, playPageTurn, playFastPageTurn, playPhaseCompletion, playRoomCompletion, playUnlockDoor, playDoorOpening, playRewardUnlock, pauseActiveTrack, resumeActiveTrack, } = useGameAudio(activeMusicTrack);
     if (appGameState.isLoading && !appGameState.geminiChat && !loadTransition && currentScreen !== 'splash' && currentScreen !== 'newGameSetup') {
         return (React.createElement("div", { className: "flex flex-col items-center justify-center min-h-screen bg-gray-900 text-gray-100 p-6", role: "alert", "aria-live": "assertive" },
             React.createElement("h1", { className: "text-3xl font-bold text-pink-400 mb-4" }, "ArtQuest"),
@@ -27548,6 +27786,7 @@ const App = () => {
     return (React.createElement(React.Fragment, null,
         screenComponent,
         loadTransition && (React.createElement(GalleryLoadingScreen, { title: loadTransition.title, message: loadTransition.message, detail: loadTransition.detail, tone: loadTransition.tone, compact: loadTransition.compact, steps: loadTransition.steps })),
+        React.createElement(RewardRevealPanel, { rewards: appGameState.pendingRewardReveals, avatar: appGameState.selectedAvatar, onEquip: handleEquipReward, onDismiss: handleDismissRewardReveal, onReveal: playRewardUnlock }),
         React.createElement(Modal, { isOpen: pendingReturnMenuTarget !== null, title: "Save Progress?", onClose: handleCancelReturnMenuPrompt },
             React.createElement("div", { className: "space-y-5" },
                 React.createElement("p", { className: "text-base leading-relaxed text-purple-100" }, "Would you like to save your game progress before opening the menu?"),

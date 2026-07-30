@@ -35,6 +35,9 @@ const UNLOCK_DOOR_POOL_SIZE = 2;
 const DOOR_OPENING_SRC = './public/audio/door-opening.m4a';
 const DOOR_OPENING_VOLUME = 0.92;
 const DOOR_OPENING_POOL_SIZE = 2;
+const REWARD_UNLOCK_SRC = './public/audio/reward-unlocked.mp3';
+const REWARD_UNLOCK_VOLUME = 0.9;
+const REWARD_UNLOCK_POOL_SIZE = 2;
 
 const pauseAudio = (audio: HTMLAudioElement | undefined) => {
   if (!audio) return;
@@ -105,6 +108,13 @@ const createDoorOpeningAudio = (): HTMLAudioElement => {
   return audio;
 };
 
+const createRewardUnlockAudio = (): HTMLAudioElement => {
+  const audio = new Audio(REWARD_UNLOCK_SRC);
+  audio.preload = 'auto';
+  audio.volume = REWARD_UNLOCK_VOLUME;
+  return audio;
+};
+
 export const useGameAudio = (activeTrack: GameMusicTrack) => {
   const activeTrackRef = useRef<GameMusicTrack>(activeTrack);
   const isMusicSuppressedRef = useRef(false);
@@ -122,6 +132,8 @@ export const useGameAudio = (activeTrack: GameMusicTrack) => {
   const unlockDoorIndexRef = useRef(0);
   const doorOpeningPoolRef = useRef<HTMLAudioElement[]>([]);
   const doorOpeningIndexRef = useRef(0);
+  const rewardUnlockPoolRef = useRef<HTMLAudioElement[]>([]);
+  const rewardUnlockIndexRef = useRef(0);
 
   const getMusicAudio = useCallback((track: ActiveGameMusicTrack): HTMLAudioElement => {
     if (!musicAudioRef.current[track]) {
@@ -194,6 +206,7 @@ export const useGameAudio = (activeTrack: GameMusicTrack) => {
       roomCompletionPoolRef.current.forEach(pauseAudio);
       unlockDoorPoolRef.current.forEach(pauseAudio);
       doorOpeningPoolRef.current.forEach(pauseAudio);
+      rewardUnlockPoolRef.current.forEach(pauseAudio);
     }
   ), []);
 
@@ -282,6 +295,18 @@ export const useGameAudio = (activeTrack: GameMusicTrack) => {
     tryPlay(audio);
   }, []);
 
+  const playRewardUnlock = useCallback(() => {
+    if (rewardUnlockPoolRef.current.length === 0) {
+      rewardUnlockPoolRef.current = Array.from({ length: REWARD_UNLOCK_POOL_SIZE }, createRewardUnlockAudio);
+    }
+
+    const audio = rewardUnlockPoolRef.current[rewardUnlockIndexRef.current % rewardUnlockPoolRef.current.length];
+    rewardUnlockIndexRef.current += 1;
+    audio.currentTime = 0;
+    audio.volume = REWARD_UNLOCK_VOLUME;
+    tryPlay(audio);
+  }, []);
+
   return {
     playWalkingTap,
     playPageTurn,
@@ -290,6 +315,7 @@ export const useGameAudio = (activeTrack: GameMusicTrack) => {
     playRoomCompletion,
     playUnlockDoor,
     playDoorOpening,
+    playRewardUnlock,
     pauseActiveTrack,
     resumeActiveTrack,
   };

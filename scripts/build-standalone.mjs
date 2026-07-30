@@ -74,6 +74,7 @@ const sourceFiles = [
   'components/AvatarLayeredPreview.tsx',
   'components/AvatarAssetPreview.tsx',
   'components/AvatarAssetLoadingOverlay.tsx',
+  'components/RewardRevealPanel.tsx',
   'components/ArtQuestUI.tsx',
   'components/useGameAudio.ts',
   'components/GalleryLoadingScreen.tsx',

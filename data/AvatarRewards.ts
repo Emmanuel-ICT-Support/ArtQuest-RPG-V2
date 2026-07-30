@@ -1,4 +1,4 @@
-import type { AvatarArchetypeId, AvatarAssetTabId, AvatarBuilderConfig, PlayerAvatar, PlayerStats, TraitLevel, TraitName } from '../types';
+import type { AvatarArchetypeId, AvatarAssetTabId, AvatarBuilderConfig, AvatarRewardReveal, PlayerAvatar, PlayerStats, TraitLevel, TraitName } from '../types';
 import {
   GENERATED_AVATAR_FACE_STYLES,
   GENERATED_AVATAR_HAIR_STYLES,
@@ -57,16 +57,7 @@ export interface AvatarBuilderTab {
   options: BuilderOption[];
 }
 
-export interface AvatarRewardMilestone {
-  traitName: TraitName;
-  level: RewardTraitLevel;
-  badgeName: string;
-  assetName: string;
-  assetId: string;
-  assetCategory: AvatarAssetTabId;
-  assetCategoryLabel: string;
-  description: string;
-}
+export type AvatarRewardMilestone = AvatarRewardReveal;
 
 export const AVATAR_ARCHETYPE_SPRITES: Record<AvatarArchetypeId, string> = {
   nova: './public/images/Nova.png',
@@ -401,6 +392,11 @@ const HELD_OBJECT_REWARD_UNLOCKS: Partial<Record<string, RewardConfigEntry>> = {
     level: 'Silver',
     rewardDescription: 'For making original connections between symbols and stories.',
   },
+  crystal_staff: {
+    traitName: 'Imagination',
+    level: 'Gold',
+    rewardDescription: 'For connecting ideas across the whole Gallery of Secrets.',
+  },
 };
 
 export const AVATAR_REWARD_HAIR_STYLES: HairStyleOption[] = [
@@ -593,6 +589,7 @@ export const getAvatarBuildForAvatar = (avatar: PlayerAvatar | null): AvatarBuil
 export const isAvatarOptionUnlocked = (option: BuilderOption, playerStats: PlayerStats | null): boolean => {
   if (!option.unlock) return true;
   if (!playerStats) return false;
+  if (playerStats.unlockedAvatarAssetIds?.includes(option.id)) return true;
 
   const traitLevel = playerStats.traits[option.unlock.traitName]?.level;
   return isTraitLevelAtLeast(traitLevel, option.unlock.level);
