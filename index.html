@@ -14649,6 +14649,11 @@ const normalizeAssetSrc = (src) => {
     return trimmed;
 };
 const preloadImage = (src) => {
+    if (imageLoadStates.get(src) === 'settled') {
+        const settledRequest = Promise.resolve();
+        imageLoadCache.set(src, settledRequest);
+        return settledRequest;
+    }
     const cached = imageLoadCache.get(src);
     if (cached)
         return cached;
@@ -14674,6 +14679,11 @@ const preloadImage = (src) => {
     return request;
 };
 const preloadAudio = (src) => {
+    if (audioLoadStates.get(src) === 'settled') {
+        const settledRequest = Promise.resolve();
+        audioLoadCache.set(src, settledRequest);
+        return settledRequest;
+    }
     const cached = audioLoadCache.get(src);
     if (cached)
         return cached;
@@ -17539,6 +17549,8 @@ const NewGameSetupScreen = ({ onStartNewGameSetupComplete }) => {
         });
     };
     const updateAvatarBuild = (key, value) => {
+        if (avatarBuild[key] === value)
+            return;
         const nextBuild = { ...avatarBuild, [key]: value };
         setAvatarBuild(nextBuild);
         preloadBuilderAvatarPreview(nextBuild);
@@ -23447,6 +23459,8 @@ const InventoryScreen = ({ playerStats, selectedAvatar, onReturnToMap, onUpdateA
         });
     };
     const updateAvatarBuild = (key, value) => {
+        if (avatarBuild[key] === value)
+            return;
         const nextBuild = { ...avatarBuild, [key]: value };
         setAvatarBuild(nextBuild);
         setSaveMessage(null);

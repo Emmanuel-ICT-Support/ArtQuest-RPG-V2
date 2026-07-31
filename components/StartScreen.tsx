@@ -888,6 +888,8 @@ const NewGameSetupScreen: React.FC<NewGameSetupScreenProps> = ({ onStartNewGameS
   };
 
   const updateAvatarBuild = (key: AvatarBuilderTabId, value: string) => {
+    if (avatarBuild[key] === value) return;
+
     const nextBuild = { ...avatarBuild, [key]: value };
     setAvatarBuild(nextBuild);
     preloadBuilderAvatarPreview(nextBuild);

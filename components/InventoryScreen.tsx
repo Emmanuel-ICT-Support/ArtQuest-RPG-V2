@@ -357,6 +357,8 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({
   };
 
   const updateAvatarBuild = (key: AvatarAssetTabId, value: string) => {
+    if (avatarBuild[key] === value) return;
+
     const nextBuild = { ...avatarBuild, [key]: value };
     setAvatarBuild(nextBuild);
     setSaveMessage(null);

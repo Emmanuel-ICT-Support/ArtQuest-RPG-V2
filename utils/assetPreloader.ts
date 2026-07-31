@@ -36,6 +36,15 @@ const normalizeAssetSrc = (src: string | null | undefined): string | null => {
 };
 
 const preloadImage = (src: string): Promise<void> => {
+  // A visible <img> may have already finished loading this asset before the
+  // background warmer reaches it. Do not change that completed state back to
+  // pending just to create a duplicate Image request.
+  if (imageLoadStates.get(src) === 'settled') {
+    const settledRequest = Promise.resolve();
+    imageLoadCache.set(src, settledRequest);
+    return settledRequest;
+  }
+
   const cached = imageLoadCache.get(src);
   if (cached) return cached;
 
@@ -67,6 +76,12 @@ const preloadImage = (src: string): Promise<void> => {
 };
 
 const preloadAudio = (src: string): Promise<void> => {
+  if (audioLoadStates.get(src) === 'settled') {
+    const settledRequest = Promise.resolve();
+    audioLoadCache.set(src, settledRequest);
+    return settledRequest;
+  }
+
   const cached = audioLoadCache.get(src);
   if (cached) return cached;
 
