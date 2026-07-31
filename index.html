@@ -14741,12 +14741,17 @@ const preloadAssets = async (assets, options = {}) => {
         seenAssets.add(key);
         uniqueAssets.push({ ...asset, src });
     });
-    await Promise.allSettled(uniqueAssets.map((asset) => withTimeout(preloadOneAsset(asset), timeoutMs)));
+    const assetLoads = uniqueAssets.map((asset) => {
+        const load = preloadOneAsset(asset);
+        return options.allowEarlyTimeout ? withTimeout(load, timeoutMs) : load;
+    });
+    await Promise.allSettled(assetLoads);
     const remainingMinimumMs = minimumMs - (Date.now() - startedAt);
     if (remainingMinimumMs > 0) {
         await wait(remainingMinimumMs);
     }
 };
+const preloadRequiredAssets = async (assets, options = {}) => preloadAssets(assets, options);
 const warmAssets = (assets) => {
     const beginWarming = () => {
         const uniqueAssets = [];

@@ -6,8 +6,11 @@ export interface PreloadAsset {
 }
 
 export interface PreloadOptions {
+  // Applies only when allowEarlyTimeout is true. Screen transitions should use
+  // the default behavior and wait for each required asset to settle.
   timeoutMs?: number;
   minimumMs?: number;
+  allowEarlyTimeout?: boolean;
 }
 
 const imageLoadCache = new Map<string, Promise<void>>();
@@ -153,15 +156,27 @@ export const preloadAssets = async (
     uniqueAssets.push({ ...asset, src });
   });
 
-  await Promise.allSettled(
-    uniqueAssets.map((asset) => withTimeout(preloadOneAsset(asset), timeoutMs)),
-  );
+  const assetLoads = uniqueAssets.map((asset) => {
+    const load = preloadOneAsset(asset);
+    return options.allowEarlyTimeout ? withTimeout(load, timeoutMs) : load;
+  });
+
+  await Promise.allSettled(assetLoads);
 
   const remainingMinimumMs = minimumMs - (Date.now() - startedAt);
   if (remainingMinimumMs > 0) {
     await wait(remainingMinimumMs);
   }
 };
+
+// Use for a screen transition. Unlike the normal helper, this does not let a
+// slow-but-still-loading asset dismiss the loading screen. Browser load errors
+// still settle, so a genuinely unavailable file cannot trap the player on a
+// permanent loader.
+export const preloadRequiredAssets = async (
+  assets: PreloadAsset[],
+  options: Omit<PreloadOptions, 'allowEarlyTimeout'> = {},
+): Promise<void> => preloadAssets(assets, options);
 
 export const warmAssets = (assets: PreloadAsset[]): void => {
   const beginWarming = () => {
